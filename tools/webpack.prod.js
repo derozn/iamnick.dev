@@ -1,31 +1,33 @@
 import webpack from 'webpack'
 import TerserWebpackPlugin from 'terser-webpack-plugin'
 import CompressionWebpackPlugin from 'compression-webpack-plugin'
+import webpackMerge from 'webpack-merge'
+import webpackCommon from './webpack.common'
 
-module.exports = {
+module.exports = webpackMerge(webpackCommon, {
   mode: 'production',
   output: {
-    filename: 'js/app.[hash].js'
+    filename: 'js/app.[hash].js',
   },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        'NODE_ENV': JSON.stringify('production')
-      }
+        'NODE_ENV': JSON.stringify('production'),
+      },
     }),
     new webpack.optimize.AggressiveMergingPlugin(),
     new CompressionWebpackPlugin({
-      exclude: /\.handlebars$/
+      exclude: /\.handlebars$/,
     })
   ],
   devtool: 'source-map',
   performance: {
-    hints: false
+    hints: false,
   },
   optimization: {
     sideEffects: false,
     minimizer: [
-      new TerserWebpackPlugin()
-    ]
-  }
-}
+      new TerserWebpackPlugin(),
+    ],
+  },
+});

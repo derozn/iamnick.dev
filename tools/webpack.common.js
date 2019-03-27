@@ -2,8 +2,10 @@ import path from 'path'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import CleanWebpackPlugin from 'clean-webpack-plugin'
 
+const viewTemplatePath = path.join(__dirname, '../src/server/templates/index.handlebars');
+
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
-  template: path.join(__dirname, '../../src/server/templates/index.handlebars'),
+  template: viewTemplatePath,
   filename: 'views/index.handlebars',
   alwaysWriteToDisk: true,
   inject: 'body',
@@ -15,11 +17,9 @@ const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
   }
 })
 
-const cleanWebpackBuild = new CleanWebpackPlugin(['build'], {
-  root: path.join(__dirname, '../../'),
+const cleanWebpackBuild = new CleanWebpackPlugin({
   verbose: true,
   dry: false,
-  exclude: ['.gitkeep']
 })
 
 module.exports = {
@@ -27,10 +27,10 @@ module.exports = {
   target: 'web',
   entry: [
     '@babel/polyfill',
-    path.join(__dirname, '../../src/client')
+    path.join(__dirname, '../src/client')
   ],
   output: {
-    path: path.join(__dirname, '../../build'),
+    path: path.join(__dirname, '../build'),
     filename: 'js/app.js',
     publicPath: '/'
   },
@@ -49,7 +49,7 @@ module.exports = {
         loader: 'file-loader',
         query: {
           name: 'assets/[path][name].[ext]',
-          context: '../../src/shared/assets'
+          context: '../src/shared/assets'
         }
       }
     ]
