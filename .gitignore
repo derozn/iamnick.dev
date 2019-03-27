@@ -1,0 +1,10 @@
+# Specifies intentionally untracked files to ignore when using Git
+build
+build-server
+node_modules
+npm-debug.log
+/.idea
+/.vscode
+yarn.lock
+.env
+.DS_Store

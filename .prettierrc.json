@@ -1,0 +1,15 @@
+{
+  "singleQuote": true,
+  "printWidth": 100,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "htmlWhitespaceSensitivity": "ignore",
+  "overrides": [
+    {
+      "files": "*.md",
+      "options": {
+        "printWidth": 200
+      }
+    }
+  ]
+}
