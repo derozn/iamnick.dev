@@ -21,5 +21,10 @@ module.exports = webpackMerge(webpackCommon, {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
   ],
+  resolve: {
+    alias: {
+      'react-dom': '@hot-loader/react-dom'
+    }
+  },
   devtool: 'cheap-module-eval-source-map',
 });

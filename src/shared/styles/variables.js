@@ -38,16 +38,10 @@ export const desktop = {
 // Color Types
 export const black = '#000';
 export const white = '#fff';
-export const carrotOrange = '#f58d1e';
-export const tennesseeOrange = '#F47E00';
-export const darkGunMetal = '#202731';
-export const wenge = '#5F5C55';
-export const gunMetal = '#272e38';
-export const platinum = '#e6eae9';
-export const sandyTaupe = '#A4791F';
-export const parisGreen = '#53D379';
-export const tractorRed = '#ff1133';
-export const jellyBean = '#D75350';
+export const raisinBlack = '#262626';
+export const blackOlive = '#3f3f3f';
+export const whiteSmoke = '#f5f5f5';
+export const gainsboro = '#dcdcdc';
 
 // Z-index
 export const zIndex = ['header'].reduce((acc, name, index) => ({ ...acc, [name]: index + 1 }), {});

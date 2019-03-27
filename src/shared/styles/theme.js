@@ -6,17 +6,8 @@ export const fontFamily = {
 };
 
 export const color = {
-  background: variables.darkGunMetal,
-  backgroundSecondary: variables.gunMetal,
-  text: variables.white,
-  textSecondary: variables.platinum,
-  success: variables.parisGreen,
-  fail: variables.tractorRed,
-  loader: variables.gunMetal,
-  loaderAccent: variables.white,
-  separator: variables.platinum,
-  button: variables.carrotOrange,
-  buttonActive: variables.tennesseeOrange,
+  background: variables.raisinBlack,
+  text: variables.whiteSmoke,
 };
 
 export const breakpoints = {
