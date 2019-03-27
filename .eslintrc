@@ -126,7 +126,8 @@
       {
         "aspects": ["invalidHref"]
       }
-    ]
+    ],
+    "global-require":"warn"
   },
   "settings": {
     "import/resolver": {

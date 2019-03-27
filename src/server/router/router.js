@@ -1,8 +1,8 @@
-import express from 'express'
-import serverSideRender from '@server/controllers/serverSideRender'
+import express from 'express';
+import serverSideRender from '@server/controllers/serverSideRender';
 
-const router = express.Router()
+const router = express.Router();
 
-router.get('*', serverSideRender)
+router.get('*', serverSideRender);
 
-export default router
+export default router;
