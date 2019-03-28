@@ -3,9 +3,12 @@ export const openSans = 'Open Sans';
 export const roboto = 'Roboto';
 export const sansSerif = 'sans-serif';
 
+export const heading = '7.2rem';
 export const title = '4.5rem';
 export const subTitle = '2.8rem';
 export const bodyText = '1.4rem';
+
+export const headingLetterSpacing = '1rem';
 
 // Breakpoints
 export const mobile = {

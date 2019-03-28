@@ -19,4 +19,15 @@ export const breakpoints = {
   xl: variables.desktop,
 };
 
+export const fontSize = {
+  heading: variables.heading,
+  title: variables.title,
+  subTitle: variables.subTitle,
+  bodyText: variables.bodyText,
+};
+
+export const letterSpace = {
+  heading: variables.headingLetterSpacing,
+};
+
 export const zIndex = variables.zIndex;
