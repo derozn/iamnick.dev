@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node ./src/server",
     "build": "cross-env NODE_ENV=production node -r @babel/register ./node_modules/webpack/bin/webpack --progress --config ./tools/webpack.prod.js",
-    "lint": "prettier 'src/**/*.{js,jsx,json,md,html}' --write && eslint --ext .jsx,.js src",
+    "lint": "echo \"Linting...\"; eslint \"src/**/*.js\"",
+    "pretty": "echo \"Making it pretty...\"; prettier --write \"src/**/*.js\"",
     "test:jest": "jest --config=./test/jest.config.json",
     "test:jest:watch": "npm run test:jest -- --watch",
     "test:jest:coverage": "npm run test:jest -- --coverage"
