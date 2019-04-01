@@ -1,16 +1,16 @@
 import React from 'react';
-import BlockTextAnimation from '@shared/components/BlockTextAnimation';
+import BlockContentAnimation from '@shared/components/BlockContentAnimation';
 import * as Styles from './Hero.styles';
 
 const HeroSection = () => (
   <Styles.Section>
-    <BlockTextAnimation>
+    <BlockContentAnimation>
       <Styles.Title>i am nick</Styles.Title>
-    </BlockTextAnimation>
+    </BlockContentAnimation>
 
-    <BlockTextAnimation css={Styles.contentSpacing}>
+    <BlockContentAnimation css={Styles.contentSpacing}>
       <Styles.Subtitle>Front End Developer</Styles.Subtitle>
-    </BlockTextAnimation>
+    </BlockContentAnimation>
   </Styles.Section>
 );
 
