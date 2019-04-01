@@ -8,7 +8,7 @@ export const title = '4.5rem';
 export const subTitle = '2.8rem';
 export const bodyText = '1.4rem';
 
-export const headingLetterSpacing = '1rem';
+export const titleLetterSpacing = '1rem';
 
 // Breakpoints
 export const mobile = {

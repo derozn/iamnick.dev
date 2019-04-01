@@ -8,6 +8,7 @@ export const fontFamily = {
 export const color = {
   background: variables.raisinBlack,
   text: variables.whiteSmoke,
+  burgerMenu: variables.whiteSmoke,
 };
 
 export const breakpoints = {
@@ -27,7 +28,7 @@ export const fontSize = {
 };
 
 export const letterSpace = {
-  heading: variables.headingLetterSpacing,
+  title: variables.titleLetterSpacing,
 };
 
 export const zIndex = variables.zIndex;

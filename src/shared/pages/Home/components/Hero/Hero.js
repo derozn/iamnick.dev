@@ -4,7 +4,13 @@ import * as Styles from './Hero.styles';
 
 const HeroSection = () => (
   <Styles.Section>
-    <BlockTextAnimation>i am nick</BlockTextAnimation>
+    <BlockTextAnimation>
+      <Styles.Title>i am nick</Styles.Title>
+    </BlockTextAnimation>
+
+    <BlockTextAnimation css={Styles.contentSpacing}>
+      <Styles.Subtitle>Front End Developer</Styles.Subtitle>
+    </BlockTextAnimation>
   </Styles.Section>
 );
 
