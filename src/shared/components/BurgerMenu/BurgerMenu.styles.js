@@ -31,8 +31,8 @@ export const BottomBun = styled.div`
 
 export const Wrapper = styled.div`
   position: relative;
-  width: 4rem;
-  height: 3rem;
+  width: 3rem;
+  height: 2rem;
   color: ${getThemeVariable('color', 'burgerMenu')};
 
   ${({ isActive }) =>
