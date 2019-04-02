@@ -26,12 +26,9 @@ const base = css`
     background: ${getThemeVariable('color', 'background')};
   }
 
-  main {
-    min-height: 100%;
-  }
-
   #app {
     position: relative;
+    height: 100%;
   }
 `;
 

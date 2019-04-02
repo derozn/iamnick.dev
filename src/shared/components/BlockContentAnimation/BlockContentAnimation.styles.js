@@ -9,19 +9,23 @@ export const Container = styled.div`
 
 const BlockAnimation = keyframes`
   0% {
-    transform: translate3d(100%, 0, 0);
+    transform: scale3d(0, 1, 1);
+    transform-origin: 0% 50% 0px;
+  }
+
+  25% {
+    transform: scale3d(1, 1, 1);
+    transform-origin: 0% 50% 0px;
   }
 
   50% {
-    transform: translate3d(0, 0, 0);
-  }
-
-  60% {
-    transform: translate3d(0, 0, 0);
+    transform: scale3d(1, 1, 1);
+    transform-origin: 100% 50% 0px;
   }
 
   100% {
-    transform: translate3d(-100%, 0, 0);
+    transform: scale3d(0, 1, 1);
+    transform-origin: 100% 50% 0px;
   }
 `;
 
@@ -45,6 +49,7 @@ export const Block = styled.div`
   width: 100%;
   height: 100%;
   background: ${getThemeVariable('color', 'text')};
-  transform: translate3d(100%, 0, 0);
+  transform: scale3d(0, 1, 1);
+  transform-origin: 100% 50% 0px;
   animation: ${BlockAnimation} 0.8s ease-in-out forwards;
 `;

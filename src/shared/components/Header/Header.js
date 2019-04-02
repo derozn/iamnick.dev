@@ -3,9 +3,9 @@ import BurgerMenu from '@shared/components/BurgerMenu';
 import * as Styles from './Header.styles';
 
 const Header = () => (
-  <Styles.StickyHeader>
+  <Styles.FixedHeader>
     <BurgerMenu />
-  </Styles.StickyHeader>
+  </Styles.FixedHeader>
 );
 
 export default Header;

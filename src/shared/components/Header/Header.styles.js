@@ -1,11 +1,12 @@
 import styled from 'styled-components';
 
-export const StickyHeader = styled.header`
-  position: sticky;
+export const FixedHeader = styled.header`
+  position: fixed;
+  top: 0;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  top: 0;
   width: 100%;
   padding: 2rem;
 `;
