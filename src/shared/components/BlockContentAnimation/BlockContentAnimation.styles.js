@@ -10,22 +10,22 @@ export const Container = styled.div`
 const BlockAnimation = keyframes`
   0% {
     transform: scale3d(0, 1, 1);
-    transform-origin: 0% 50% 0px;
+    transform-origin: 100% 50% 0px;
   }
 
-  25% {
+  35% {
     transform: scale3d(1, 1, 1);
-    transform-origin: 0% 50% 0px;
+    transform-origin: 100% 50% 0px;
   }
 
   50% {
     transform: scale3d(1, 1, 1);
-    transform-origin: 100% 50% 0px;
+    transform-origin: 0% 50% 0px;
   }
 
   100% {
     transform: scale3d(0, 1, 1);
-    transform-origin: 100% 50% 0px;
+    transform-origin: 0% 50% 0px;
   }
 `;
 
