@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { getThemeVariable } from '@shared/styles/helpers';
 
 export const FixedHeader = styled.header`
   position: fixed;
@@ -9,4 +10,5 @@ export const FixedHeader = styled.header`
   justify-content: flex-end;
   width: 100%;
   padding: 2rem;
+  z-index: ${getThemeVariable('zIndex', 'header')};
 `;
