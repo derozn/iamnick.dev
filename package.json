@@ -45,8 +45,10 @@
     "react": "16.8.5",
     "react-dom": "16.8.5",
     "react-hot-loader": "4.8.0",
+    "react-lazy-progressive-image": "^1.4.0",
     "react-pose": "4.0.4",
     "react-router-dom": "5.0.0",
+    "sharp": "^0.22.0",
     "styled-components": "4.2.0",
     "styled-normalize": "8.0.6"
   },

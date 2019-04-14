@@ -9,7 +9,12 @@ const BlockContentAnimation = ({ children, ...rest }) => (
   </Styles.Container>
 );
 
+BlockContentAnimation.defaultProps = {
+  delay: 0,
+};
+
 BlockContentAnimation.propTypes = {
+  delay: PropTypes.number,
   children: PropTypes.oneOfType([PropTypes.node, PropTypes.element]),
 };
 

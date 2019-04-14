@@ -30,6 +30,10 @@ const base = css`
     position: relative;
     height: 100%;
   }
+
+  canvas {
+    display: block;
+  }
 `;
 
 export default base;

@@ -1,11 +1,15 @@
 import styled, { keyframes } from 'styled-components';
-import { getThemeVariable } from '@shared/styles/helpers';
+import {
+  getVariable,
+  getThemeVariable,
+  getVariableWithModifications,
+} from '@shared/styles/helpers';
 
-export const Container = styled.div`
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-`;
+const defaultDelay = 0.4;
+
+const getContentDelay = getVariableWithModifications(getVariable('delay'), delay =>
+  delay ? defaultDelay + delay : defaultDelay
+);
 
 const BlockAnimation = keyframes`
   0% {
@@ -29,16 +33,29 @@ const BlockAnimation = keyframes`
   }
 `;
 
-const ContentAnimation = keyframes`
-  from {  opacity: 0; }
+const ContentFadeAnimation = keyframes`
+  from {
+    opacity: 0;
+  }
 
-  to { opacity: 1;}
+  to {
+    opacity: 1;
+  }
+`;
+
+const ContentShiftAnimation = keyframes`
+  from {
+    transform: translate3d(10px, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
 `;
 
 export const Content = styled.span`
   display: inline-block;
   opacity: 0;
-  animation: ${ContentAnimation} 0s 0.4s linear forwards;
 `;
 
 export const Block = styled.div`
@@ -51,5 +68,18 @@ export const Block = styled.div`
   background: ${getThemeVariable('color', 'text')};
   transform: scale3d(0, 1, 1);
   transform-origin: 100% 50% 0px;
-  animation: ${BlockAnimation} 0.8s ease-in-out forwards;
+`;
+
+export const Container = styled.div`
+  position: relative;
+  display: inline-block;
+
+  ${Block} {
+    animation: ${BlockAnimation} 0.8s ${getVariable('delay')}s ease-in-out forwards;
+  }
+
+  ${Content} {
+    animation: ${ContentFadeAnimation} 0.4s ${getContentDelay}s ease-out forwards,
+      ${ContentShiftAnimation} 0.6s ${getContentDelay}s ease-out forwards;
+  }
 `;
