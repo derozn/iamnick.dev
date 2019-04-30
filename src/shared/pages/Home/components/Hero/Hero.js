@@ -1,17 +1,13 @@
 import React from 'react';
 import BlockContentAnimation from '@shared/components/BlockContentAnimation';
-import ProgressiveImage from '@shared/components/ProgressiveImage';
+import NoiseParticles from '@shared/components/NoiseParticles';
 import * as Styles from './Hero.styles';
 
 const HeroSection = () => (
   <Styles.Section>
-    <ProgressiveImage
-      alt="Some fancy hero background"
-      src="/images/dark.jpg"
-      placeholder="/thumbnail/dark.jpg"
-      width={1155}
-      height={770}
-    />
+    <Styles.BackgroundContainer>
+      <NoiseParticles />
+    </Styles.BackgroundContainer>
     <Styles.Content>
       <BlockContentAnimation>
         <Styles.Title>i am nick</Styles.Title>

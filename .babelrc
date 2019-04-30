@@ -4,8 +4,8 @@
     [
       "babel-plugin-styled-components",
       {
-        "ssr": true,
-      },
+        "ssr": true
+      }
     ],
     [
       "module-resolver",
@@ -16,12 +16,12 @@
           "@client": "./src/client",
           "@shared": "./src/shared",
           "@server": "./src/server",
-          "@tools": "./tools",
+          "@tools": "./tools"
         },
-        "transformFunctions": ["module.hot.accept"],
-      },
+        "transformFunctions": ["module.hot.accept"]
+      }
     ],
-    "react-hot-loader/babel",
+    "react-hot-loader/babel"
   ],
   "env": {
     "test": {
@@ -29,10 +29,10 @@
         [
           "@babel/preset-env",
           {
-            "modules": "commonjs",
-          },
-        ],
-      ],
-    },
-  },
+            "modules": "commonjs"
+          }
+        ]
+      ]
+    }
+  }
 }

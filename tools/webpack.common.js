@@ -34,15 +34,12 @@ module.exports = {
     filename: 'js/app.js',
     publicPath: '/'
   },
-  resolveLoader: {
-    moduleExtensions: ['-loader']
-  },
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        loaders: ['babel']
+        loaders: ['babel-loader']
       },
       {
         test: /\.(jpe?g|png|gif|svg|ttf|woff|eot|mp4|woff2)$/i,
@@ -51,7 +48,11 @@ module.exports = {
           name: 'assets/[path][name].[ext]',
           context: '../src/shared/assets'
         }
-      }
+      },
+      {
+				test: /\.(glsl|frag|vert)$/i,
+				use: ['glslify-import-loader', 'raw-loader', 'glslify-loader']
+			},
     ]
   },
   plugins: [
