@@ -3,7 +3,7 @@
 precision highp float;
 
 uniform sampler2D uTexture;
-
+uniform vec3 uBaseColor;
 varying vec2 vPUv;
 varying vec2 vUv;
 
@@ -16,8 +16,8 @@ void main() {
 	vec4 colA = texture2D(uTexture, puv);
 
 	// greyscale
-	float grey = colA.r * 0.21 + colA.g * 0.71 + colA.b * 0.07;
-	vec4 colB = vec4(colA.r, colA.g, colA.b, 1.0);
+	// float grey = colA.r * 0.21 + colA.g * 0.71 + colA.b * 0.07;
+	vec4 colB = vec4(uBaseColor.rgb, 1.0);
 
 	// circle
 	float border = 0.3;

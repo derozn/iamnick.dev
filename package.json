@@ -43,6 +43,7 @@
     "glslify": "7.0.0",
     "glslify-import-loader": "0.1.2",
     "glslify-loader": "2.0.0",
+    "gsap": "^2.1.2",
     "isdev": "1.0.1",
     "popmotion": "8.6.4",
     "postprocessing": "^6.3.1",

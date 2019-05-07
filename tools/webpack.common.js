@@ -51,7 +51,7 @@ module.exports = {
       },
       {
 				test: /\.(glsl|frag|vert)$/i,
-				use: ['glslify-import-loader', 'raw-loader', 'glslify-loader']
+				use: ['glslify-import-loader', 'raw-loader', 'glslify-loader'],
 			},
     ]
   },
