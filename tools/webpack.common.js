@@ -25,10 +25,7 @@ const cleanWebpackBuild = new CleanWebpackPlugin({
 module.exports = {
   name: 'client',
   target: 'web',
-  entry: [
-    '@babel/polyfill',
-    path.join(__dirname, '../src/client')
-  ],
+  entry: [path.join(__dirname, '../src/client')],
   output: {
     path: path.join(__dirname, '../build'),
     filename: 'js/app.js',

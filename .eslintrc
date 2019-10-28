@@ -1,7 +1,7 @@
 {
   "extends": ["airbnb", "prettier", "prettier/react"],
   "parser": "babel-eslint",
-  "plugins": ["prettier", "jsx-a11y"],
+  "plugins": ["prettier", "jsx-a11y", "react-hooks"],
   "parserOptions": {
     "ecmaVersion": 5,
     "ecmaFeatures": {
@@ -127,7 +127,9 @@
         "aspects": ["invalidHref"]
       }
     ],
-    "global-require":"warn"
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "global-require": "warn"
   },
   "settings": {
     "import/resolver": {

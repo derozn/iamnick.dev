@@ -1,5 +1,17 @@
 {
-  "presets": ["@babel/preset-env", "@babel/preset-react"],
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "corejs": {
+          "version": 3,
+          "proposals": true
+        },
+        "useBuiltIns": "usage"
+      }
+    ],
+    "@babel/preset-react"
+  ],
   "plugins": [
     [
       "babel-plugin-styled-components",
@@ -22,17 +34,5 @@
       }
     ],
     "react-hot-loader/babel"
-  ],
-  "env": {
-    "test": {
-      "presets": [
-        [
-          "@babel/preset-env",
-          {
-            "modules": "commonjs"
-          }
-        ]
-      ]
-    }
-  }
+  ]
 }
