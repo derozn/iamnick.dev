@@ -10,7 +10,7 @@ const useSetDevicePixelRatio = () => {
   React.useEffect(() => {
     const devicePixelRatio = window.devicePixelRatio.toFixed(1);
     gl.setPixelRatio(devicePixelRatio);
-  }, []);
+  }, [gl]);
 };
 
 // Calculates the perfect FOV (or so they say...)

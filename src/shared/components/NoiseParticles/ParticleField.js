@@ -7,6 +7,7 @@ import { TweenLite } from 'gsap';
 import InteractiveTexture from './InteractiveTexture';
 
 const TEXTURE_URLS = [
+  '/images/profile.png',
   '/images/character_n.png',
   '/images/character_y.png',
   '/images/character_a.png',
