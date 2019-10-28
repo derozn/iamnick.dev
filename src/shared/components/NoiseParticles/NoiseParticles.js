@@ -28,7 +28,7 @@ const useFOVPerfectFit = distance => {
 
 const WebGlLayer = () => {
   useSetDevicePixelRatio();
-  useFOVPerfectFit(200);
+  useFOVPerfectFit(220);
 
   return (
     <scene>

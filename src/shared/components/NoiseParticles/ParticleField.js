@@ -167,7 +167,7 @@ const ParticleField = () => {
 
   useRender(() => {
     if (pointMesh.current) {
-      pointMesh.current.material.uniforms.uTime.value += 0.1;
+      pointMesh.current.material.uniforms.uTime.value += 0.05;
     }
   });
 

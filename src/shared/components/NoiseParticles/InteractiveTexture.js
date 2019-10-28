@@ -1,21 +1,22 @@
 import React from 'react';
 import * as THREE from 'three';
 import { useRender } from 'react-three-fiber';
+import throttle from '@banterstudiosuk/throttle';
 import { easeOutQuad } from './easings';
 
-const MAX_AGE = 60;
-const RADIUS = 0.15;
-const SIZE = 32;
+const MAX_AGE = 100;
+const RADIUS = 0.5;
+const SIZE = 128;
 
 const createCanvas = () => {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
 
-  canvas.width = 64;
-  canvas.height = 64;
+  canvas.width = 128;
+  canvas.height = 128;
 
-  canvas.style.width = '64px';
-  canvas.style.height = '64px';
+  canvas.style.width = '128px';
+  canvas.style.height = '128px';
 
   context.fillStyle = 'black';
   context.fillRect(0, 0, canvas.width, canvas.height);
@@ -41,23 +42,26 @@ const InteractiveTexture = ({ width, height, particles }) => {
   const canvasTexture = React.useMemo(() => new THREE.Texture(canvas), [canvas]);
   const trail = React.useRef([]);
 
-  const createParticle = React.useCallback(event => {
-    const { uv: point } = event;
+  const createParticle = React.useCallback(
+    throttle(event => {
+      const { uv: point } = event;
 
-    let force = 0;
+      let force = 0;
 
-    const last = trail.current[trail.current.length - 1];
+      const last = trail.current[trail.current.length - 1];
 
-    if (last) {
-      const dx = last.x - point.x;
-      const dy = last.y - point.y;
-      const dd = dx * dx + dy * dy;
+      if (last) {
+        const dx = last.x - point.x;
+        const dy = last.y - point.y;
+        const dd = dx * dx + dy * dy;
 
-      force = Math.min(dd * 10000, 1);
-    }
+        force = Math.min(dd * 10000, 1);
+      }
 
-    trail.current.push({ x: point.x, y: point.y, age: 0, force });
-  }, []);
+      trail.current.push({ x: point.x, y: point.y, age: 0, force });
+    }),
+    []
+  );
 
   const updateParticles = React.useCallback(() => {
     context.fillStyle = 'black';
