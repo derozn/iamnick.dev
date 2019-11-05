@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import * as Styles from './BlockContentAnimation.styles';
+import { Container, Content, Block } from './BlockContentAnimation.styles';
 
 const BlockContentAnimation = ({ children, ...rest }) => (
-  <Styles.Container {...rest}>
-    <Styles.Content>{children}</Styles.Content>
-    <Styles.Block />
-  </Styles.Container>
+  <Container {...rest}>
+    <Content>{children}</Content>
+    <Block />
+  </Container>
 );
 
 BlockContentAnimation.defaultProps = {

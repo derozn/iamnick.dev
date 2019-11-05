@@ -1,23 +1,27 @@
 import React from 'react';
 import BlockContentAnimation from '@shared/components/BlockContentAnimation';
-import NoiseParticles from '@shared/components/NoiseParticles';
-import * as Styles from './Hero.styles';
+import {
+  Section,
+  BackgroundContainer,
+  Content,
+  Title,
+  Subtitle,
+  contentSpacing,
+} from './Hero.styles';
 
 const HeroSection = () => (
-  <Styles.Section>
-    <Styles.BackgroundContainer>
-      <NoiseParticles />
-    </Styles.BackgroundContainer>
-    <Styles.Content>
+  <Section>
+    <BackgroundContainer />
+    <Content>
       <BlockContentAnimation>
-        <Styles.Title>i am nick</Styles.Title>
+        <Title>i am nick</Title>
       </BlockContentAnimation>
 
-      <BlockContentAnimation delay={0.2} css={Styles.contentSpacing}>
-        <Styles.Subtitle>Front End Developer</Styles.Subtitle>
+      <BlockContentAnimation delay={0.2} css={contentSpacing}>
+        <Subtitle>Front End Developer</Subtitle>
       </BlockContentAnimation>
-    </Styles.Content>
-  </Styles.Section>
+    </Content>
+  </Section>
 );
 
 export default HeroSection;
