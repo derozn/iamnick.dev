@@ -60,7 +60,7 @@
     "shifty": "2.8.0",
     "styled-components": "4.4.0",
     "styled-normalize": "8.0.6",
-    "three": "^0.109.0"
+    "three": "0.109.0"
   },
   "devDependencies": {
     "@babel/core": "7.4.0",
