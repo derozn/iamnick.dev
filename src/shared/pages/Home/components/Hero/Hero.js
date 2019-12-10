@@ -1,27 +1,27 @@
 import React from 'react';
 import BlockContentAnimation from '@shared/components/BlockContentAnimation';
-import ProgressiveImage from '@shared/components/ProgressiveImage';
-import * as Styles from './Hero.styles';
+import {
+  Section,
+  BackgroundContainer,
+  Content,
+  Title,
+  Subtitle,
+  contentSpacing,
+} from './Hero.styles';
 
 const HeroSection = () => (
-  <Styles.Section>
-    <ProgressiveImage
-      alt="Some fancy hero background"
-      src="/images/dark.jpg"
-      placeholder="/thumbnail/dark.jpg"
-      width={1155}
-      height={770}
-    />
-    <Styles.Content>
+  <Section>
+    <BackgroundContainer />
+    <Content>
       <BlockContentAnimation>
-        <Styles.Title>i am nick</Styles.Title>
+        <Title>i am nick</Title>
       </BlockContentAnimation>
 
-      <BlockContentAnimation delay={0.2} css={Styles.contentSpacing}>
-        <Styles.Subtitle>Front End Developer</Styles.Subtitle>
+      <BlockContentAnimation delay={0.2} css={contentSpacing}>
+        <Subtitle>Front End Developer</Subtitle>
       </BlockContentAnimation>
-    </Styles.Content>
-  </Styles.Section>
+    </Content>
+  </Section>
 );
 
 export default HeroSection;

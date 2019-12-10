@@ -8,6 +8,14 @@ export const Section = styled.section`
   padding: 2rem;
 `;
 
+export const BackgroundContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+`;
+
 export const Content = styled.div`
   display: flex;
   flex-direction: column;
@@ -18,6 +26,7 @@ export const Content = styled.div`
   margin: 0 auto;
   width: 100%;
   height: 100%;
+  pointer-events: none;
 `;
 
 export const Title = styled.h1`

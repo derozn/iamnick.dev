@@ -1,11 +1,11 @@
 import React from 'react';
 import BurgerMenu from '@shared/components/BurgerMenu';
-import * as Styles from './Header.styles';
+import { FixedHeader } from './Header.styles';
 
 const Header = () => (
-  <Styles.FixedHeader>
+  <FixedHeader>
     <BurgerMenu />
-  </Styles.FixedHeader>
+  </FixedHeader>
 );
 
 export default Header;
