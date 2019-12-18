@@ -1,4 +1,5 @@
 import React from 'react';
+import loadable from '@loadable/component';
 import BlockContentAnimation from '@shared/components/BlockContentAnimation';
 import {
   Section,
@@ -9,9 +10,13 @@ import {
   contentSpacing,
 } from './Hero.styles';
 
+const Particles = loadable(() => import('@shared/lib/Particles'));
+
 const HeroSection = () => (
   <Section>
-    <BackgroundContainer />
+    <BackgroundContainer>
+      <Particles />
+    </BackgroundContainer>
     <Content>
       <BlockContentAnimation>
         <Title>i am nick</Title>

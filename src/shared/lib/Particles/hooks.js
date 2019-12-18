@@ -1,11 +1,12 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { useThree } from 'react-three-fiber';
+import { isArray } from '@shared/utils';
 
 export const useTexturesLoader = ({ textureUrls }) => {
-  const [textures, setTextures] = React.useState(null);
+  const [textures, setTextures] = useState([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const adjustTexture = texture => {
       texture.minFilter = THREE.LinearFilter;
       texture.magFilter = THREE.LinearFilter;
@@ -15,7 +16,7 @@ export const useTexturesLoader = ({ textureUrls }) => {
     };
 
     const loadTextures = async () => {
-      const asyncTextureLoaders = textureUrls.map(
+      const asyncTextureLoaders = (isArray(textureUrls) ? textureUrls : [textureUrls]).map(
         url =>
           new Promise((resolve, reject) =>
             new THREE.TextureLoader().load(url, resolve, undefined, reject)
@@ -43,7 +44,7 @@ export const useTexturesLoader = ({ textureUrls }) => {
 export const useSetDevicePixelRatio = () => {
   const { gl } = useThree();
 
-  React.useEffect(() => {
+  useEffect(() => {
     const devicePixelRatio = window.devicePixelRatio.toFixed(1);
     gl.setPixelRatio(devicePixelRatio);
   }, [gl]);
