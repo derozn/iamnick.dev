@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import glslify from 'glslify';
 import * as THREE from 'three';
-import { useLoader } from 'react-three-fiber';
+import { useLoader, useUpdate } from 'react-three-fiber';
 import { getImageData } from './utils';
 import Layout from './Layout';
 
 import rawVertexShader from './shaders/particle.vert';
 import rawFragmentShader from './shaders/particle.frag';
+
+const vertexShader = glslify(rawVertexShader);
+const fragmentShader = glslify(rawFragmentShader);
 
 const TEXTURE_URLS = [
   '/images/profile.png',
@@ -15,182 +18,102 @@ const TEXTURE_URLS = [
   '/images/character_v.png',
 ];
 
-const getNumberOfVisiblePoints = ({ texture }) => {
-  const { image } = texture;
-  const { width, height } = image;
-  const numberOfPoints = width * height;
-  const threshold = 34;
+const PositionBufferAttribute = props => {
+  const ref = useRef();
 
-  const { data } = getImageData(image);
-  const originalColors = Float32Array.from(data);
+  useUpdate(attribute => {
+    attribute.setXYZ(0, -0.5, 0.5, 0.0);
+    attribute.setXYZ(1, 0.5, 0.5, 0.0);
+    attribute.setXYZ(2, -0.5, -0.5, 0.0);
+    attribute.setXYZ(3, 0.5, -0.5, 0.0);
+  }, []);
 
-  let numberOfVisiblePoints = 0;
-
-  for (let i = 0; i < numberOfPoints; i++) {
-    if (originalColors[i * 4 + 0] > threshold) {
-      numberOfVisiblePoints += 1;
-    }
-  }
-
-  return {
-    threshold,
-    numberOfPoints,
-    numberOfVisiblePoints,
-    originalColors,
-  };
+  return <bufferAttribute ref={ref} {...props} />;
 };
 
-const getShaderMaterial = ({ vertexShader, fragmentShader, baseColor = 0x00aeff, texture }) => {
-  const { image } = texture;
-  const { width, height } = image;
+const UvBufferAttribute = props => {
+  const ref = useRef();
 
-  return new THREE.RawShaderMaterial({
-    uniforms: {
-      uBaseColor: { value: new THREE.Color(baseColor) },
-      uTime: { value: 0 },
-      uRandom: { value: 1.0 },
-      uDepth: { value: 2.0 },
-      uSize: { value: 0.0 },
-      uTextureSize: { value: new THREE.Vector2(width, height) },
-      uTexture: { value: image },
-      uTouch: { value: null },
-    },
-    vertexShader,
-    fragmentShader,
-    depthTest: false,
-    transparent: true,
-  });
-};
+  useUpdate(attribute => {
+    attribute.setXYZ(0, 0.0, 0.0);
+    attribute.setXYZ(1, 1.0, 0.0);
+    attribute.setXYZ(2, 0.0, 1.0);
+    attribute.setXYZ(3, 1.0, 1.0);
+  }, []);
 
-const getOffsets = ({
-  threshold,
-  width,
-  numberOfPoints,
-  numberOfVisiblePoints,
-  originalColors,
-}) => {
-  const indices = new Uint16Array(numberOfVisiblePoints);
-  const offsets = new Float32Array(numberOfVisiblePoints * 3);
-  const angles = new Float32Array(numberOfVisiblePoints);
-
-  for (let i = 0, j = 0; i < numberOfPoints; i++) {
-    if (originalColors[i * 4 + 0] > threshold) {
-      offsets[j * 3 + 0] = i % width;
-      offsets[j * 3 + 1] = Math.floor(i / width);
-
-      indices[j] = i;
-
-      angles[j] = Math.random() * Math.PI;
-
-      j += 1;
-    }
-  }
-
-  return { indices, offsets, angles };
+  return <bufferAttribute ref={ref} {...props} />;
 };
 
 const Profile = () => {
-  const [store, setStore] = useState({
-    width: 0,
-    height: 0,
-    shaderMaterial: null,
-    indices: null,
-    offsets: null,
-    angles: null,
-  });
-
   const texture = useLoader(THREE.TextureLoader, '/images/profile.png');
 
-  useEffect(() => {
-    if (!texture) {
-      return;
-    }
+  const { image } = texture;
+  const { width, height } = image;
+  const numPoints = width * height;
 
-    const {
-      image: { width, height },
-    } = texture;
+  const indices = new Uint16Array(numPoints);
+  const offsets = new Float32Array(numPoints * 3);
+  const angles = new Float32Array(numPoints);
 
-    const {
-      threshold,
-      numberOfVisiblePoints,
-      originalColors,
-      numberOfPoints,
-    } = getNumberOfVisiblePoints({
-      texture,
-    });
+  for (let i = 0; i < numPoints; i++) {
+    offsets[i * 3 + 0] = i % width;
+    offsets[i * 3 + 1] = Math.floor(i / width);
 
-    const vertexShader = glslify(rawVertexShader);
-    const fragmentShader = glslify(rawFragmentShader);
+    indices[i] = i;
 
-    const shaderMaterial = getShaderMaterial({ vertexShader, fragmentShader, texture });
-
-    const { indices, offsets, angles } = getOffsets({
-      threshold,
-      width,
-      height,
-      numberOfPoints,
-      numberOfVisiblePoints,
-      originalColors,
-    });
-
-    setStore({
-      width,
-      height,
-      shaderMaterial,
-      indices,
-      offsets,
-      angles,
-    });
-  }, [texture, setStore]);
-
-  const { indices, offsets, angles } = store;
+    angles[i] = Math.random() * Math.PI;
+  }
 
   return (
     <mesh>
-      <instancedBufferGeometry
-        attach="geometry"
-        setIndex={new THREE.BufferAttribute(new Uint16Array([0, 2, 1, 2, 3, 1]), 1)}
-      >
-        <bufferAttribute
+      <instancedBufferGeometry attach="geometry">
+        <bufferAttribute attach="index" args={[new Uint16Array([0, 2, 1, 2, 3, 1]), 1]} />
+        <PositionBufferAttribute
           attachObject={['attributes', 'position']}
-          array={new Float32Array(4 * 3)}
-          itemSize={3}
-          setXYZ={[
-            [0, -0.5, 0.5, 0.0],
-            [1, 0.5, 0.5, 0.0],
-            [2, -0.5, -0.5, 0.0],
-            [3, 0.5, -0.5, 0.0],
-          ]}
+          args={[new Float32Array(4 * 3), 3]}
         />
 
-        <bufferAttribute
-          attachObject={['attributes', 'uv']}
-          array={new Float32Array(4 * 2)}
-          itemSize={2}
-          setXYZ={[[0, 0.0, 0.0], [1, 1.0, 0.0], [2, 0.0, 1.0], [3, 1.0, 1.0]]}
+        <UvBufferAttribute
+          attachObject={['attributes', 'position']}
+          args={[new Float32Array(4 * 3), 3]}
         />
 
         <instancedBufferAttribute
           attachObject={['attributes', 'pindex']}
-          array={indices}
-          itemSize={1}
-          normalized={false}
+          args={[indices, 1, false]}
         />
 
         <instancedBufferAttribute
           attachObject={['attributes', 'offset']}
-          array={offsets}
-          itemSize={3}
-          normalized={false}
+          args={[offsets, 3, false]}
         />
 
         <instancedBufferAttribute
           attachObject={['attributes', 'angle']}
-          array={angles}
-          itemSize={1}
-          normalized={false}
+          args={[angles, 1, false]}
         />
       </instancedBufferGeometry>
+      <rawShaderMaterial
+        attach="material"
+        args={[
+          {
+            uniforms: {
+              uBaseColor: { value: new THREE.Color(0xffffff) },
+              uTime: { value: 0 },
+              uRandom: { value: 1.0 },
+              uDepth: { value: 2.0 },
+              uSize: { value: 0.0 },
+              uTextureSize: { value: new THREE.Vector2(width, height) },
+              uTexture: { value: image },
+              uTouch: { value: null },
+            },
+            vertexShader,
+            fragmentShader,
+            depthTest: false,
+            transparent: true,
+          },
+        ]}
+      />
     </mesh>
   );
 };
