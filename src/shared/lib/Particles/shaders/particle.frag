@@ -3,7 +3,7 @@
 precision highp float;
 
 uniform sampler2D uTexture;
-uniform vec3 uBaseColor;
+
 varying vec2 vPUv;
 varying vec2 vUv;
 
@@ -13,11 +13,7 @@ void main() {
 	vec2 puv = vPUv;
 
 	// pixel color
-	vec4 colA = texture2D(uTexture, puv);
-
-	// greyscale
-	// float grey = colA.r * 0.21 + colA.g * 0.71 + colA.b * 0.07;
-	vec4 colB = vec4(uBaseColor.rgb, 1.0);
+	vec4 texture = texture2D(uTexture, puv);
 
 	// circle
 	float border = 0.3;
@@ -25,8 +21,7 @@ void main() {
 	float dist = radius - distance(uv, vec2(0.5));
 	float t = smoothstep(0.0, border, dist);
 
-	// final color
-	color = colB;
+	color = vec4(texture.rgb, 1.0);
 	color.a = t;
 
 	gl_FragColor = color;

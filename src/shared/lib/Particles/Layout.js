@@ -6,11 +6,7 @@ const WebGlLayer = ({ children }) => {
   useSetDevicePixelRatio();
   useFOVPerfectFit(220);
 
-  return (
-    <scene>
-      <Suspense fallback={null}>{children}</Suspense>
-    </scene>
-  );
+  return <Suspense fallback={null}>{children}</Suspense>;
 };
 
 const Layout = ({ children }) => (
