@@ -1,0 +1,10 @@
+{
+  "verbose": true,
+  "setupFiles": ["<rootDir>/test/jest.setup.js"],
+  "setupFilesAfterEnv": ["<rootDir>/test/jest.setup.postenv.js"],
+  "modulePaths": [
+    "<rootDir>"
+  ],
+  "rootDir": "../",
+  "testURL": "http://iamnick.dev"
+}
