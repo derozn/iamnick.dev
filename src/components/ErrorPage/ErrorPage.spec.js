@@ -1,9 +1,9 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 
-import ErrorPage from './Error';
+import ErrorPage from './ErrorPage';
 
-describe('pages/error', () => {
+describe('components/ErrorPage', () => {
   it('renders error message', () => {
     const { getByText } = render(<ErrorPage />);
 
