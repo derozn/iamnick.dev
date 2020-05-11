@@ -8,9 +8,7 @@
     "start": "next start",
     "test": "jest --config=./test/jest.config.json",
     "test:watch": "yarn test --watch",
-    "test:coverage": "yarn test --coverage",
-    "lint": "echo \"Linting...\"; eslint \"src/**/*.{js,jsx,ts,tsx}\"",
-    "pretty": "echo \"Making it pretty...\"; prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
+    "test:coverage": "yarn test --coverage"
   },
   "dependencies": {
     "babel-plugin-module-resolver": "^4.0.0",
