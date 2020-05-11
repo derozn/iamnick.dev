@@ -6,7 +6,9 @@ module.exports = {
   extends: ['@banterstudiosuk/eslint-config-typescript/react'],
   settings: {
     'import/resolver': {
-      'babel-module': {},
+      'babel-module': {
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs'],
+      },
     },
   },
   rules: {
