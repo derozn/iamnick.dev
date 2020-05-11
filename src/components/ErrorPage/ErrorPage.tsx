@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Props } from './ErrorPage.types';
+import { Props } from './types';
 import { Container } from './ErrorPage.style';
 
 const ErrorPage = (props: Props) => {

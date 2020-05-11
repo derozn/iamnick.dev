@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Props } from './HomePage.types';
+import { Props } from './types';
 import { Container } from './HomePage.style';
 
 const HomePage = (props: Props) => {

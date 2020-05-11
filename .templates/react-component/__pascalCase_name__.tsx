@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Props } from './{{pascalCase name}}.types';
+import { Props } from './types';
 import { Container } from './{{pascalCase name}}.style';
 
 const {{pascalCase name}} = (props: Props) => {
