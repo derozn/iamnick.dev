@@ -13,7 +13,6 @@ jobs:
       - restore_cache:
           key: cache-{{ .Branch }}-{{ checksum "yarn.lock" }}
       - run: yarn
-      - run: yarn lint
       - run: yarn build
       - save_cache:
           key: cache-{{ .Branch }}-{{ checksum "yarn.lock" }}
