@@ -2,8 +2,8 @@
   "verbose": true,
   "setupFiles": ["<rootDir>/test/jest.setup.js"],
   "setupFilesAfterEnv": ["<rootDir>/test/jest.setup.postenv.js"],
-  "testPathIgnorePatterns": ["./.next/", "./node_modules/"],
-  "transformIgnorePatterns": ["./.next/", "./node_modules/"],
+  "testPathIgnorePatterns": ["./.next/", "./node_modules/", "./.templates/"],
+  "transformIgnorePatterns": ["./.next/", "./node_modules/", "./.templates/"],
   "modulePaths": ["<rootDir>"],
   "rootDir": "../",
   "testURL": "http://iamnick.dev"

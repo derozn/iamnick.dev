@@ -4,9 +4,9 @@ import { render } from '@testing-library/react';
 import ErrorPage from './ErrorPage';
 
 describe('components/ErrorPage', () => {
-  it('renders error message', () => {
+  it('renders', () => {
     const { getByText } = render(<ErrorPage />);
 
-    expect(getByText('Something went wrong...')).toBeTruthy();
+    expect(getByText('Oops! Something went wrong...')).toBeTruthy();
   });
 });
