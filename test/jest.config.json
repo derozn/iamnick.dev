@@ -6,5 +6,8 @@
   "transformIgnorePatterns": ["./.next/", "./node_modules/", "./.templates/"],
   "modulePaths": ["<rootDir>"],
   "rootDir": "../",
+  "moduleNameMapper": {
+    "three/examples/jsm/loaders/OBJLoader": "<rootDir>/test/stubs/OBJLoader"
+  },
   "testURL": "http://iamnick.dev"
 }

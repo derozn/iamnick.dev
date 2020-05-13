@@ -4,9 +4,9 @@ import { render } from '@testing-library/react';
 import HomePage from './HomePage';
 
 describe('components/HomePage', () => {
-  it('renders', () => {
-    const { getByText } = render(<HomePage />);
+  it('render <Scene /> canvas', () => {
+    const { getByTestId } = render(<HomePage />);
 
-    expect(getByText('Welcome!')).toBeTruthy();
+    expect(getByTestId('scene')).toBeTruthy();
   });
 });
