@@ -13,10 +13,9 @@ exports[`components/Skull renders skull 1`] = `
   <mesh
     name="skull-head"
   >
-    <meshBasicMaterial
+    <skullMaterial
       attach="material"
-      flatShading={true}
-      map="texture"
+      noiseTex="texture"
     />
   </mesh>
   <mesh
@@ -24,7 +23,6 @@ exports[`components/Skull renders skull 1`] = `
   >
     <meshBasicMaterial
       attach="material"
-      flatShading={true}
       map="texture"
     />
   </mesh>
