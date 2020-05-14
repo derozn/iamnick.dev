@@ -5,6 +5,8 @@ import { TextureLoader } from 'three';
 
 import useStore from '#store';
 
+import './materials/skull';
+
 const Skull = () => {
   const { gltfUrl, textureUrl } = useStore((state) => state.skull);
 
@@ -14,10 +16,10 @@ const Skull = () => {
   return (
     <group rotation={[0, -Math.PI / 4, 0]}>
       <mesh name="skull-head" {...skullGLTF.scene.children[3]}>
-        <meshBasicMaterial attach="material" map={skullTexture} flatShading />
+        <skullMaterial attach="material" noiseTex={skullTexture} />
       </mesh>
       <mesh name="skull-jaw" {...skullGLTF.scene.children[2]}>
-        <meshBasicMaterial attach="material" map={skullTexture} flatShading />
+        <meshBasicMaterial attach="material" map={skullTexture} />
       </mesh>
     </group>
   );
