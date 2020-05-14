@@ -1,6 +1,6 @@
 import create from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { Vector3 } from 'three';
+import { Vector3, Color } from 'three';
 
 import { State } from './types';
 
@@ -12,6 +12,7 @@ const store = (): State => {
       gltfUrl: '/models/skullhead.gltf',
       textureUrl: '/textures/noise.png',
     },
+    backgroundColor: new Color('#070810'),
   };
 };
 

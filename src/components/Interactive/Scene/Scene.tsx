@@ -7,10 +7,23 @@ import useStore from '#store';
 const Skull = dynamic(() => import('#components/Interactive/Skull'), { ssr: false });
 
 const Scene = () => {
-  const { zoom, position } = useStore((state) => ({ zoom: state.zoom, position: state.position }));
+  const { zoom, position, backgroundColor } = useStore((state) => ({
+    zoom: state.zoom,
+    position: state.position,
+    backgroundColor: state.backgroundColor,
+  }));
 
   return (
-    <Canvas data-testid="scene" concurrent pixelRatio={1} orthographic camera={{ zoom, position }}>
+    <Canvas
+      data-testid="scene"
+      concurrent
+      pixelRatio={1}
+      orthographic
+      camera={{ zoom, position }}
+      onCreated={({ gl }) => {
+        gl.setClearColor(backgroundColor);
+      }}
+    >
       <Suspense fallback={null}>
         <Skull />
       </Suspense>

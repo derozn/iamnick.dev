@@ -1,4 +1,4 @@
-import { Vector3 } from 'three';
+import { Vector3, Color } from 'three';
 
 export interface State {
   zoom: number;
@@ -7,4 +7,5 @@ export interface State {
     gltfUrl: string;
     textureUrl: string;
   };
+  backgroundColor: Color;
 }

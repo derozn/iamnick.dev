@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/Skull renders skull 1`] = `
+<group
+  rotation={
+    Array [
+      0,
+      -0.7853981633974483,
+      0,
+    ]
+  }
+>
+  <mesh
+    name="skull-head"
+  >
+    <meshBasicMaterial
+      attach="material"
+      flatShading={true}
+      map="texture"
+    />
+  </mesh>
+  <mesh
+    name="skull-jaw"
+  >
+    <meshBasicMaterial
+      attach="material"
+      flatShading={true}
+      map="texture"
+    />
+  </mesh>
+</group>
+`;
