@@ -1,14 +1,26 @@
 import React from 'react';
 import { useLoader } from 'react-three-fiber';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { TextureLoader } from 'three';
 
 import useStore from '#store';
 
 const Skull = () => {
-  const skullUrl = useStore((state) => state.skullUrl);
-  const skullOBJ = useLoader(OBJLoader, skullUrl);
+  const { gltfUrl, textureUrl } = useStore((state) => state.skull);
 
-  return <primitive object={skullOBJ} />;
+  const skullTexture = useLoader(TextureLoader, textureUrl);
+  const skullGLTF = useLoader(GLTFLoader, gltfUrl);
+
+  return (
+    <group>
+      <mesh name="skull-head" {...skullGLTF.scene.children[3]}>
+        <meshBasicMaterial attach="material" map={skullTexture} />
+      </mesh>
+      <mesh name="skull-jaw" {...skullGLTF.scene.children[2]}>
+        <meshBasicMaterial attach="material" map={skullTexture} />
+      </mesh>
+    </group>
+  );
 };
 
 export default Skull;

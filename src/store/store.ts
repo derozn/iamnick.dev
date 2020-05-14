@@ -8,7 +8,10 @@ const store = (): State => {
   return {
     zoom: 75,
     position: new Vector3(0, 0, 500),
-    skullUrl: '/models/skullHead.obj',
+    skull: {
+      gltfUrl: '/models/skullhead.gltf',
+      textureUrl: '/textures/noise.png',
+    },
   };
 };
 

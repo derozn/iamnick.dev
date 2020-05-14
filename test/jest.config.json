@@ -7,7 +7,7 @@
   "modulePaths": ["<rootDir>"],
   "rootDir": "../",
   "moduleNameMapper": {
-    "three/examples/jsm/loaders/OBJLoader": "<rootDir>/test/stubs/OBJLoader"
+    "three/examples/jsm/loaders/GLTFLoader": "<rootDir>/test/stubs/GLTFLoader"
   },
   "testURL": "http://iamnick.dev"
 }
