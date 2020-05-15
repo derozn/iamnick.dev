@@ -10,7 +10,7 @@ const store = (): State => {
     position: new Vector3(0, 0, 500),
     skull: {
       gltfUrl: '/models/skullhead.gltf',
-      textureUrl: '/textures/noise.png',
+      textureUrl: '/textures/noise-bw.png',
     },
     backgroundColor: new Color('#070810'),
   };

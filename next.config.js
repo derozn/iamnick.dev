@@ -3,9 +3,15 @@ module.exports = {
     config.module.rules.push({
       test: /\.(glsl|vs|fs)$/,
       exclude: /node_modules/,
-      use: ['ts-shader-loader'],
+      use: ['raw-loader', 'glslify-loader'],
     });
 
     return config;
   },
 };
+
+// {
+//       test: /\.(glsl|vs|fs)$/,
+//       exclude: /node_modules/,
+//       use: ['ts-shader-loader'],
+// }

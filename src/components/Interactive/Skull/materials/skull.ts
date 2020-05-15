@@ -1,10 +1,10 @@
 import { extend } from 'react-three-fiber';
-import { ShaderMaterial, Texture } from 'three';
+import { RawShaderMaterial, Texture } from 'three';
 
 import vertexShader from '../shaders/vert.glsl';
 import fragmentShader from '../shaders/frag.glsl';
 
-export class SkullMaterial extends ShaderMaterial {
+export class SkullMaterial extends RawShaderMaterial {
   constructor() {
     super({
       vertexShader,

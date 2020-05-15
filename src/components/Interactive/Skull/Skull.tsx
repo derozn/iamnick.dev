@@ -16,10 +16,10 @@ const Skull = () => {
   return (
     <group rotation={[0, -Math.PI / 4, 0]}>
       <mesh name="skull-head" {...skullGLTF.scene.children[3]}>
-        <skullMaterial attach="material" noiseTex={skullTexture} />
+        <skullMaterial attach="material" noiseTex={skullTexture} extensions-derivatives />
       </mesh>
       <mesh name="skull-jaw" {...skullGLTF.scene.children[2]}>
-        <meshBasicMaterial attach="material" map={skullTexture} />
+        <skullMaterial attach="material" noiseTex={skullTexture} extensions-derivatives />
       </mesh>
     </group>
   );
