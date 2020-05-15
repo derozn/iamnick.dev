@@ -15,15 +15,17 @@ exports[`components/Skull renders skull 1`] = `
   >
     <skullMaterial
       attach="material"
+      extensions-derivatives={true}
       noiseTex="texture"
     />
   </mesh>
   <mesh
     name="skull-jaw"
   >
-    <meshBasicMaterial
+    <skullMaterial
       attach="material"
-      map="texture"
+      extensions-derivatives={true}
+      noiseTex="texture"
     />
   </mesh>
 </group>
