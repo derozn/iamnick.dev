@@ -3,9 +3,13 @@ import { Vector3, Color } from 'three';
 export interface State {
   zoom: number;
   position: Vector3;
-  skull: {
-    gltfUrl: string;
+  background: {
+    color: Color;
+  };
+  fog: {
     textureUrl: string;
   };
-  backgroundColor: Color;
+  face: {
+    textureUrl: string;
+  };
 }

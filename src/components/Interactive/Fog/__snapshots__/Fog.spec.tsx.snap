@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/Fog renders Fog 1`] = `
+<mesh
+  name="fog"
+>
+  <instancedBufferGeometry
+    attach="geometry"
+  />
+  <fogMaterial
+    attach="material"
+    extensions-derivatives={true}
+    fogTexture="texture"
+    time={0}
+  />
+</mesh>
+`;

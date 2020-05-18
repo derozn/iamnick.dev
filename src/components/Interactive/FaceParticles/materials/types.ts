@@ -3,12 +3,12 @@
 // Seems to be an error when using declare/namespace and unused vars when they're being used
 import { ReactThreeFiber } from 'react-three-fiber';
 
-import { SkullMaterial } from './skull';
+import { FaceMaterial } from './face';
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      skullMaterial: ReactThreeFiber.MaterialNode<SkullMaterial, []>;
+      faceMaterial: ReactThreeFiber.MaterialNode<FaceMaterial, []>;
     }
   }
 }

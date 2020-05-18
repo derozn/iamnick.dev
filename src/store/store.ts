@@ -6,13 +6,17 @@ import { State } from './types';
 
 const store = (): State => {
   return {
-    zoom: 75,
-    position: new Vector3(0, 0, 500),
-    skull: {
-      gltfUrl: '/models/skullhead.gltf',
-      textureUrl: '/textures/noise.png',
+    zoom: 1,
+    position: new Vector3(0, 0, 300),
+    background: {
+      color: new Color('#070810'),
     },
-    backgroundColor: new Color('#070810'),
+    fog: {
+      textureUrl: '/textures/fog.png',
+    },
+    face: {
+      textureUrl: '/textures/nick.png',
+    },
   };
 };
 
