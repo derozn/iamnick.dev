@@ -12,12 +12,17 @@
   },
   "dependencies": {
     "babel-plugin-module-resolver": "^4.0.0",
+    "glsl-hsv2rgb": "^1.0.0",
+    "glsl-noise": "^0.0.0",
     "next": "9.3.6",
     "prop-types": "^15.7.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "react-three-fiber": "^4.2.4",
     "styled-components": "^5.1.0",
-    "styled-normalize": "^8.0.7"
+    "styled-normalize": "^8.0.7",
+    "three": "^0.116.1",
+    "zustand": "^2.2.3"
   },
   "devDependencies": {
     "@banterstudiosuk/eslint-config-typescript": "^0.2.0",
@@ -28,6 +33,7 @@
     "@types/node": "^13.13.5",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.7",
+    "@types/react-test-renderer": "^16.9.2",
     "@types/styled-components": "^5.1.0",
     "@typescript-eslint/eslint-plugin": "^2.31.0",
     "@typescript-eslint/parser": "^2.31.0",
@@ -41,6 +47,7 @@
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react": "^7.18.3",
     "eslint-plugin-react-hooks": "^2.0.0",
+    "glslify-loader": "^2.0.0",
     "husky": "^4.2.5",
     "jest": "^26.0.1",
     "jest-cli": "^26.0.1",
@@ -48,6 +55,8 @@
     "jest-styled-components": "^7.0.2",
     "lint-staged": "^10.2.2",
     "prettier": "^2.0.5",
+    "raw-loader": "^4.0.1",
+    "react-test-renderer": "^16.13.1",
     "typescript": "^3.8.3"
   }
 }

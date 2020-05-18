@@ -6,5 +6,9 @@
   "transformIgnorePatterns": ["./.next/", "./node_modules/", "./.templates/"],
   "modulePaths": ["<rootDir>"],
   "rootDir": "../",
+  "moduleNameMapper": {
+    "three/examples/jsm/loaders/GLTFLoader": "<rootDir>/test/stubs/GLTFLoader",
+    "\\.glsl$": "<rootDir>/test/stubs/GLSL"
+  },
   "testURL": "http://iamnick.dev"
 }

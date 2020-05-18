@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/FaceParticles renders FaceParticles 1`] = `
+<group
+  name="particle-hit-group"
+>
+  <mesh
+    name="particles"
+  >
+    <instancedBufferGeometry
+      attach="geometry"
+    />
+    <faceMaterial
+      attach="material"
+      extensions-derivatives={true}
+      faceTexture="texture"
+      time={0}
+    />
+  </mesh>
+</group>
+`;

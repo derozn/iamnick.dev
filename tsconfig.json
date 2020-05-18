@@ -23,5 +23,13 @@
     }
   },
   "exclude": ["node_modules", ".templates/*"],
-  "include": ["next-env.d.ts", "test/**/*", "src/**/*", ".eslintrc.js", "babel.config.js"]
+  "include": [
+    "definitions/**/*",
+    "next-env.d.ts",
+    "test/**/*",
+    "src/**/*",
+    ".eslintrc.js",
+    "babel.config.js",
+    "next.config.js"
+  ]
 }
