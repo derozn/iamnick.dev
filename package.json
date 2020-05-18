@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "test": "jest --config=./test/jest.config.json",
     "test:watch": "yarn test --watch",
     "test:coverage": "yarn test --coverage"
