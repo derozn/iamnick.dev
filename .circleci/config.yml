@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  heroku: circleci/heroku@1.0.1
+
 defaults: &defaults
   working_directory: ~/service
   docker:
@@ -35,14 +38,6 @@ jobs:
             JEST_JUNIT_OUTPUT_DIR: ./junit.xml
       - store_artifacts:
           path: ./coverage
-  # deploy:
-  #   <<: *defaults
-  #   steps:
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         command: yarn deploy
-  #         no_output_timeout: 45m
 
 workflows:
   build-test-deploy:
@@ -71,19 +66,11 @@ workflows:
             branches:
               only:
                 - master
-      # - deploy:
-      #     name: deploy-dev
-      #     context: dev
-      #     requires:
-      #       - aws-cli-dev
-      #       - test-dev
-      # - deploy:
-      #     name: deploy-prod
-      #     context: prod
-      #     requires:
-      #       - aws-cli-prod
-      #       - test-prod
-      #     filters:
-      #       branches:
-      #         only:
-      #           - master
+      - heroku/deploy-via-git:
+          name: deploy-staging
+          context: prod
+          requires:
+            - test-prod
+          filters:
+            branches:
+              only: sequential-branch-filter
