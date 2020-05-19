@@ -1,10 +1,9 @@
-import { extend } from 'react-three-fiber';
 import { RawShaderMaterial, Texture, RepeatWrapping, AdditiveBlending } from 'three';
 
 import vertexShader from '../shaders/vert.glsl';
 import fragmentShader from '../shaders/frag.glsl';
 
-export class FogMaterial extends RawShaderMaterial {
+export class CloudsMaterial extends RawShaderMaterial {
   constructor() {
     super({
       wireframe: false,
@@ -18,7 +17,7 @@ export class FogMaterial extends RawShaderMaterial {
           type: 'f',
           value: 0.0,
         },
-        fogTexture: {
+        cloudTexture: {
           type: 't',
           value: null,
         },
@@ -26,16 +25,14 @@ export class FogMaterial extends RawShaderMaterial {
     });
   }
 
-  set fogTexture(texture: Texture) {
+  set cloudTexture(texture: Texture) {
     texture.wrapS = RepeatWrapping;
     texture.wrapT = RepeatWrapping;
 
-    this.uniforms.fogTexture.value = texture;
+    this.uniforms.cloudTexture.value = texture;
   }
 
   set time(value: number) {
     this.uniforms.time.value = value;
   }
 }
-
-extend({ FogMaterial });

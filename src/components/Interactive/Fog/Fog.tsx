@@ -1,19 +1,23 @@
-import React, { useState, useRef } from 'react';
-import { useLoader, useFrame } from 'react-three-fiber';
-import { TextureLoader, InstancedBufferGeometry } from 'three';
+import React, { useState, useRef, useEffect } from 'react';
+import { useLoader, useFrame, extend } from 'react-three-fiber';
+import { TextureLoader } from 'three';
 
 import useStore from '#store';
 
-import './materials/fog';
-import { useCreateFogGeometry } from './hooks/useCreateFogGeometry';
+import { CloudsMaterial } from './materials/clouds';
+import { Clouds } from './objects/clouds';
+
+extend({ CloudsMaterial, Clouds });
 
 const Fog = () => {
-  const instancedBufferGeomRef = useRef<InstancedBufferGeometry>();
+  const clouds = useRef<Clouds>(null);
   const [time, setTime] = useState(0.0);
   const { textureUrl } = useStore((state) => state.fog);
-  const backgroundTexture = useLoader(TextureLoader, textureUrl);
+  const cloudTexture = useLoader(TextureLoader, textureUrl);
 
-  useCreateFogGeometry({ geometry: instancedBufferGeomRef.current, amount: 20 });
+  useEffect(() => {
+    if (clouds.current) clouds.current.create();
+  }, []);
 
   useFrame((_, delay) => {
     setTime(time + delay);
@@ -21,10 +25,10 @@ const Fog = () => {
 
   return (
     <mesh name="fog">
-      <instancedBufferGeometry ref={instancedBufferGeomRef} attach="geometry" />
-      <fogMaterial
+      <clouds args={[20]} ref={clouds} attach="geometry" />
+      <cloudsMaterial
         attach="material"
-        fogTexture={backgroundTexture}
+        cloudTexture={cloudTexture}
         time={time}
         extensions-derivatives
       />

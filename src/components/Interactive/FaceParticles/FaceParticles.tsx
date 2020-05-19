@@ -1,19 +1,23 @@
-import React, { useRef, useState } from 'react';
-import { useLoader, useFrame } from 'react-three-fiber';
+import React, { useRef, useState, useEffect } from 'react';
+import { useLoader, useFrame, extend } from 'react-three-fiber';
 import { TextureLoader } from 'three';
 
 import useStore from '#store';
 
-import './materials/face';
-import { useFaceGeometry } from './hooks/useFaceGeometry';
+import { ParticlesMaterial } from './materials/particles';
+import { Particles } from './objects/particles';
+
+extend({ ParticlesMaterial, Particles });
 
 const FaceParticles = () => {
   const [time, setTime] = useState(0);
-  const instancedBufferGeomRef = useRef<any>();
+  const particles = useRef<Particles>(null);
   const { textureUrl } = useStore((state) => state.face);
-  const faceTexture = useLoader(TextureLoader, textureUrl);
+  const particleTexture = useLoader(TextureLoader, textureUrl);
 
-  useFaceGeometry({ geometry: instancedBufferGeomRef, texture: faceTexture });
+  useEffect(() => {
+    if (particles.current !== null) particles.current.create();
+  }, []);
 
   useFrame((_, delta) => {
     setTime(time + delta);
@@ -22,11 +26,11 @@ const FaceParticles = () => {
   return (
     <group name="particle-hit-group">
       <mesh name="particles">
-        <instancedBufferGeometry ref={instancedBufferGeomRef} attach="geometry" />
-        <faceMaterial
+        <particles args={[particleTexture]} attach="geometry" ref={particles} />
+        <particlesMaterial
           attach="material"
           time={time}
-          faceTexture={faceTexture}
+          particleTexture={particleTexture}
           extensions-derivatives
         />
       </mesh>
