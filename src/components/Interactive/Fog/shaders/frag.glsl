@@ -9,16 +9,6 @@ varying vec3 vColor;
 varying float vBlink;
 varying float vDelay;
 
-// void main() {
-//   vec2 p = vUv * 2.0 - 1.0; // Make between 0-1
-
-//   vec4 texColor = texture2D(cloudTexture, vUv);
-//   vec3 color = (texColor.rgb - vBlink * length(p) * 0.8) * vColor;
-//   float opacity = texColor.a * 0.36;
-
-//   gl_FragColor = vec4(color, opacity);
-// }
-
 void main() {
   vec2 p = vUv * 2.0 - 1.0; // Make between 0-1
   vec3 color = vec3(0.0);
@@ -35,13 +25,3 @@ void main() {
 
   gl_FragColor = vec4(color, opacity);
 }
-
-/*
-  vec3 color = vec3(0.0);
-
-  float pct = abs(sin(u_time));
-
-  // Mix uses pct (a value from 0-1) to
-  // mix the two colors
-  color = mix(colorA, colorB, pct);
-*/
