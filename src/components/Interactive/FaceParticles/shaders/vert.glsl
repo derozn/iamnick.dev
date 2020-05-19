@@ -8,8 +8,8 @@ attribute float angle;
 
 uniform mat4 projectionMatrix;
 uniform mat4 modelViewMatrix;
-uniform sampler2D faceTexture;
-uniform vec2 faceTextureSize;
+uniform sampler2D particleTexture;
+uniform vec2 particleTextureSize;
 
 uniform float random;
 uniform float time;
@@ -35,11 +35,11 @@ void main(void) {
   vUv = uv;
 
   // Particle UV
-  vec2 puv = offset.xy / faceTextureSize;
+  vec2 puv = offset.xy / particleTextureSize;
   vPUv = puv;
 
   // Color of pixel
-  vec4 color = texture2D(faceTexture, puv);
+  vec4 color = texture2D(particleTexture, puv);
   float grey = color.r * 0.21 * color.g * 0.71 * color.b * 0.07;
 
   // Displacement
@@ -51,7 +51,7 @@ void main(void) {
 	displaced.z += rndz * (randomFloat(pindex) * 2.0 * depth);
 
 	// center
-	displaced.xy -= faceTextureSize * 0.5;
+	displaced.xy -= particleTextureSize * 0.5;
 
   // Particle Size
   float psize = (snoise2(vec2(time, pindex) * 0.5) + 2.0);

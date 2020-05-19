@@ -1,4 +1,3 @@
-import { extend } from 'react-three-fiber';
 import {
   RawShaderMaterial,
   Texture,
@@ -19,7 +18,7 @@ const addWrapModeToTexture = (texture: Texture) => {
   texture.wrapT = RepeatWrapping;
 };
 
-export class FaceMaterial extends RawShaderMaterial {
+export class ParticlesMaterial extends RawShaderMaterial {
   constructor() {
     super({
       depthTest: false,
@@ -27,11 +26,11 @@ export class FaceMaterial extends RawShaderMaterial {
       vertexShader,
       fragmentShader,
       uniforms: {
-        faceTexture: {
+        particleTexture: {
           type: 't',
           value: null,
         },
-        faceTextureSize: {
+        particleTextureSize: {
           type: 'v2',
           value: new Vector2(0, 0),
         },
@@ -55,16 +54,17 @@ export class FaceMaterial extends RawShaderMaterial {
     });
   }
 
-  set faceTexture(texture: Texture) {
+  set particleTexture(texture: Texture) {
     addWrapModeToTexture(texture);
 
-    this.uniforms.faceTexture.value = texture;
-    this.uniforms.faceTextureSize.value = new Vector2(texture.image.width, texture.image.height);
+    this.uniforms.particleTexture.value = texture;
+    this.uniforms.particleTextureSize.value = new Vector2(
+      texture.image.width,
+      texture.image.height,
+    );
   }
 
   set time(time: number) {
     this.uniforms.time.value = time;
   }
 }
-
-extend({ FaceMaterial });

@@ -1,6 +1,6 @@
 precision highp float;
 
-uniform sampler2D fogTexture;
+uniform sampler2D cloudTexture;
 uniform float time;
 
 varying vec3 vPosition;
@@ -12,7 +12,7 @@ varying float vDelay;
 // void main() {
 //   vec2 p = vUv * 2.0 - 1.0; // Make between 0-1
 
-//   vec4 texColor = texture2D(fogTexture, vUv);
+//   vec4 texColor = texture2D(cloudTexture, vUv);
 //   vec3 color = (texColor.rgb - vBlink * length(p) * 0.8) * vColor;
 //   float opacity = texColor.a * 0.36;
 
@@ -22,7 +22,7 @@ varying float vDelay;
 void main() {
   vec2 p = vUv * 2.0 - 1.0; // Make between 0-1
   vec3 color = vec3(0.0);
-  vec4 texColor = texture2D(fogTexture, vUv);
+  vec4 texColor = texture2D(cloudTexture, vUv);
 
   float pct = abs(sin(time * 0.2 + vDelay * 0.2));
   

@@ -4,13 +4,18 @@ exports[`components/Fog renders Fog 1`] = `
 <mesh
   name="fog"
 >
-  <instancedBufferGeometry
+  <clouds
+    args={
+      Array [
+        20,
+      ]
+    }
     attach="geometry"
   />
-  <fogMaterial
+  <cloudsMaterial
     attach="material"
+    cloudTexture="texture"
     extensions-derivatives={true}
-    fogTexture="texture"
     time={0}
   />
 </mesh>
