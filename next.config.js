@@ -9,9 +9,3 @@ module.exports = {
     return config;
   },
 };
-
-// {
-//       test: /\.(glsl|vs|fs)$/,
-//       exclude: /node_modules/,
-//       use: ['ts-shader-loader'],
-// }
