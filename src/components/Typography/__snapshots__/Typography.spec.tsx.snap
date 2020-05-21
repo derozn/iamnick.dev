@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/Typography renders as h1 1`] = `
+.c0 {
+  margin: 0;
+  font-family: 'Montserrat',sans-serif;
+  font-weight: 600;
+  font-size: 6rem;
+  line-height: 1.167;
+  -webkit-letter-spacing: -0.01562em;
+  -moz-letter-spacing: -0.01562em;
+  -ms-letter-spacing: -0.01562em;
+  letter-spacing: -0.01562em;
+}
+
+<h1
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders as h1 styles when variant is h1 1`] = `
+.c0 {
+  margin: 0;
+  font-family: 'Montserrat',sans-serif;
+  font-weight: 600;
+  font-size: 6rem;
+  line-height: 1.167;
+  -webkit-letter-spacing: -0.01562em;
+  -moz-letter-spacing: -0.01562em;
+  -ms-letter-spacing: -0.01562em;
+  letter-spacing: -0.01562em;
+}
+
+<h2
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders as h2 1`] = `
+.c0 {
+  margin: 0;
+  font-family: 'Open Sans',sans-serif;
+  font-weight: 400;
+  font-size: 3.75rem;
+  line-height: 1.2;
+  -webkit-letter-spacing: -0.00833em;
+  -moz-letter-spacing: -0.00833em;
+  -ms-letter-spacing: -0.00833em;
+  letter-spacing: -0.00833em;
+}
+
+<h2
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders as span 1`] = `
+.c0 {
+  margin: 0;
+}
+
+<span
+  class="c0"
+/>
+`;
