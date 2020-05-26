@@ -12,7 +12,6 @@ const Scene = () => {
   return (
     <Canvas
       data-testid="scene"
-      resize={{ scroll: true, debounce: { scroll: 50, resize: 20 } }}
       concurrent
       pixelRatio={1}
       camera={{ zoom: 1, position: [0, 0, 300], far: 50000 }}
