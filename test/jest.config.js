@@ -18,4 +18,9 @@ module.exports = {
   rootDir: '../',
   moduleNameMapper,
   testURL: 'http://iamnick.dev',
+  globals: {
+    'ts-jest': {
+      tsConfig: '<rootDir>/tsconfig.test.json',
+    },
+  },
 };
