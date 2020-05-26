@@ -24,7 +24,7 @@
   },
   "exclude": ["node_modules", ".templates/*"],
   "include": [
-    "definitions/**/*",
+    "declarations/**/*",
     "next-env.d.ts",
     "test/**/*",
     "src/**/*",

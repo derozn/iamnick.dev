@@ -47,4 +47,24 @@ describe('components/Typography', () => {
 
     expect(container.firstChild).toMatchSnapshot();
   });
+
+  it('renders with primary text color when color is primary', () => {
+    const { container } = render(
+      <ThemeProvider theme={theme}>
+        <Typography color="primary" />
+      </ThemeProvider>,
+    );
+
+    expect(container.firstChild).toMatchSnapshot();
+  });
+
+  it('renders with secondary text color when color is secondary', () => {
+    const { container } = render(
+      <ThemeProvider theme={theme}>
+        <Typography color="secondary" />
+      </ThemeProvider>,
+    );
+
+    expect(container.firstChild).toMatchSnapshot();
+  });
 });

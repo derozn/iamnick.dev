@@ -3,9 +3,10 @@
 exports[`components/Typography renders as h1 1`] = `
 .c0 {
   margin: 0;
+  position: relative;
   font-family: 'Montserrat',sans-serif;
   font-weight: 600;
-  font-size: 6rem;
+  font-size: 7.2rem;
   line-height: 1.167;
   -webkit-letter-spacing: -0.01562em;
   -moz-letter-spacing: -0.01562em;
@@ -21,9 +22,10 @@ exports[`components/Typography renders as h1 1`] = `
 exports[`components/Typography renders as h1 styles when variant is h1 1`] = `
 .c0 {
   margin: 0;
+  position: relative;
   font-family: 'Montserrat',sans-serif;
   font-weight: 600;
-  font-size: 6rem;
+  font-size: 7.2rem;
   line-height: 1.167;
   -webkit-letter-spacing: -0.01562em;
   -moz-letter-spacing: -0.01562em;
@@ -39,6 +41,7 @@ exports[`components/Typography renders as h1 styles when variant is h1 1`] = `
 exports[`components/Typography renders as h2 1`] = `
 .c0 {
   margin: 0;
+  position: relative;
   font-family: 'Open Sans',sans-serif;
   font-weight: 400;
   font-size: 3.75rem;
@@ -57,9 +60,36 @@ exports[`components/Typography renders as h2 1`] = `
 exports[`components/Typography renders as span 1`] = `
 .c0 {
   margin: 0;
+  position: relative;
 }
 
 <span
   class="c0"
+/>
+`;
+
+exports[`components/Typography renders with primary text color when color is primary 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+  color: #ffffff;
+}
+
+<span
+  class="c0"
+  color="primary"
+/>
+`;
+
+exports[`components/Typography renders with secondary text color when color is secondary 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+  color: #000000;
+}
+
+<span
+  class="c0"
+  color="secondary"
 />
 `;
