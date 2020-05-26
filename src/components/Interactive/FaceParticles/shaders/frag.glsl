@@ -1,6 +1,7 @@
 precision highp float;
 
 uniform sampler2D particleTexture;
+uniform float time;
 
 varying vec2 vPUv;
 varying vec2 vUv;
@@ -18,8 +19,10 @@ void main() {
 	float dist = radius - distance(uv, vec2(0.5));
 	float t = smoothstep(0.0, border, dist);
 
+  float fade = min(mix(0.0, t, time), t);
+
   color = texColor;
-	color.a = t;
+	color.a = fade;
 
   gl_FragColor = color;
 }
