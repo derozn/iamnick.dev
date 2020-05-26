@@ -2,7 +2,6 @@ precision highp float;
 
 uniform sampler2D particleTexture;
 uniform float time;
-// uniform float fade;
 
 varying vec2 vPUv;
 varying vec2 vUv;
