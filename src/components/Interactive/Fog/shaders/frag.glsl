@@ -20,7 +20,8 @@ void main() {
 
   color = (texColor.rgb - vBlink * length(p) * 0.8) * rdzColor;
 
-  float opacity = texColor.a * 0.1;
+  float texAlpha = texColor.a * 0.1;
+  float opacity = min(mix(0.0, texAlpha, time), texAlpha);
 
   gl_FragColor = vec4(color, opacity);
 }
