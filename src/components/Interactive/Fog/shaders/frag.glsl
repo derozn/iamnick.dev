@@ -16,7 +16,6 @@ void main() {
 
   float pct = abs(sin(time * 0.2 + vDelay * 0.2));
   
-  // RGB = 212/72/2 - 
   vec3 rdzColor = mix(vec3(0.8, 0.28, 0.28), vec3(0.8, 0.49, 0.28), pct);
 
   color = (texColor.rgb - vBlink * length(p) * 0.8) * rdzColor;

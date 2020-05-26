@@ -67,4 +67,24 @@ describe('components/Typography', () => {
 
     expect(container.firstChild).toMatchSnapshot();
   });
+
+  it('renders with textAlign', () => {
+    const { container } = render(
+      <ThemeProvider theme={theme}>
+        <Typography align="center" />
+      </ThemeProvider>,
+    );
+
+    expect(container.firstChild).toMatchSnapshot();
+  });
+
+  it('renders with display', () => {
+    const { container } = render(
+      <ThemeProvider theme={theme}>
+        <Typography display="inline" />
+      </ThemeProvider>,
+    );
+
+    expect(container.firstChild).toMatchSnapshot();
+  });
 });

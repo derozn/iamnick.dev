@@ -25,7 +25,7 @@ const FaceParticles = () => {
 
   return (
     <group name="particle-hit-group">
-      <mesh name="particles">
+      <mesh name="particles" position={[75, 0, 0]}>
         <particles args={[particleTexture]} attach="geometry" ref={particles} />
         <particlesMaterial
           attach="material"
