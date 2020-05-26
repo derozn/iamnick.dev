@@ -19,20 +19,22 @@ const Fog = () => {
     if (clouds.current) clouds.current.create();
   }, []);
 
-  useFrame((_, delay) => {
-    setTime(time + delay);
+  useFrame((_, delta) => {
+    setTime(time + delta);
   });
 
   return (
-    <mesh name="fog">
-      <clouds args={[20]} ref={clouds} attach="geometry" />
-      <cloudsMaterial
-        attach="material"
-        cloudTexture={cloudTexture}
-        time={time}
-        extensions-derivatives
-      />
-    </mesh>
+    <group>
+      <mesh name="fog" position={[0, 0, -700]}>
+        <clouds args={[20]} ref={clouds} attach="geometry" />
+        <cloudsMaterial
+          attach="material"
+          cloudTexture={cloudTexture}
+          time={time}
+          extensions-derivatives
+        />
+      </mesh>
+    </group>
   );
 };
 

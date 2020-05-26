@@ -1,8 +1,9 @@
 import React from 'react';
 import NextApp, { AppContext } from 'next/app';
 import Head from 'next/head';
+import { ThemeProvider } from 'styled-components';
 
-import { GlobalStyle } from '#styles';
+import { GlobalStyle, theme } from '#styles';
 
 class App extends NextApp {
   static async getInitialProps({ Component, ctx }: AppContext) {
@@ -19,8 +20,10 @@ class App extends NextApp {
         <Head>
           <title>iamnick.dev</title>
         </Head>
-        <GlobalStyle />
-        <Component {...pageProps} />
+        <ThemeProvider theme={theme}>
+          <GlobalStyle />
+          <Component {...pageProps} />
+        </ThemeProvider>
       </>
     );
   }

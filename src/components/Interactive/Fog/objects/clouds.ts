@@ -25,7 +25,7 @@ export class Clouds extends InstancedBufferGeometry {
       instancePositions.setXYZ(
         index,
         (Math.random() * 2 - 1) * 850,
-        0,
+        -500.0,
         (Math.random() * 2 - 1) * 300,
       );
 

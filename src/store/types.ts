@@ -1,15 +1,8 @@
-import { Vector3, Color } from 'three';
-
-export interface State {
-  zoom: number;
-  position: Vector3;
-  background: {
-    color: Color;
-  };
+export type State = {
   fog: {
     textureUrl: string;
   };
   face: {
     textureUrl: string;
   };
-}
+};

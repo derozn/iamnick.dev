@@ -16,7 +16,7 @@ varying vec3 vColor;
 varying float vBlink;
 varying float vDelay;
 
-const float duration = 500.0;
+const float duration = 200.0;
 
 #pragma glslify: convertHsvToRgb = require(glsl-hsv2rgb)
 

@@ -1,0 +1,153 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/Typography renders as h1 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+  font-family: 'Montserrat',sans-serif;
+  font-weight: 600;
+  font-size: 4.8rem;
+  line-height: 1.167;
+  -webkit-letter-spacing: -0.01562em;
+  -moz-letter-spacing: -0.01562em;
+  -ms-letter-spacing: -0.01562em;
+  letter-spacing: -0.01562em;
+}
+
+@media (min-width:600px) {
+  .c0 {
+    font-size: 6rem;
+  }
+}
+
+@media (min-width:1280px) {
+  .c0 {
+    font-size: 7.2rem;
+  }
+}
+
+<h1
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders as h1 styles when variant is h1 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+  font-family: 'Montserrat',sans-serif;
+  font-weight: 600;
+  font-size: 4.8rem;
+  line-height: 1.167;
+  -webkit-letter-spacing: -0.01562em;
+  -moz-letter-spacing: -0.01562em;
+  -ms-letter-spacing: -0.01562em;
+  letter-spacing: -0.01562em;
+}
+
+@media (min-width:600px) {
+  .c0 {
+    font-size: 6rem;
+  }
+}
+
+@media (min-width:1280px) {
+  .c0 {
+    font-size: 7.2rem;
+  }
+}
+
+<h2
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders as h2 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+  font-family: 'Montserrat',sans-serif;
+  font-weight: 400;
+  font-size: 3.75rem;
+  line-height: 1.2;
+  -webkit-letter-spacing: -0.00833em;
+  -moz-letter-spacing: -0.00833em;
+  -ms-letter-spacing: -0.00833em;
+  letter-spacing: -0.00833em;
+}
+
+@media (min-width:600px) {
+  .c0 {
+    font-size: 4.8rem;
+  }
+}
+
+@media (min-width:1280px) {
+  .c0 {
+    font-size: 6rem;
+  }
+}
+
+<h2
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders as span 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+}
+
+<span
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders with display 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+  display: inline-block;
+}
+
+<span
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders with primary text color when color is primary 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+  color: #d6d6d6;
+}
+
+<span
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders with secondary text color when color is secondary 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+  color: #000000;
+}
+
+<span
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders with textAlign 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+  text-align: center;
+}
+
+<span
+  class="c0"
+/>
+`;

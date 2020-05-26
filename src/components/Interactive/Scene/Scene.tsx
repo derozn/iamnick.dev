@@ -1,34 +1,29 @@
 import React, { Suspense } from 'react';
-import dynamic from 'next/dynamic';
 import { Canvas } from 'react-three-fiber';
+import { useTheme } from 'styled-components';
 
-import useStore from '#store';
-
-const Fog = dynamic(() => import('#components/Interactive/Fog'), { ssr: false });
-const FaceParticles = dynamic(() => import('#components/Interactive/FaceParticles'), {
-  ssr: false,
-});
+import Fog from '#components/Interactive/Fog';
+import FaceParticles from '#components/Interactive/FaceParticles';
+import Effects from '#components/Interactive/Effects';
 
 const Scene = () => {
-  const { zoom, position, backgroundColor } = useStore((state) => ({
-    zoom: state.zoom,
-    position: state.position,
-    backgroundColor: state.background.color,
-  }));
+  const theme = useTheme();
 
   return (
     <Canvas
       data-testid="scene"
+      resize={{ scroll: true, debounce: { scroll: 50, resize: 20 } }}
       concurrent
       pixelRatio={1}
-      camera={{ zoom, position }}
+      camera={{ zoom: 1, position: [0, 0, 300], far: 50000 }}
       onCreated={({ gl }) => {
-        gl.setClearColor(backgroundColor);
+        gl.setClearColor(theme.palette.background.primary);
       }}
     >
       <Suspense fallback={null}>
         <Fog />
         <FaceParticles />
+        <Effects backgroundColor={theme.palette.background.primary} />
       </Suspense>
     </Canvas>
   );

@@ -1,12 +1,56 @@
 import React from 'react';
 import { render } from '@testing-library/react';
+import { ThemeProvider } from 'styled-components';
+
+import createMatchMedia from 'test/helpers/createMatchMedia';
+import { theme } from '#styles/theme';
 
 import HomePage from './HomePage';
 
-describe('components/HomePage', () => {
-  it('render <Scene /> canvas', () => {
-    const { getByTestId } = render(<HomePage />);
+jest.mock('next/dynamic', () => () => () => 'Scene');
 
-    expect(getByTestId('scene')).toBeTruthy();
+const renderComponent = () => {
+  return render(
+    <ThemeProvider theme={theme}>
+      <HomePage />
+    </ThemeProvider>,
+  );
+};
+
+describe('components/HomePage', () => {
+  it('does not render <Scene /> when window width is smaller than 600px', () => {
+    Object.assign(window, { matchMedia: createMatchMedia(500) });
+
+    const { queryByText } = renderComponent();
+
+    expect(queryByText('Scene')).toBe(null);
+  });
+
+  it('renders <Scene /> when window width is greater than 600px', () => {
+    Object.assign(window, { matchMedia: createMatchMedia(700) });
+
+    const { getByText } = renderComponent();
+
+    expect(getByText('Scene')).toBeTruthy();
+  });
+
+  it('renders title', () => {
+    const { getByText } = renderComponent();
+
+    const result = getByText((_, element) => {
+      return element.textContent === 'I AM NICK';
+    });
+
+    expect(result).toBeTruthy();
+  });
+
+  it('renders subtitle', () => {
+    const { getByText } = renderComponent();
+
+    const result = getByText((_, element) => {
+      return element.textContent === 'Creative Front End Developer';
+    });
+
+    expect(result).toBeTruthy();
   });
 });
