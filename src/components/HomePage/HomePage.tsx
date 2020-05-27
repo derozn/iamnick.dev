@@ -4,27 +4,37 @@ import { useTheme } from 'styled-components';
 
 import useMedia from '#hooks/useMedia';
 import Typography from '#components/Typography';
-import { Header, CanvasWrapper, Section } from './HomePage.style';
+import Slide from '#components/Slide';
+
+import { Header, CanvasWrapper, Content, Section } from './HomePage.style';
 
 const Scene = dynamic(() => import('#components/Interactive/Scene'), { ssr: false });
 
 const HomePage = () => {
-  const { mediaQuery } = useTheme();
+  const { mediaQuery, palette } = useTheme();
 
   const showInteractiveScene = useMedia(mediaQuery.sm, false);
 
   return (
     <Header>
       <CanvasWrapper>{showInteractiveScene && <Scene />}</CanvasWrapper>
-      <Section>
-        <Typography component="h1" color="primary" align="center">
-          <Typography color="accent">I</Typography> AM NICK
-        </Typography>
+      <Content>
+        <Section>
+          <Slide backgroundColor={palette.primary.main}>
+            <Typography component="h1" color="primary" align="center">
+              <Typography color="accent">I</Typography> AM NICK
+            </Typography>
+          </Slide>
+        </Section>
 
-        <Typography component="h2" variant="h3" color="primary" align="center">
-          <Typography color="accent">Creative</Typography> Front End Developer
-        </Typography>
-      </Section>
+        <Section>
+          <Slide backgroundColor={palette.primary.main} delay={0.3}>
+            <Typography component="h2" variant="h3" color="primary" align="center">
+              <Typography color="accent">Creative</Typography> Front End Developer
+            </Typography>
+          </Slide>
+        </Section>
+      </Content>
     </Header>
   );
 };

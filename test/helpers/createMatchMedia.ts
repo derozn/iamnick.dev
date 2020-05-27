@@ -1,11 +1,9 @@
 import mediaQuery from 'css-mediaquery';
 
-const createMatchMedia = (width: number) => {
+export const createMatchMedia = (width: number) => {
   return (query: string) => ({
     matches: mediaQuery.match(query, { width }),
     addListener: () => {},
     removeListener: () => {},
   });
 };
-
-export default createMatchMedia;
