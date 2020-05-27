@@ -33,6 +33,7 @@ declare module 'styled-components' {
     palette: {
       primary: {
         light: string;
+        main: string;
       };
       text: {
         primary: string;

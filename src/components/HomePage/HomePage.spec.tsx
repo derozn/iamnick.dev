@@ -2,7 +2,8 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { ThemeProvider } from 'styled-components';
 
-import createMatchMedia from 'test/helpers/createMatchMedia';
+import { getByNestedText } from 'test/helpers/getByNestedText';
+import { createMatchMedia } from 'test/helpers/createMatchMedia';
 import { theme } from '#styles/theme';
 
 import HomePage from './HomePage';
@@ -37,20 +38,12 @@ describe('components/HomePage', () => {
   it('renders title', () => {
     const { getByText } = renderComponent();
 
-    const result = getByText((_, element) => {
-      return element.textContent === 'I AM NICK';
-    });
-
-    expect(result).toBeTruthy();
+    expect(getByNestedText(getByText, 'I AM NICK')).toBeTruthy();
   });
 
   it('renders subtitle', () => {
     const { getByText } = renderComponent();
 
-    const result = getByText((_, element) => {
-      return element.textContent === 'Creative Front End Developer';
-    });
-
-    expect(result).toBeTruthy();
+    expect(getByNestedText(getByText, 'Creative Front End Developer')).toBeTruthy();
   });
 });

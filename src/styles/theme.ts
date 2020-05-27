@@ -70,6 +70,7 @@ const theme: DefaultTheme = {
   palette: {
     primary: {
       light: '#ffffff',
+      main: '#d6d6d6',
     },
     text: {
       primary: '#d6d6d6',

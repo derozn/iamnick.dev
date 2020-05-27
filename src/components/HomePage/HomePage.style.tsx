@@ -8,6 +8,7 @@ export const Header = styled.header`
   align-items: center;
   flex-direction: column;
 
+  padding: 10px;
   max-width: ${({ theme }) => theme.sizing.maxWidth}px;
   margin: 0 auto;
   height: 100vh;
@@ -23,9 +24,17 @@ export const CanvasWrapper = styled.div`
   z-index: -1;
 `;
 
-export const Section = styled.section`
+export const Content = styled.section`
   ${({ theme }) => theme.mediaQuery.md} {
     margin-left: -250px;
     margin-top: -65px;
+  }
+`;
+
+export const Section = styled.div`
+  margin-bottom: 10px;
+
+  &:last-of-type {
+    margin-bottom: 0;
   }
 `;

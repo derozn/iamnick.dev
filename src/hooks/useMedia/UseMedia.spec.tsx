@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-hooks';
 
-import createMatchMedia from 'test/helpers/createMatchMedia';
+import { createMatchMedia } from 'test/helpers/createMatchMedia';
 import useMedia from './useMedia';
 
 describe('components/useMedia', () => {
