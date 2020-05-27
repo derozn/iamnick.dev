@@ -32,7 +32,7 @@ export class CloudsMaterial extends RawShaderMaterial {
     this.uniforms.cloudTexture.value = texture;
   }
 
-  set time(value: number) {
-    this.uniforms.time.value = value;
+  public update(delta: number) {
+    this.uniforms.time.value += delta;
   }
 }
