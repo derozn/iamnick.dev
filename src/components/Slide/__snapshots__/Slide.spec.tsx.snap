@@ -3,6 +3,7 @@
 exports[`components/Slide renders with additional delay factor on slide animation 1`] = `
 .c0 {
   position: relative;
+  overflow: hidden;
 }
 
 .c0::after {
@@ -39,6 +40,7 @@ exports[`components/Slide renders with additional delay factor on slide animatio
 exports[`components/Slide renders with background css style set to passed in backgroundColor 1`] = `
 .c0 {
   position: relative;
+  overflow: hidden;
 }
 
 .c0::after {

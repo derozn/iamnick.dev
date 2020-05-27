@@ -33,6 +33,7 @@ const show = keyframes`
 
 export const Container = styled.div<Props>`
   position: relative;
+  overflow: hidden;
 
   &::after {
     content: '';
