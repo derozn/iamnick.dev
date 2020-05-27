@@ -64,7 +64,7 @@ export class ParticlesMaterial extends RawShaderMaterial {
     );
   }
 
-  set time(time: number) {
-    this.uniforms.time.value = time;
+  public update(delta: number) {
+    this.uniforms.time.value += delta;
   }
 }

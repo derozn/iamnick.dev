@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useLoader, useFrame, extend } from 'react-three-fiber';
 import { TextureLoader } from 'three';
 
@@ -10,8 +10,8 @@ import { Particles } from './objects/particles';
 extend({ ParticlesMaterial, Particles });
 
 const FaceParticles = () => {
-  const [time, setTime] = useState(0);
   const particles = useRef<Particles>(null);
+  const particlesMaterialRef = useRef<ParticlesMaterial>(null);
   const { textureUrl } = useStore((state) => state.face);
   const particleTexture = useLoader(TextureLoader, textureUrl);
 
@@ -20,7 +20,9 @@ const FaceParticles = () => {
   }, []);
 
   useFrame((_, delta) => {
-    setTime(time + delta);
+    if (particlesMaterialRef.current) {
+      particlesMaterialRef.current.update(delta);
+    }
   });
 
   return (
@@ -28,8 +30,8 @@ const FaceParticles = () => {
       <mesh name="particles" position={[75, 0, 0]}>
         <particles args={[particleTexture]} attach="geometry" ref={particles} />
         <particlesMaterial
+          ref={particlesMaterialRef}
           attach="material"
-          time={time}
           particleTexture={particleTexture}
           extensions-derivatives
         />

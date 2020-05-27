@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useLoader, useFrame, extend } from 'react-three-fiber';
 import { TextureLoader } from 'three';
 
@@ -11,7 +11,7 @@ extend({ CloudsMaterial, Clouds });
 
 const Fog = () => {
   const clouds = useRef<Clouds>(null);
-  const [time, setTime] = useState(0.0);
+  const cloudsMaterialRef = useRef<CloudsMaterial>(null);
   const { textureUrl } = useStore((state) => state.fog);
   const cloudTexture = useLoader(TextureLoader, textureUrl);
 
@@ -20,7 +20,9 @@ const Fog = () => {
   }, []);
 
   useFrame((_, delta) => {
-    setTime(time + delta);
+    if (cloudsMaterialRef.current) {
+      cloudsMaterialRef.current.update(delta);
+    }
   });
 
   return (
@@ -28,9 +30,9 @@ const Fog = () => {
       <mesh name="fog" position={[0, 0, -700]}>
         <clouds args={[20]} ref={clouds} attach="geometry" />
         <cloudsMaterial
+          ref={cloudsMaterialRef}
           attach="material"
           cloudTexture={cloudTexture}
-          time={time}
           extensions-derivatives
         />
       </mesh>
