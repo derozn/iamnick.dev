@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { ThemeProvider } from 'styled-components';
 
-import { getByNestedText } from 'test/helpers/getByNestedText';
+import { getByNestedText } from 'test/react-testing-library-addons/getByNestedText';
 import { createMatchMedia } from 'test/helpers/createMatchMedia';
 import { theme } from '#styles/theme';
 
@@ -20,7 +20,7 @@ const renderComponent = () => {
 
 describe('components/HomePage', () => {
   it('does not render <Scene /> when window width is smaller than 600px', () => {
-    Object.assign(window, { matchMedia: createMatchMedia(500) });
+    createMatchMedia({ width: 500 });
 
     const { queryByText } = renderComponent();
 
@@ -28,7 +28,7 @@ describe('components/HomePage', () => {
   });
 
   it('renders <Scene /> when window width is greater than 600px', () => {
-    Object.assign(window, { matchMedia: createMatchMedia(700) });
+    createMatchMedia({ width: 700 });
 
     const { getByText } = renderComponent();
 

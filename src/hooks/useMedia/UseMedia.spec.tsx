@@ -3,9 +3,9 @@ import { renderHook } from '@testing-library/react-hooks';
 import { createMatchMedia } from 'test/helpers/createMatchMedia';
 import useMedia from './useMedia';
 
-describe('components/useMedia', () => {
+describe('hooks/useMedia', () => {
   it('returns true when width is greater that the given min-width', () => {
-    Object.assign(window, { matchMedia: createMatchMedia(769) });
+    createMatchMedia({ width: 769 });
 
     const { result } = renderHook(() => useMedia('(min-width: 768px)', false));
 
@@ -13,7 +13,7 @@ describe('components/useMedia', () => {
   });
 
   it('returns false when width is less than the given min-width', () => {
-    Object.assign(window, { matchMedia: createMatchMedia(400) });
+    createMatchMedia({ width: 400 });
 
     const { result } = renderHook(() => useMedia('(min-width: 768px)', false));
 
