@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, RefObject } from 'react';
 
+// SORT THUIS OUT
+import 'intersection-observer';
+
 function useOnScreen<T extends HTMLElement>(
   rootMargin: string | undefined = '0px',
 ): [RefObject<T>, boolean] {

@@ -1,21 +1,24 @@
-import styled from 'styled-components';
+/* eslint-disable complexity */
+import styled, { css } from 'styled-components';
 import { TextProps } from './types';
 
-// This needs sorting out.
-export const Text = styled.span<TextProps>`
+export const Text = styled.span<TextProps>(
+  (props) => css`
   margin: 0;
   position: relative;
 
-  ${(props) => props.displayAs === 'block' && `display: block;`}
-  ${(props) => props.displayAs === 'inline' && `display: inline-block;`}
+  ${props.displayAs === 'block' && `display: block;`}
+  ${props.displayAs === 'inline' && `display: inline-block;`}
 
-  ${(props) => props.variant === 'h1' && props.theme.typography.h1}
-  ${(props) => props.variant === 'h2' && props.theme.typography.h2}
-  ${(props) => props.variant === 'h3' && props.theme.typography.h3}
+  ${props.variant === 'h1' && props.theme.typography.h1}
+  ${props.variant === 'h2' && props.theme.typography.h2}
+  ${props.variant === 'h3' && props.theme.typography.h3}
+  ${props.variant === 'body' && props.theme.typography.body}
 
-  ${(props) => props.textColor === 'primary' && `color: ${props.theme.palette.text.primary};`}
-  ${(props) => props.textColor === 'secondary' && `color: ${props.theme.palette.text.secondary};`}
-  ${(props) => props.textColor === 'accent' && `color: ${props.theme.palette.text.accent};`}
+  ${props.textColor === 'primary' && `color: ${props.theme.palette.text.primary};`}
+  ${props.textColor === 'secondary' && `color: ${props.theme.palette.text.secondary};`}
+  ${props.textColor === 'accent' && `color: ${props.theme.palette.text.accent};`}
   
-  ${(props) => props.textAlign && `text-align: ${props.textAlign};`}
-`;
+  ${props.textAlign && `text-align: ${props.textAlign};`}
+`,
+);

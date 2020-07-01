@@ -3,25 +3,15 @@ import styled from 'styled-components';
 export const Layout = styled.section`
   display: grid;
   grid-template-columns: 10px auto 10px;
-  grid-auto-rows: max-content;
-  grid-template-rows: 1fr 1fr;
+  grid-auto-rows: min-content;
+  grid-template-rows: 1fr min-content;
   grid-template-areas: '. header .' '. feed .';
 
   max-width: ${({ theme }) => theme.sizing.maxWidth}px;
+  margin: 0 auto;
 
   ${({ theme }) => theme.mediaQuery.sm} {
     grid-template-columns: 20px auto 20px;
-    row-gap: 20px;
-  }
-
-  ${({ theme }) => theme.mediaQuery.md} {
-    grid-template-columns: 40px auto 40px;
-    row-gap: 40px;
-  }
-
-  ${({ theme }) => theme.mediaQuery.lg} {
-    grid-template-columns: 80px auto 80px;
-    row-gap: 80px;
   }
 `;
 
@@ -48,13 +38,6 @@ export const CanvasWrapper = styled.div`
   z-index: -1;
 `;
 
-export const Content = styled.section`
-  ${({ theme }) => theme.mediaQuery.md} {
-    margin-left: -250px;
-    margin-top: -65px;
-  }
-`;
-
 export const Section = styled.div`
   margin-bottom: 10px;
 
@@ -63,6 +46,11 @@ export const Section = styled.div`
   }
 `;
 
-export const Feed = styled.div`
+export const FeedLayout = styled.div`
   grid-area: feed;
+`;
+
+export const FeedTitle = styled.div`
+  margin: 40vh 0;
+  text-align: center;
 `;

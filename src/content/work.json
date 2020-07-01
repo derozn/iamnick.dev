@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Lyvly",
+    "date": "2020",
+    "image": {
+      "src": "/images/lyvly.jpg",
+      "alt": "Lyvly - London’s Best Shared Living Community",
+      "width": "1140",
+      "height": "960",
+      "source": [
+        { "srcSet": "/images/lyvly.webp", "type": "image/webp" },
+        { "srcSet": "/images/lyvly.jpg", "type": "image/jpeg" }
+      ]
+    },
+    "summary": "lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem "
+  },
+  {
+    "title": "YOTI",
+    "date": "2018",
+    "image": {
+      "src": "/images/yoti.jpg",
+      "alt": "Yoti - Your digital identity",
+      "width": "1140",
+      "height": "960",
+      "source": [
+        { "srcSet": "/images/yoti.webp", "type": "image/webp" },
+        { "srcSet": "/images/yoti.jpg", "type": "image/jpeg" }
+      ]
+    },
+    "summary": "lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem "
+  },
+  {
+    "title": "Arcadia",
+    "date": "2017",
+    "image": {
+      "src": "/images/arcadia.jpg",
+      "alt": "Arcadia - Ecommerce",
+      "width": "1140",
+      "height": "960",
+      "source": [
+        { "srcSet": "/images/arcadia.webp", "type": "image/webp" },
+        { "srcSet": "/images/arcadia.jpg", "type": "image/jpeg" }
+      ]
+    },
+    "summary": "lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem "
+  },
+  {
+    "title": "Vitamin",
+    "date": "2014",
+    "image": {
+      "src": "/images/vitamin.jpg",
+      "alt": "Vitamin London - Creative Agency",
+      "width": "1140",
+      "height": "960",
+      "source": [
+        { "srcSet": "/images/vitamin.webp", "type": "image/webp" },
+        { "srcSet": "/images/vitamin.jpg", "type": "image/jpeg" }
+      ]
+    },
+    "summary": "lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem "
+  }
+]

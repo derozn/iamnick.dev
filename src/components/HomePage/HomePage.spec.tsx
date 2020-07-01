@@ -6,6 +6,8 @@ import { getByNestedText } from 'test/react-testing-library-addons/getByNestedTe
 import { createMatchMedia } from 'test/helpers/createMatchMedia';
 import { theme } from '#styles/theme';
 
+import workContent from '#content/work.json';
+
 import HomePage from './HomePage';
 
 jest.mock('next/dynamic', () => () => () => 'Scene');
@@ -13,7 +15,7 @@ jest.mock('next/dynamic', () => () => () => 'Scene');
 const renderComponent = () => {
   return render(
     <ThemeProvider theme={theme}>
-      <HomePage />
+      <HomePage workContent={workContent} />
     </ThemeProvider>,
   );
 };
@@ -45,5 +47,20 @@ describe('components/HomePage', () => {
     const { getByText } = renderComponent();
 
     expect(getByNestedText(getByText, 'Creative Front End Developer')).toBeTruthy();
+  });
+
+  it('renders work experience title', () => {
+    const { getByText } = renderComponent();
+
+    expect(getByNestedText(getByText, 'Work Experience')).toBeTruthy();
+  });
+
+  it('renders timeline', () => {
+    const { getByText } = renderComponent();
+
+    expect(getByNestedText(getByText, 'Lyvly')).toBeTruthy();
+    expect(getByNestedText(getByText, 'Arcadia')).toBeTruthy();
+    expect(getByNestedText(getByText, 'YOTI')).toBeTruthy();
+    expect(getByNestedText(getByText, 'Vitamin')).toBeTruthy();
   });
 });

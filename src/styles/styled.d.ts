@@ -1,7 +1,7 @@
 import 'styled-components';
 import { mediaQuery } from './theme';
 
-type TypographyHeading = {
+type TypographyText = {
   fontFamily: string;
   fontWeight: number;
   fontSize: string;
@@ -20,14 +20,14 @@ declare module 'styled-components' {
     typography: {
       htmlFontSize: number;
       fontFamily: string;
-      fontSize: number;
       fontWeightLight: number;
       fontWeightRegular: number;
       fontWeightMedium: number;
       fontWeightBold: number;
-      h1: TypographyHeading;
-      h2: TypographyHeading;
-      h3: TypographyHeading;
+      h1: TypographyText;
+      h2: TypographyText;
+      h3: TypographyText;
+      body: TypographyText;
     };
 
     palette: {
