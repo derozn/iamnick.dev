@@ -10,6 +10,9 @@
     "test:watch": "yarn test --watch",
     "test:coverage": "yarn test --coverage"
   },
+  "engines": {
+    "node": "12.16.3"
+  },
   "dependencies": {
     "glsl-hsv2rgb": "^1.0.0",
     "glsl-noise": "^0.0.0",
