@@ -1,13 +1,4 @@
 const withPlugins = require('next-compose-plugins');
+const withGLSLLoader = require('./plugins/next-glsl-loader');
 
-module.exports = withPlugins([], {
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.(glsl|vs|fs)$/,
-      exclude: /node_modules/,
-      use: ['raw-loader', 'glslify-loader'],
-    });
-
-    return config;
-  },
-});
+module.exports = withPlugins([withGLSLLoader]);
