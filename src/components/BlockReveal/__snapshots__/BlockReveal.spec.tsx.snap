@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`components/Slide renders with additional delay factor on slide animation 1`] = `
+exports[`components/BlockReveal renders with additional delay factor on reveal animation 1`] = `
 .c0 {
   position: relative;
-  overflow: hidden;
+  display: inherit;
 }
 
 .c0::after {
@@ -23,24 +23,24 @@ exports[`components/Slide renders with additional delay factor on slide animatio
 
 .c0 > span {
   display: inherit;
-  visibility: hidden;
-  -webkit-animation: cwLUPY 0.5s 1.5s ease-out forwards;
-  animation: cwLUPY 0.5s 1.5s ease-out forwards;
+  opacity: 0;
+  -webkit-animation: jGGCbr 0.5s 1.5s ease-out  forwards;
+  animation: jGGCbr 0.5s 1.5s ease-out  forwards;
 }
 
-<div
+<span
   class="c0"
 >
   <span>
     hello world!
   </span>
-</div>
+</span>
 `;
 
-exports[`components/Slide renders with background css style set to passed in backgroundColor 1`] = `
+exports[`components/BlockReveal renders with background css style set to passed in backgroundColor 1`] = `
 .c0 {
   position: relative;
-  overflow: hidden;
+  display: inherit;
 }
 
 .c0::after {
@@ -60,16 +60,16 @@ exports[`components/Slide renders with background css style set to passed in bac
 
 .c0 > span {
   display: inherit;
-  visibility: hidden;
-  -webkit-animation: cwLUPY 0.5s 1s ease-out forwards;
-  animation: cwLUPY 0.5s 1s ease-out forwards;
+  opacity: 0;
+  -webkit-animation: jGGCbr 0.5s 1s ease-out  forwards;
+  animation: jGGCbr 0.5s 1s ease-out  forwards;
 }
 
-<div
+<span
   class="c0"
 >
   <span>
     hello world!
   </span>
-</div>
+</span>
 `;

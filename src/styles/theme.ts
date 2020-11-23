@@ -25,7 +25,6 @@ const theme: DefaultTheme = {
   typography: {
     htmlFontSize: 16,
     fontFamily: `'Montserrat', sans-serif`,
-    fontSize: 14,
     fontWeightLight: 300,
     fontWeightRegular: 400,
     fontWeightMedium: 500,
@@ -45,7 +44,7 @@ const theme: DefaultTheme = {
     },
     h2: {
       fontFamily: `'Montserrat', sans-serif`,
-      fontWeight: 400,
+      fontWeight: 600,
       fontSize: '3.75rem',
       lineHeight: 1.2,
       letterSpacing: '-0.00833em',
@@ -64,6 +63,16 @@ const theme: DefaultTheme = {
       letterSpacing: '0em',
       [mediaQuery.lg]: {
         fontSize: '3rem',
+      },
+    },
+    body: {
+      fontFamily: `'Open Sans', arial, sans-serif`,
+      fontWeight: 400,
+      fontSize: '1.6rem',
+      lineHeight: 1.5,
+      letterSpacing: '0.00938em',
+      [mediaQuery.md]: {
+        fontSize: '1.8rem',
       },
     },
   },

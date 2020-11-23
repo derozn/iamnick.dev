@@ -1,17 +1,11 @@
 import React from 'react';
-import NextApp, { AppContext } from 'next/app';
+import NextApp from 'next/app';
 import Head from 'next/head';
 import { ThemeProvider } from 'styled-components';
 
 import { GlobalStyle, theme } from '#styles';
 
 class App extends NextApp {
-  static async getInitialProps({ Component, ctx }: AppContext) {
-    const pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {};
-
-    return { pageProps };
-  }
-
   render() {
     const { Component, pageProps } = this.props;
 
@@ -20,7 +14,7 @@ class App extends NextApp {
         <Head>
           <title>iamnick.dev</title>
           <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-          <meta name="description" content="A Creative Front End Developers personal portfolio" />
+          <meta name="description" content="A Creative Full Stack Developers personal portfolio" />
 
           <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
           <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -33,7 +27,7 @@ class App extends NextApp {
           <meta itemProp="name" content="iamnick.dev" />
           <meta
             itemProp="description"
-            content="A Creative Front End Developers personal portfolio"
+            content="A Creative Full Stack Developers personal portfolio"
           />
           <meta itemProp="image" content="https://iamnick.dev/social-icon-260.jpg" />
 
@@ -42,7 +36,7 @@ class App extends NextApp {
           <meta name="twitter:title" content="iamnick.dev" />
           <meta
             name="twitter:description"
-            content="A Creative Front End Developers personal portfolio"
+            content="A Creative Full Stack Developers personal portfolio"
           />
           <meta name="twitter:creator" content="@dr_182" />
           <meta name="twitter:image" content="https://iamnick.dev/social-icon-260.jpg" />

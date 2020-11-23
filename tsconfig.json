@@ -29,6 +29,7 @@
     "next-env.d.ts",
     "test/**/*",
     "src/**/*",
+    "plugins/**/*",
     ".eslintrc.js",
     "babel.config.js",
     "next.config.js"

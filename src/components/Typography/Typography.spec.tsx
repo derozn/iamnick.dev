@@ -38,6 +38,26 @@ describe('components/Typography', () => {
     expect(container.firstChild).toMatchSnapshot();
   });
 
+  it('renders as h3', () => {
+    const { container } = render(
+      <ThemeProvider theme={theme}>
+        <Typography component="h3" />
+      </ThemeProvider>,
+    );
+
+    expect(container.firstChild).toMatchSnapshot();
+  });
+
+  it('renders as p', () => {
+    const { container } = render(
+      <ThemeProvider theme={theme}>
+        <Typography component="p" />
+      </ThemeProvider>,
+    );
+
+    expect(container.firstChild).toMatchSnapshot();
+  });
+
   it('renders as h1 styles when variant is h1', () => {
     const { container } = render(
       <ThemeProvider theme={theme}>

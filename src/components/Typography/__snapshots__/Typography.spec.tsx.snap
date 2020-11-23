@@ -67,7 +67,7 @@ exports[`components/Typography renders as h2 1`] = `
   margin: 0;
   position: relative;
   font-family: 'Montserrat',sans-serif;
-  font-weight: 400;
+  font-weight: 600;
   font-size: 3.75rem;
   line-height: 1.2;
   -webkit-letter-spacing: -0.00833em;
@@ -89,6 +89,56 @@ exports[`components/Typography renders as h2 1`] = `
 }
 
 <h2
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders as h3 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+  font-family: 'Montserrat',sans-serif;
+  font-weight: 400;
+  font-size: 2.8rem;
+  line-height: 1.167;
+  -webkit-letter-spacing: 0em;
+  -moz-letter-spacing: 0em;
+  -ms-letter-spacing: 0em;
+  letter-spacing: 0em;
+}
+
+@media (min-width:1280px) {
+  .c0 {
+    font-size: 3rem;
+  }
+}
+
+<h3
+  class="c0"
+/>
+`;
+
+exports[`components/Typography renders as p 1`] = `
+.c0 {
+  margin: 0;
+  position: relative;
+  font-family: 'Open Sans',arial,sans-serif;
+  font-weight: 400;
+  font-size: 1.6rem;
+  line-height: 1.5;
+  -webkit-letter-spacing: 0.00938em;
+  -moz-letter-spacing: 0.00938em;
+  -ms-letter-spacing: 0.00938em;
+  letter-spacing: 0.00938em;
+}
+
+@media (min-width:960px) {
+  .c0 {
+    font-size: 1.8rem;
+  }
+}
+
+<p
   class="c0"
 />
 `;

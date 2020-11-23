@@ -1,26 +1,26 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 
-import Slide from './Slide';
+import BlockReveal from './BlockReveal';
 
-describe('components/Slide', () => {
+describe('components/BlockReveal', () => {
   it('renders children', () => {
-    const { getByText } = render(<Slide backgroundColor="#fff">hello world!</Slide>);
+    const { getByText } = render(<BlockReveal backgroundColor="#fff">hello world!</BlockReveal>);
 
     expect(getByText('hello world!')).toBeTruthy();
   });
 
   it('renders with background css style set to passed in backgroundColor', () => {
-    const { container } = render(<Slide backgroundColor="#fff">hello world!</Slide>);
+    const { container } = render(<BlockReveal backgroundColor="#fff">hello world!</BlockReveal>);
 
     expect(container.firstChild).toMatchSnapshot();
   });
 
-  it('renders with additional delay factor on slide animation', () => {
+  it('renders with additional delay factor on reveal animation', () => {
     const { container } = render(
-      <Slide backgroundColor="#fff" delay={0.5}>
+      <BlockReveal backgroundColor="#fff" delay={0.5}>
         hello world!
-      </Slide>,
+      </BlockReveal>,
     );
 
     expect(container.firstChild).toMatchSnapshot();
