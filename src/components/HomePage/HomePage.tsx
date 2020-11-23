@@ -35,7 +35,7 @@ const HomePage = ({ workContent }: any) => {
         <Section>
           <BlockReveal backgroundColor={palette.primary.main} delay={0.3}>
             <Typography component="h2" variant="h3" color="primary" align="center">
-              <Typography color="accent">Creative</Typography> Front End Developer
+              <Typography color="accent">Creative</Typography> Full Stack Developer
             </Typography>
           </BlockReveal>
         </Section>

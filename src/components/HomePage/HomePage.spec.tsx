@@ -46,7 +46,7 @@ describe('components/HomePage', () => {
   it('renders subtitle', () => {
     const { getByText } = renderComponent();
 
-    expect(getByNestedText(getByText, 'Creative Front End Developer')).toBeTruthy();
+    expect(getByNestedText(getByText, 'Creative Full Stack Developer')).toBeTruthy();
   });
 
   it('renders work experience title', () => {

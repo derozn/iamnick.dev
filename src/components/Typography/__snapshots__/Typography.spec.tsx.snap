@@ -67,7 +67,7 @@ exports[`components/Typography renders as h2 1`] = `
   margin: 0;
   position: relative;
   font-family: 'Montserrat',sans-serif;
-  font-weight: 400;
+  font-weight: 600;
   font-size: 3.75rem;
   line-height: 1.2;
   -webkit-letter-spacing: -0.00833em;

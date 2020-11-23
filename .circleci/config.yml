@@ -23,7 +23,7 @@ jobs:
             - ./node_modules
             - ./.next/cache
       - persist_to_workspace:
-          root: ./
+          root: ~/
           paths:
             - ./
   test:

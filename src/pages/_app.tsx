@@ -14,7 +14,7 @@ class App extends NextApp {
         <Head>
           <title>iamnick.dev</title>
           <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-          <meta name="description" content="A Creative Front End Developers personal portfolio" />
+          <meta name="description" content="A Creative Full Stack Developers personal portfolio" />
 
           <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
           <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -27,7 +27,7 @@ class App extends NextApp {
           <meta itemProp="name" content="iamnick.dev" />
           <meta
             itemProp="description"
-            content="A Creative Front End Developers personal portfolio"
+            content="A Creative Full Stack Developers personal portfolio"
           />
           <meta itemProp="image" content="https://iamnick.dev/social-icon-260.jpg" />
 
@@ -36,7 +36,7 @@ class App extends NextApp {
           <meta name="twitter:title" content="iamnick.dev" />
           <meta
             name="twitter:description"
-            content="A Creative Front End Developers personal portfolio"
+            content="A Creative Full Stack Developers personal portfolio"
           />
           <meta name="twitter:creator" content="@dr_182" />
           <meta name="twitter:image" content="https://iamnick.dev/social-icon-260.jpg" />

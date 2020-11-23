@@ -29,7 +29,7 @@ const TimelineItem: FunctionComponent<Props> = ({
   const [ref, inView] = useOnScreen<HTMLSpanElement>();
 
   return (
-    <Article {...rest} reverse={reverse}>
+    <Article {...rest} reverse={reverse} data-testid={`reverse-${reverse}`}>
       <Group>
         <Title>
           <Typography display="inline" component="h1" variant="h2" color="primary">

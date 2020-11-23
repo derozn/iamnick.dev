@@ -1,5 +1,20 @@
 [
   {
+    "title": "Gousto",
+    "date": "Present",
+    "image": {
+      "src": "/images/gousto.jpg",
+      "alt": "Lyvly - London’s Best Shared Living Community",
+      "width": "1140",
+      "height": "960",
+      "source": [
+        { "srcSet": "/images/gousto.webp", "type": "image/webp" },
+        { "srcSet": "/images/gousto.jpg", "type": "image/jpeg" }
+      ]
+    },
+    "summary": ""
+  },
+  {
     "title": "Lyvly",
     "date": "2020",
     "image": {
@@ -12,7 +27,7 @@
         { "srcSet": "/images/lyvly.jpg", "type": "image/jpeg" }
       ]
     },
-    "summary": "lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem "
+    "summary": ""
   },
   {
     "title": "YOTI",
@@ -27,7 +42,7 @@
         { "srcSet": "/images/yoti.jpg", "type": "image/jpeg" }
       ]
     },
-    "summary": "lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem "
+    "summary": ""
   },
   {
     "title": "Arcadia",
@@ -42,7 +57,7 @@
         { "srcSet": "/images/arcadia.jpg", "type": "image/jpeg" }
       ]
     },
-    "summary": "lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem "
+    "summary": ""
   },
   {
     "title": "Vitamin",
@@ -57,6 +72,6 @@
         { "srcSet": "/images/vitamin.jpg", "type": "image/jpeg" }
       ]
     },
-    "summary": "lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem "
+    "summary": ""
   }
 ]
