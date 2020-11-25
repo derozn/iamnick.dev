@@ -45,6 +45,10 @@ workflows:
       - build:
           name: build-dev
           context: dev
+          filters:
+            branches:
+              ignore:
+                - master
       - build:
           name: build-prod
           context: prod
@@ -55,6 +59,10 @@ workflows:
       - test:
           name: test-dev
           context: dev
+          filters:
+            branches:
+              ignore:
+                - master
           requires:
             - build-dev
       - test:
