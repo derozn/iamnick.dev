@@ -1,11 +1,17 @@
 import { useState, useEffect, useRef, RefObject } from 'react';
 
-// SORT THUIS OUT
+// SORT THIS OUT
 import 'intersection-observer';
 
-function useOnScreen<T extends HTMLElement>(
-  rootMargin: string | undefined = '0px',
-): [RefObject<T>, boolean] {
+type Props = {
+  rootMargin?: string | undefined;
+  persist?: boolean;
+};
+
+function useOnScreen<T extends HTMLElement>({ rootMargin = '0px', persist = false }: Props = {}): [
+  RefObject<T>,
+  boolean,
+] {
   const [isIntersecting, setIntersecting] = useState<boolean>(false);
 
   const ref = useRef<T>(null);
@@ -16,6 +22,8 @@ function useOnScreen<T extends HTMLElement>(
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIntersecting(entry.isIntersecting);
+
+        if (persist && entry.isIntersecting && currentRef) observer.unobserve(currentRef);
       },
       {
         rootMargin,
@@ -30,7 +38,7 @@ function useOnScreen<T extends HTMLElement>(
         observer.unobserve(currentRef);
       }
     };
-  }, [ref, rootMargin]);
+  }, [ref, rootMargin, persist]);
 
   return [ref, isIntersecting];
 }

@@ -76,8 +76,6 @@ export const Separator = styled.div`
 
 const leftArticleStyles = css`
   ${({ theme }) => theme.mediaQuery.sm} {
-    align-self: flex-start;
-
     ${Title} {
       position: absolute;
       top: 50%;
@@ -116,8 +114,6 @@ const leftArticleStyles = css`
 
 const rightArticleStyles = css`
   ${({ theme }) => theme.mediaQuery.sm} {
-    align-self: flex-end;
-
     ${Title} {
       position: absolute;
       top: 50%;
@@ -167,4 +163,15 @@ export const Article = styled.article<ArticleProps>`
   }
 
   ${({ reverse }) => (reverse ? rightArticleStyles : leftArticleStyles)}
+`;
+
+export const ChildArticle = styled(Article)`
+  ${({ reverse }) => (reverse ? 'left: 2px' : 'right: 2px')};
+`;
+
+export const Wrapper = styled.div`
+  position: relative;
+  display: flex;
+  width: 100%;
+  ${({ reverse }: { reverse: boolean }) => `flex-direction: ${reverse ? 'row' : 'row-reverse'}`}
 `;
