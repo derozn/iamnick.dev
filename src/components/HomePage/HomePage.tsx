@@ -2,6 +2,7 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { useTheme } from 'styled-components';
 
+import useSmoothScroll, { useParallax } from '#hooks/useSmoothScroll';
 import useMedia from '#hooks/useMedia';
 import Typography from '#components/Typography';
 import BlockReveal from '#components/BlockReveal';
@@ -11,46 +12,51 @@ import { Header, CanvasWrapper, Section, FeedLayout, Layout, FeedTitle } from '.
 
 import useOnScreen from '#hooks/useOnScreen';
 
-const Scene = dynamic(() => import('#components/Interactive/Scene'), { ssr: false });
+const Nick = dynamic(() => import('#components/Interactive/Nick'), { ssr: false });
 
 const HomePage = ({ workContent }: any) => {
   const { mediaQuery, palette } = useTheme();
-
   const [sectionTitleRef, sectionTitleInView] = useOnScreen<HTMLSpanElement>();
-
   const showInteractiveScene = useMedia(mediaQuery.sm, false);
 
-  return (
-    <Layout>
-      <Header>
-        <CanvasWrapper>{showInteractiveScene && <Scene />}</CanvasWrapper>
-        <Section>
-          <BlockReveal backgroundColor={palette.primary.main}>
-            <Typography component="h1" color="primary" align="center">
-              <Typography color="accent">I</Typography> AM NICK
-            </Typography>
-          </BlockReveal>
-        </Section>
+  const { scrollRef } = useSmoothScroll({ enabled: showInteractiveScene });
+  const { anchorRef } = useParallax({ maxValue: 25 });
+  const { anchorRef: contentRef } = useParallax({ maxValue: 50 });
 
-        <Section>
-          <BlockReveal backgroundColor={palette.primary.main} delay={0.3}>
-            <Typography component="h2" variant="h3" color="primary" align="center">
-              <Typography color="accent">Creative</Typography> Full Stack Developer
-            </Typography>
-          </BlockReveal>
-        </Section>
-      </Header>
-      <FeedLayout>
-        <FeedTitle>
-          <Typography component="h2" variant="h1" color="primary" display="inline">
-            <BlockReveal backgroundColor={palette.primary.main} show={sectionTitleInView}>
-              <span ref={sectionTitleRef}>Work Experience</span>
+  return (
+    <main>
+      <Layout ref={scrollRef}>
+        <Header>
+          <CanvasWrapper>{showInteractiveScene && <Nick />}</CanvasWrapper>
+          {/* @ts-ignore */}
+          <Section ref={anchorRef}>
+            <BlockReveal backgroundColor={palette.primary.main}>
+              <Typography component="h1" color="primary" align="center">
+                <Typography color="accent">I</Typography> AM NICK
+              </Typography>
             </BlockReveal>
-          </Typography>
-        </FeedTitle>
-        <Timeline items={workContent} />
-      </FeedLayout>
-    </Layout>
+          </Section>
+          {/* @ts-ignore */}
+          <Section ref={contentRef}>
+            <BlockReveal backgroundColor={palette.primary.main} delay={0.3}>
+              <Typography component="h2" variant="h3" color="primary" align="center">
+                <Typography color="accent">Creative</Typography> Full Stack Developer
+              </Typography>
+            </BlockReveal>
+          </Section>
+        </Header>
+        <FeedLayout>
+          <FeedTitle>
+            <Typography component="h2" variant="h1" color="primary" display="inline">
+              <BlockReveal backgroundColor={palette.primary.main} show={sectionTitleInView}>
+                <span ref={sectionTitleRef}>Work Experience</span>
+              </BlockReveal>
+            </Typography>
+          </FeedTitle>
+          <Timeline items={workContent} />
+        </FeedLayout>
+      </Layout>
+    </main>
   );
 };
 

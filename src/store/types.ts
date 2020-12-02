@@ -5,4 +5,7 @@ export type State = {
   face: {
     textureUrl: string;
   };
+  work: {
+    textureUrls: string[];
+  };
 };

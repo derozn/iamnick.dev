@@ -1,18 +1,20 @@
-import React, { useRef, useEffect } from 'react';
+import React, { FunctionComponent, useRef, useEffect } from 'react';
 import { useLoader, useFrame, extend } from 'react-three-fiber';
-import { TextureLoader } from 'three';
-
-import useStore from '#store';
+import { TextureLoader, Vector3 } from 'three';
 
 import { ParticlesMaterial } from './materials/particles';
 import { Particles } from './objects/particles';
 
 extend({ ParticlesMaterial, Particles });
 
-const FaceParticles = () => {
+type Props = {
+  textureUrl: string;
+  position?: number[];
+};
+
+const FaceParticles: FunctionComponent<Props> = ({ textureUrl, position }) => {
   const particles = useRef<Particles>(null);
   const particlesMaterialRef = useRef<ParticlesMaterial>(null);
-  const { textureUrl } = useStore((state) => state.face);
   const particleTexture = useLoader(TextureLoader, textureUrl);
 
   useEffect(() => {
@@ -27,7 +29,7 @@ const FaceParticles = () => {
 
   return (
     <group name="particle-hit-group">
-      <mesh name="particles" position={[75, 0, 0]}>
+      <mesh name="particles" position={(position as unknown) as Vector3}>
         <particles args={[particleTexture]} attach="geometry" ref={particles} />
         <particlesMaterial
           ref={particlesMaterialRef}

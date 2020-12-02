@@ -34,5 +34,12 @@ export const SpacedTimelineItem = styled(TimelineItem)`
 
   ${({ theme }) => theme.mediaQuery.sm} {
     margin: 0;
+    margin-bottom: 50vh;
+  }
+
+  :last-child {
+    ${({ theme }) => theme.mediaQuery.sm} {
+      margin: 0;
+    }
   }
 `;

@@ -2,6 +2,7 @@ import React from 'react';
 import NextApp from 'next/app';
 import Head from 'next/head';
 import { ThemeProvider } from 'styled-components';
+import { ParallaxProvider } from 'react-scroll-parallax';
 
 import { GlobalStyle, theme } from '#styles';
 
@@ -43,7 +44,9 @@ class App extends NextApp {
         </Head>
         <ThemeProvider theme={theme}>
           <GlobalStyle />
-          <Component {...pageProps} />
+          <ParallaxProvider>
+            <Component {...pageProps} />
+          </ParallaxProvider>
         </ThemeProvider>
       </>
     );

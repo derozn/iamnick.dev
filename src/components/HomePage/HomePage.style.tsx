@@ -47,10 +47,12 @@ export const Section = styled.div`
 `;
 
 export const FeedLayout = styled.div`
+  position: relative;
   grid-area: feed;
 `;
 
 export const FeedTitle = styled.div`
+  position: relative;
   margin: 40vh 0;
   text-align: center;
 `;

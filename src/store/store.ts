@@ -11,6 +11,15 @@ const store = (): State => {
     face: {
       textureUrl: '/textures/nick.png',
     },
+    work: {
+      textureUrls: [
+        '/textures/gousto.png',
+        '/textures/lyvly.png',
+        '/textures/yoti.png',
+        '/textures/arcadia.png',
+        '/textures/vitamin.png',
+      ],
+    },
   };
 };
 
