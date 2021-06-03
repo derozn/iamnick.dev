@@ -16,6 +16,6 @@ const store = (): State => {
 
 const withMiddleWare = devtools(store);
 
-const [useStore] = create<State>(withMiddleWare);
+const useStore = create<State>(withMiddleWare);
 
 export default useStore;
