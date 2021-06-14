@@ -8,7 +8,7 @@ import {
   WebGLRenderer,
   WebGLRenderTarget,
   IUniform,
-  clamp,
+  MathUtils,
   Color,
 } from 'three';
 import { Pass } from 'three/examples/jsm/postprocessing/Pass';
@@ -86,12 +86,12 @@ export class VignettePass extends Pass {
   }
 
   set radius(radius: number) {
-    const radiusRange = clamp(radius, 0, 1);
+    const radiusRange = MathUtils.clamp(radius, 0, 1);
     this.uniforms.radius.value = radiusRange;
   }
 
   set softness(softness: number) {
-    const softnessRange = clamp(softness, 0, 1);
+    const softnessRange = MathUtils.clamp(softness, 0, 1);
     this.uniforms.softness.value = softnessRange;
   }
 
