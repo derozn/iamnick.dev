@@ -76,6 +76,8 @@ workflows:
                 - master
       - heroku/deploy-via-git:
           name: deploy-staging
+          parameters:
+            force: true
           context: prod
           requires:
             - test-prod

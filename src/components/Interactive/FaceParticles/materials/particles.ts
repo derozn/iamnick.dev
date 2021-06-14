@@ -27,27 +27,21 @@ export class ParticlesMaterial extends RawShaderMaterial {
       fragmentShader,
       uniforms: {
         particleTexture: {
-          type: 't',
           value: null,
         },
         particleTextureSize: {
-          type: 'v2',
           value: new Vector2(0, 0),
         },
         time: {
-          type: 'f',
           value: 0.0,
         },
         random: {
-          type: 'f',
           value: 2.0,
         },
         depth: {
-          type: 'f',
           value: 20.0,
         },
         size: {
-          type: 'f',
           value: 1.5,
         },
       },

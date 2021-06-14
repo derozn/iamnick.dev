@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Canvas } from 'react-three-fiber';
+import { Canvas } from '@react-three/fiber';
 import { useTheme } from 'styled-components';
 
 import Fog from '#components/Interactive/Fog';
@@ -12,8 +12,8 @@ const Scene = () => {
   return (
     <Canvas
       data-testid="scene"
-      concurrent
-      pixelRatio={1}
+      mode="concurrent"
+      dpr={1}
       camera={{ zoom: 1, position: [0, 0, 300], far: 50000 }}
       onCreated={({ gl }) => {
         gl.setClearColor(theme.palette.background.primary);

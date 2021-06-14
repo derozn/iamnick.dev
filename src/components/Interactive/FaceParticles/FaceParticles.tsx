@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { useLoader, useFrame, extend } from 'react-three-fiber';
+import { useLoader, useFrame, extend } from '@react-three/fiber';
 import { TextureLoader } from 'three';
 
 import useStore from '#store';
