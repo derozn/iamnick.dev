@@ -31,24 +31,19 @@ export class VignettePass extends Pass {
     super();
 
     this.uniforms = UniformsUtils.clone({
-      texture: {
-        type: 't',
+      u_texture: {
         value: null,
       },
       byp: {
-        type: 'i',
         value: 0,
       },
       radius: {
-        type: 'f',
         value: 0.0,
       },
       softness: {
-        type: 'f',
         value: 0.12,
       },
       color: {
-        type: 'v3',
         value: new Color(backgroundColor),
       },
     });
@@ -74,7 +69,7 @@ export class VignettePass extends Pass {
     writeBuffer: WebGLRenderTarget,
     readBuffer: WebGLRenderTarget,
   ) {
-    this.uniforms.texture.value = readBuffer.texture;
+    this.uniforms.u_texture.value = readBuffer.texture;
 
     if (this.renderToScreen) {
       renderer.setRenderTarget(null);

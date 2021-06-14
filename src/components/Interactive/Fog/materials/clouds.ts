@@ -14,11 +14,9 @@ export class CloudsMaterial extends RawShaderMaterial {
       blending: AdditiveBlending,
       uniforms: {
         time: {
-          type: 'f',
           value: 0.0,
         },
         cloudTexture: {
-          type: 't',
           value: null,
         },
       },

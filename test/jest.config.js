@@ -1,5 +1,5 @@
 const { pathsToModuleNameMapper } = require('ts-jest/utils');
-const { compilerOptions } = require('../tsconfig');
+const { compilerOptions } = require('../tsconfig.json');
 
 const moduleNameMapper = {
   'three/examples/jsm/loaders/GLTFLoader': '<rootDir>/test/stubs/GLTFLoader',
@@ -9,6 +9,7 @@ const moduleNameMapper = {
 
 module.exports = {
   preset: 'ts-jest',
+  testEnvironment: 'jsdom',
   verbose: true,
   setupFiles: ['<rootDir>/test/jest.setup.js'],
   setupFilesAfterEnv: ['<rootDir>/test/jest.setup.postenv.js'],
@@ -20,7 +21,8 @@ module.exports = {
   testURL: 'http://iamnick.dev',
   globals: {
     'ts-jest': {
-      tsConfig: '<rootDir>/tsconfig.test.json',
+      tsconfig: '<rootDir>/tsconfig.test.json',
+      isolatedModules: true,
     },
   },
 };

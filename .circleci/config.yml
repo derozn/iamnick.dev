@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  heroku: circleci/heroku@1.0.1
+  heroku: circleci/heroku@1.2.6
 
 defaults: &defaults
   working_directory: ~/service
@@ -76,6 +76,7 @@ workflows:
                 - master
       - heroku/deploy-via-git:
           name: deploy-staging
+          force: true
           context: prod
           requires:
             - test-prod

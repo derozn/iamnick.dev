@@ -1,6 +1,6 @@
 # Interactive
 
-These are the React-Three-Fiber components used to render WebGL components.
+These are the @react-three/fiber components used to render WebGL components.
 
 ## Known issues
 
