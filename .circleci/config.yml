@@ -1,12 +1,9 @@
 version: 2.1
 
-orbs:
-  heroku: circleci/heroku@1.2.6
-
 defaults: &defaults
   working_directory: ~/service
   docker:
-    - image: circleci/node:12.16.3
+    - image: circleci/node:18.13.0
 
 jobs:
   build:
@@ -40,7 +37,7 @@ jobs:
           path: ./coverage
 
 workflows:
-  build-test-deploy:
+  build-test:
     jobs:
       - build:
           name: build-dev
@@ -74,12 +71,3 @@ workflows:
             branches:
               only:
                 - master
-      - heroku/deploy-via-git:
-          name: deploy-staging
-          force: true
-          context: prod
-          requires:
-            - test-prod
-          filters:
-            branches:
-              only: master

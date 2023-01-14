@@ -4,11 +4,11 @@ import { TextProps } from './types';
 
 export const Text = styled.span<TextProps>(
   (props) => css`
-  margin: 0;
-  position: relative;
+    margin: 0;
+    position: relative;
 
-  ${props.displayAs === 'block' && `display: block;`}
-  ${props.displayAs === 'inline' && `display: inline-block;`}
+    ${props.displayAs === 'block' && `display: block;`}
+    ${props.displayAs === 'inline' && `display: inline-block;`}
 
   ${props.variant === 'h1' && props.theme.typography.h1}
   ${props.variant === 'h2' && props.theme.typography.h2}
@@ -20,5 +20,5 @@ export const Text = styled.span<TextProps>(
   ${props.textColor === 'accent' && `color: ${props.theme.palette.text.accent};`}
   
   ${props.textAlign && `text-align: ${props.textAlign};`}
-`,
+  `,
 );

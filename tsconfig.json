@@ -21,11 +21,13 @@
     "paths": {
       "#*": ["src/*"],
       "test/*": ["test/*"]
-    }
+    },
+    "incremental": true
   },
   "exclude": ["node_modules", ".templates/*"],
+  "typeRoots": ["./@types", "./node_modules/@types"],
   "include": [
-    "declarations/**/*",
+    "./@types/**/*",
     "next-env.d.ts",
     "test/**/*",
     "src/**/*",
