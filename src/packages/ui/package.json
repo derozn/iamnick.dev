@@ -26,6 +26,9 @@
     "!node_modules",
     "!reports"
   ],
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "prebuild": "rimraf build",
     "build": "tsc -p 'tsconfig.json'",

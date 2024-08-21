@@ -32,7 +32,7 @@
     "postbuild": "next-sitemap --config next-sitemap.config.js"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "dependencies": {
     "@derozn/tailwind-variants": "0.2.6",
