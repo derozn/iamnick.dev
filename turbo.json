@@ -10,9 +10,11 @@
       "dependsOn": ["^typecheck"]
     },
     "test:ci": {
+      "dependsOn": ["^test:ci"],
       "outputs": ["coverage/**"]
     },
     "test:": {
+      "dependsOn": ["^test"],
       "outputs": ["coverage/**"]
     },
     "lint:": {
