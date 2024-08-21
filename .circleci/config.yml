@@ -44,7 +44,7 @@ jobs:
           path: ./coverage
 
 workflows:
-  build-test:
+  build-test-check:
     jobs:
       - build:
           name: build-dev
@@ -67,6 +67,8 @@ workflows:
             branches:
               ignore:
                 - master
+          requires:
+            - build-dev
       - typecheck:
           name: typecheck-prod
           context: prod
@@ -74,6 +76,8 @@ workflows:
             branches:
               only:
                 - master
+          requires:
+            - build-prod
       - test:
           name: test-dev
           context: dev
