@@ -34,7 +34,7 @@
     "build": "tsc -p 'tsconfig.json'",
     "test": "jest",
     "test:watch": "yarn test --watch",
-    "test:ci": "jest --ci --maxWorkers=3 --coverage --passWithNoTests",
+    "test:ci": "yarn test --ci --maxWorkers=3 --coverage --passWithNoTests",
     "lint": "prettier --check --ignore-path ../../../.prettierignore . && eslint --cache .",
     "lint:fix": "prettier --write --ignore-path ../../../.prettierignore . && eslint --cache --fix .",
     "typecheck": "tsc --noEmit",

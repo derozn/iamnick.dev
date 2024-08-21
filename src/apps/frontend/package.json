@@ -23,7 +23,7 @@
     "start": "next start -p $PORT",
     "test": "jest --config=./test/jest.config.js",
     "test:watch": "yarn test --watch",
-    "test:ci": "jest --ci --maxWorkers=3 --coverage --passWithNoTests",
+    "test:ci": "yarn test --ci --maxWorkers=3 --coverage --passWithNoTests",
     "test:coverage": "yarn test --coverage",
     "typecheck": "tsc --noEmit",
     "prepare": "husky install",
