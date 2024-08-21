@@ -46,20 +46,6 @@ jobs:
 workflows:
   build-test:
     jobs:
-      - typecheck:
-          name: typecheck-dev
-          context: dev
-          filters:
-            branches:
-              ignore:
-                - master
-      - typecheck:
-          name: typecheck-prod
-          context: prod
-          filters:
-            branches:
-              only:
-                - master
       - build:
           name: build-dev
           context: dev
@@ -69,6 +55,20 @@ workflows:
                 - master
       - build:
           name: build-prod
+          context: prod
+          filters:
+            branches:
+              only:
+                - master
+      - typecheck:
+          name: typecheck-dev
+          context: dev
+          filters:
+            branches:
+              ignore:
+                - master
+      - typecheck:
+          name: typecheck-prod
           context: prod
           filters:
             branches:
