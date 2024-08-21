@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Style system config",
   "author": "iamnick",
+  "private": true,
   "bugs": {
     "url": "https://github.com/derozn/iamnick.dev/issues"
   },

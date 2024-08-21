@@ -2,6 +2,7 @@
   "name": "@iamnick/ui",
   "version": "1.0.0",
   "description": "iamnick Design System",
+  "private": true,
   "author": "iamnick",
   "license": "ISC",
   "homepage": "https://github.com/derozn/iamnick.dev#readme",
