@@ -3,7 +3,7 @@ version: 2.1
 defaults: &defaults
   working_directory: ~/service
   docker:
-    - image: cimg/node:18.13.0
+    - image: cimg/node:18.18.2
 
 jobs:
   build:
@@ -29,7 +29,7 @@ jobs:
       - attach_workspace:
           at: ~/
       - run:
-          command: yarn test --runInBand --collectCoverage=true
+          command: yarn test
           environment:
             CIRCLE_BRANCH: local
             JEST_JUNIT_OUTPUT_DIR: ./junit.xml
