@@ -18,7 +18,9 @@ module.exports = {
   modulePaths: ['<rootDir>'],
   rootDir: '../',
   moduleNameMapper,
-  testURL: 'http://iamnick.dev',
+  testEnvironmentOptions: {
+    url: 'http://iamnick.dev',
+  },
   globals: {
     /** @type {import('ts-jest').TsJestGlobalOptions} */
     'ts-jest': {

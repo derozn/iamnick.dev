@@ -1,11 +1,3 @@
-const { pathsToModuleNameMapper } = require('ts-jest');
-
-const { compilerOptions } = require('./tsconfig.json');
-
-const moduleNameMapper = pathsToModuleNameMapper(compilerOptions.paths, {
-  prefix: '<rootDir>/',
-});
-
 const ignoreFolders = ['./storybook/', './build/', 'node_modules/'];
 
 module.exports = {
@@ -36,9 +28,10 @@ module.exports = {
     '\\.(css|less|scss|sass)$': '<rootDir>/config/jest/stubs/css.js',
   },
   modulePaths: ['<rootDir>'],
-  moduleNameMapper,
   roots: ['<rootDir>/src'],
-  testURL: 'https://ui.iamnick.dev',
+  testEnvironmentOptions: {
+    url: 'http://iamnick.dev',
+  },
   testEnvironment: 'jest-environment-jsdom',
   globals: {
     /** @type {import('ts-jest').TsJestGlobalOptions} */
