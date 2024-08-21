@@ -1,12 +1,9 @@
 version: 2.1
 
-orbs:
-  heroku: circleci/heroku@1.2.6
-
 defaults: &defaults
   working_directory: ~/service
   docker:
-    - image: circleci/node:12.16.3
+    - image: cimg/node:20.16.0
 
 jobs:
   build:
@@ -15,24 +12,31 @@ jobs:
       - checkout
       - restore_cache:
           key: cache-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run: yarn
+      - run: yarn install --immutable
       - run: yarn build
       - save_cache:
           key: cache-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - ./node_modules
-            - ./.next/cache
+            - ./src/apps/frontend/.next/cache
       - persist_to_workspace:
           root: ~/
           paths:
             - ./
+  typecheck:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          command: yarn typecheck
   test:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/
       - run:
-          command: yarn test --runInBand --collectCoverage=true
+          command: yarn test:ci
           environment:
             CIRCLE_BRANCH: local
             JEST_JUNIT_OUTPUT_DIR: ./junit.xml
@@ -40,7 +44,7 @@ jobs:
           path: ./coverage
 
 workflows:
-  build-test-deploy:
+  build-test-check:
     jobs:
       - build:
           name: build-dev
@@ -56,6 +60,24 @@ workflows:
             branches:
               only:
                 - master
+      - typecheck:
+          name: typecheck-dev
+          context: dev
+          filters:
+            branches:
+              ignore:
+                - master
+          requires:
+            - build-dev
+      - typecheck:
+          name: typecheck-prod
+          context: prod
+          filters:
+            branches:
+              only:
+                - master
+          requires:
+            - build-prod
       - test:
           name: test-dev
           context: dev
@@ -74,12 +96,3 @@ workflows:
             branches:
               only:
                 - master
-      - heroku/deploy-via-git:
-          name: deploy-staging
-          force: true
-          context: prod
-          requires:
-            - test-prod
-          filters:
-            branches:
-              only: master

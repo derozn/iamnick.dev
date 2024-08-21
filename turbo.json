@@ -1,0 +1,28 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "prebuild": {},
+    "build": {
+      "dependsOn": ["prebuild", "^build"],
+      "outputs": []
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
+    "test:ci": {
+      "dependsOn": ["^test:ci"],
+      "outputs": ["coverage/**"]
+    },
+    "test:": {
+      "dependsOn": ["^test"],
+      "outputs": ["coverage/**"]
+    },
+    "lint:": {
+      "dependsOn": ["^lint"]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    }
+  }
+}

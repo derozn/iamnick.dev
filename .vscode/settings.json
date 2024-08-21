@@ -20,5 +20,7 @@
     "titleBar.inactiveForeground": "#15202b99",
     "commandCenter.border": "#15202b99"
   },
-  "peacock.color": "#cd65fe"
+  "peacock.color": "#cd65fe",
+  "editor.formatOnSave": true,
+  "prettier.configPath": ".prettierrc.json"
 }

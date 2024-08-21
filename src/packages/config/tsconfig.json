@@ -1,0 +1,18 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "target": "es2018",
+    "composite": true,
+    "noEmit": false
+  },
+  "include": [
+    "src/**/*",
+    "src/**/*.json",
+    "**/*.ts",
+    "src/**/*.d.ts",
+    "postcss.config.js",
+    "eslint.config.js"
+  ],
+  "exclude": ["node_modules", "build"]
+}

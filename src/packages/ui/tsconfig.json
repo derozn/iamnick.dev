@@ -1,0 +1,21 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "composite": true,
+    "noEmit": false
+  },
+  "include": [
+    "src/**/*",
+    "config/**/*",
+    ".storybook/*",
+    "tailwind.config.ts",
+    "src/**/*.json",
+    "eslint.config.js",
+    "babel.config.js",
+    "jest.config.js",
+    "postcss.config.js",
+    "tsconfig.json"
+  ],
+  "exclude": ["node_modules", "coverage", "build/**", "package.json"]
+}

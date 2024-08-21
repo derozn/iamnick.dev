@@ -1,7 +1,12 @@
-.next
-node_modules
+.next/*
+node_modules/*
 public/*
 dist/*
 build/*
-.webpack
-.templates
+.webpack/*
+coverage/*
+reports/*
+.storybook/*
+storybook-static/*
+.turbo/*
+**/*.d.ts
