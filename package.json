@@ -35,7 +35,7 @@
     "prepare": "husky install"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "devDependencies": {
     "@banterstudiosuk/eslint-config-typescript": "0.2.5",
