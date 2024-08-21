@@ -15,13 +15,10 @@ export const PageLoader = ({ className }: IPageLoaderProps) => {
     <div
       className={classnames(
         'ui-w-full ui-h-full ui-absolute ui-top-0 ui-left-0 ui-flex ui-justify-center ui-items-center',
-        className
+        className,
       )}
     >
-      <Spinner
-        width={theme.spacing[19]}
-        height={theme.spacing[19]}
-      />
+      <Spinner width={theme.spacing[19]} height={theme.spacing[19]} />
     </div>
   );
 };

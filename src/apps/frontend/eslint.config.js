@@ -20,5 +20,6 @@ module.exports = fixupConfigRules(
     rules: {
       'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     },
-  })
+    ignorePatterns: ['.next/*', 'node_modules/*', 'next-env.d.ts', '.turbo/*', 'public/*'],
+  }),
 );

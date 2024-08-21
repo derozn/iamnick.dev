@@ -14,27 +14,12 @@ export interface IFadeItemProps {
   as?: keyof ReactHTML;
 }
 
-export const FadeItem = forwardRef<
-  HTMLSpanElement,
-  PropsWithChildren<IFadeItemProps>
->(
+export const FadeItem = forwardRef<HTMLSpanElement, PropsWithChildren<IFadeItemProps>>(
   (
-    {
-      children,
-      itemKey,
-      className,
-      delay,
-      layout,
-      isActive = true,
-      duration = 0.25,
-      as = 'span',
-    },
-    ref
+    { children, itemKey, className, delay, layout, isActive = true, duration = 0.25, as = 'span' },
+    ref,
   ) => {
-    const MotionElement = useMemo(
-      () => motion<HTMLMotionProps<typeof as>>(as),
-      [as]
-    );
+    const MotionElement = useMemo(() => motion<HTMLMotionProps<typeof as>>(as), [as]);
 
     return (
       <MotionElement
@@ -52,5 +37,5 @@ export const FadeItem = forwardRef<
         {children}
       </MotionElement>
     );
-  }
+  },
 );

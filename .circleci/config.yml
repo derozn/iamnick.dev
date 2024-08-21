@@ -12,13 +12,13 @@ jobs:
       - checkout
       - restore_cache:
           key: cache-{{ .Branch }}-{{ checksum "yarn.lock" }}
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --immutable
       - run: yarn build
       - save_cache:
           key: cache-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - ./node_modules
-            - ./.next/cache
+            - ./src/apps/frontend/.next/cache
       - persist_to_workspace:
           root: ~/
           paths:

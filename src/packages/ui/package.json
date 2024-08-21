@@ -10,6 +10,9 @@
     "access": "restricted",
     "registry": "https://npm.pkg.github.com"
   },
+  "imports": {
+    "@iamnick/ui/*": "./*"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/derozn/iamnick.dev.git"
@@ -17,7 +20,7 @@
   "files": [
     "*",
     "!**/*.test.*",
-    "!testCoverage",
+    "!coverage",
     "!.turbo",
     "!.vscode",
     "!node_modules",

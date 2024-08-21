@@ -3,10 +3,7 @@
   "compilerOptions": {
     "outDir": "build",
     "composite": true,
-    "noEmit": false,
-    "paths": {
-      "@iamnick/ui/src/*": ["src/packages/ui/src/*"],
-    }
+    "noEmit": false
   },
   "include": [
     "src/**/*",
@@ -17,12 +14,8 @@
     "eslint.config.js",
     "babel.config.js",
     "jest.config.js",
-    "postcss.config.js"
+    "postcss.config.js",
+    "tsconfig.json"
   ],
-  "exclude": ["node_modules", "coverage", "build/**", "package.json"],
-  "references": [
-    {
-      "path": "../config"
-    }
-  ]
+  "exclude": ["node_modules", "coverage", "build/**", "package.json"]
 }

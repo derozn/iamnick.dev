@@ -20,5 +20,14 @@ module.exports = fixupConfigRules(
     rules: {
       'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     },
+    ignorePatterns: [
+      'build/*',
+      'coverage/*',
+      'reports/*',
+      '**/*.d.ts',
+      '.storybook/*',
+      'storybook-static/*',
+      '.turbo/*',
+    ],
   }),
 );

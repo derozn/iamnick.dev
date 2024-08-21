@@ -54,6 +54,7 @@
     "@banterstudiosuk/eslint-config-typescript": "0.2.5",
     "@banterstudiosuk/prettier-config": "0.2.0",
     "@eslint/compat": "1.1.1",
+    "@eslint/eslintrc": "3.1.0",
     "@iamnick/config": "*",
     "@tailwindcss/typography": "0.5.13",
     "@testing-library/jest-dom": "6.4.8",

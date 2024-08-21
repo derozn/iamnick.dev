@@ -7,6 +7,9 @@
   "bugs": {
     "url": "https://github.com/derozn/iamnick.dev/issues"
   },
+  "imports": {
+    "@iamnick/config/*": "./*"
+  },
   "homepage": "https://github.com/derozn/iamnick.dev#readme",
   "license": "ISC",
   "main": "index.js",
@@ -17,7 +20,7 @@
   "files": [
     "*",
     "!**/*.test.*",
-    "!testCoverage",
+    "!coverage",
     "!.turbo",
     "!.vscode",
     "!node_modules",

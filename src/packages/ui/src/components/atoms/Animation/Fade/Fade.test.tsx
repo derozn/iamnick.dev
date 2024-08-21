@@ -8,7 +8,7 @@ describe(FadeAnimation.name, () => {
     render(
       <FadeAnimation>
         <FadeItem>hello</FadeItem>
-      </FadeAnimation>
+      </FadeAnimation>,
     );
 
     expect(screen.getByText('hello')).toBeInTheDocument();

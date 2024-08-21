@@ -20,5 +20,6 @@ module.exports = fixupConfigRules(
     rules: {
       'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     },
+    ignorePatterns: ['build/*', '.turbo/*', 'output/*'],
   }),
 );

@@ -79,9 +79,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
       <body>
         <ThemeProvider>
           <main>
-            <Suspense fallback={<PageLoader className="pb-footer" />}>
-              {children}
-            </Suspense>
+            <Suspense fallback={<PageLoader className="pb-footer" />}>{children}</Suspense>
           </main>
         </ThemeProvider>
         <div id={uiPortalId} className="relative z-10" />

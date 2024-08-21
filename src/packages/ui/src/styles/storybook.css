@@ -20,7 +20,9 @@
   font-family: 'Montserrat';
   font-style: normal;
   font-weight: 400;
-  src: local('Montserrat Regular'), local('Montserrat-Regular'),
+  src:
+    local('Montserrat Regular'),
+    local('Montserrat-Regular'),
     url('/fonts/montserrat-v14-latin-regular.woff2') format('woff2'),
     url('/fonts/montserrat-v14-latin-regular.woff') format('woff');
 }
@@ -29,7 +31,9 @@
   font-family: 'Montserrat';
   font-style: normal;
   font-weight: 600;
-  src: local('Montserrat SemiBold'), local('Montserrat-SemiBold'),
+  src:
+    local('Montserrat SemiBold'),
+    local('Montserrat-SemiBold'),
     url('/fonts/montserrat-v14-latin-600.woff2') format('woff2'),
     url('/fonts/montserrat-v14-latin-600.woff') format('woff');
 }
@@ -39,8 +43,9 @@
   font-family: 'Open Sans';
   font-style: normal;
   font-weight: 400;
-  src: local('Open Sans Regular'), local('OpenSans-Regular'),
+  src:
+    local('Open Sans Regular'),
+    local('OpenSans-Regular'),
     url('/fonts/open-sans-v17-latin-regular.woff2') format('woff2'),
     url('/fonts/open-sans-v17-latin-regular.woff') format('woff');
 }
-

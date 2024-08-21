@@ -2316,6 +2316,7 @@ __metadata:
     "@banterstudiosuk/prettier-config": 0.2.0
     "@derozn/tailwind-variants": 0.2.6
     "@eslint/compat": 1.1.1
+    "@eslint/eslintrc": 3.1.0
     "@iamnick/config": "*"
     "@iamnick/ui": "*"
     "@react-three/fiber": 8.17.5
@@ -2390,7 +2391,7 @@ __metadata:
     lint-staged: 15.2.9
     prettier: 3.3.3
     rimraf: 6.0.1
-    turborepo: latest
+    turbo: 2.0.14
     typescript: 5.5.4
   languageName: unknown
   linkType: soft
@@ -17307,10 +17308,74 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turborepo@npm:latest":
-  version: 0.0.1
-  resolution: "turborepo@npm:0.0.1"
-  checksum: 4975a23063185a87729f5de4fdb42c2118b52d88263128fa1416fe651798725a8d9f3e8a10a099d1188bd5ae04a39a93fe39810ced7e9187230ae9aa3ba645cf
+"turbo-darwin-64@npm:2.0.14":
+  version: 2.0.14
+  resolution: "turbo-darwin-64@npm:2.0.14"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"turbo-darwin-arm64@npm:2.0.14":
+  version: 2.0.14
+  resolution: "turbo-darwin-arm64@npm:2.0.14"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"turbo-linux-64@npm:2.0.14":
+  version: 2.0.14
+  resolution: "turbo-linux-64@npm:2.0.14"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
+"turbo-linux-arm64@npm:2.0.14":
+  version: 2.0.14
+  resolution: "turbo-linux-arm64@npm:2.0.14"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"turbo-windows-64@npm:2.0.14":
+  version: 2.0.14
+  resolution: "turbo-windows-64@npm:2.0.14"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"turbo-windows-arm64@npm:2.0.14":
+  version: 2.0.14
+  resolution: "turbo-windows-arm64@npm:2.0.14"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"turbo@npm:2.0.14":
+  version: 2.0.14
+  resolution: "turbo@npm:2.0.14"
+  dependencies:
+    turbo-darwin-64: 2.0.14
+    turbo-darwin-arm64: 2.0.14
+    turbo-linux-64: 2.0.14
+    turbo-linux-arm64: 2.0.14
+    turbo-windows-64: 2.0.14
+    turbo-windows-arm64: 2.0.14
+  dependenciesMeta:
+    turbo-darwin-64:
+      optional: true
+    turbo-darwin-arm64:
+      optional: true
+    turbo-linux-64:
+      optional: true
+    turbo-linux-arm64:
+      optional: true
+    turbo-windows-64:
+      optional: true
+    turbo-windows-arm64:
+      optional: true
+  bin:
+    turbo: bin/turbo
+  checksum: 68df50a1898143cdbd0058fde9cae415bc0e316223bd4eae4a2dde5b6c29f2e3e561e0cde95f3a7e0b1de1fc28110f60b05021a3862c25d0c0544d1ae8816ab6
   languageName: node
   linkType: hard
 

@@ -4,10 +4,7 @@
     "outDir": "build",
     "target": "es2018",
     "composite": true,
-    "noEmit": false,
-    "paths": {
-      "@iamnick/config/src/*": ["src/packages/config/src/*"]
-    }
+    "noEmit": false
   },
   "include": [
     "src/**/*",

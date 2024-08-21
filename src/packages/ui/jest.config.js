@@ -12,7 +12,7 @@ module.exports = {
   preset: 'ts-jest',
   clearMocks: true,
   bail: 10,
-  coverageDirectory: 'testCoverage',
+  coverageDirectory: 'coverage',
   coveragePathIgnorePatterns: ['/node_modules/'],
   coverageReporters: ['json', 'text', 'lcov', 'clover'],
   collectCoverageFrom: [
