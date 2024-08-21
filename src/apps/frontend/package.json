@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@derozn/tailwind-variants": "0.2.6",
-    "@iamnick/ui": "workspace:*",
+    "@iamnick/ui": "*",
     "@react-three/fiber": "8.17.5",
     "framer-motion": "11.3.29",
     "glsl-hsv2rgb": "1.0.0",
@@ -54,7 +54,7 @@
     "@banterstudiosuk/eslint-config-typescript": "0.2.5",
     "@banterstudiosuk/prettier-config": "0.2.0",
     "@eslint/compat": "1.1.1",
-    "@iamnick/config": "workspace:*",
+    "@iamnick/config": "*",
     "@tailwindcss/typography": "0.5.13",
     "@testing-library/jest-dom": "6.4.8",
     "@testing-library/react": "16.0.0",
