@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TruncateText When rendering variants and the line count 1 renders correctly 1`] = `
+<span
+  class="ui-line-clamp-1"
+/>
+`;
+
+exports[`TruncateText When rendering variants and the line count 2 renders correctly 1`] = `
+<span
+  class="ui-line-clamp-2"
+/>
+`;
+
+exports[`TruncateText When rendering variants and the line count 3 renders correctly 1`] = `
+<span
+  class="ui-line-clamp-3"
+/>
+`;

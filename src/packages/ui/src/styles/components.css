@@ -1,0 +1,5 @@
+@layer components {
+  .ui-img-overlay {
+    @apply ui-absolute ui-left-0 ui-top-0 ui-w-full ui-h-full ui-bg-background-primary ui-opacity-50;
+  }
+}

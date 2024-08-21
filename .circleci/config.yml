@@ -3,7 +3,7 @@ version: 2.1
 defaults: &defaults
   working_directory: ~/service
   docker:
-    - image: circleci/node:18.13.0
+    - image: cimg/node:18.13.0
 
 jobs:
   build:

@@ -1,0 +1,28 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "composite": true,
+    "noEmit": false,
+    "paths": {
+      "@iamnick/ui/src/*": ["src/packages/ui/src/*"],
+    }
+  },
+  "include": [
+    "src/**/*",
+    "config/**/*",
+    ".storybook/*",
+    "tailwind.config.ts",
+    "src/**/*.json",
+    "eslint.config.js",
+    "babel.config.js",
+    "jest.config.js",
+    "postcss.config.js"
+  ],
+  "exclude": ["node_modules", "coverage", "build/**", "package.json"],
+  "references": [
+    {
+      "path": "../config"
+    }
+  ]
+}

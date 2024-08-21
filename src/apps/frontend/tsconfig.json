@@ -1,0 +1,50 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@/test/*": [
+        "./test/*"
+      ]
+    },
+    "incremental": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    ".templates/*",
+    "build"
+  ],
+  "typeRoots": [
+    "./@types",
+    "./node_modules/@types"
+  ],
+  "include": [
+    "./@types/**/*",
+    "next-env.d.ts",
+    "test/**/*",
+    "src/**/*",
+    "plugins/**/*",
+    "eslint.config.js",
+    "next.config.mjs",
+    "tailwind.config.ts",
+    "postcss.config.js",
+    ".next/types/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/config"
+    },
+    {
+      "path": "../../packages/ui"
+    }
+  ]
+}
