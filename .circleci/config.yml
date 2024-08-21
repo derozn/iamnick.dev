@@ -23,13 +23,20 @@ jobs:
           root: ~/
           paths:
             - ./
+  typecheck:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          command: yarn typecheck
   test:
     <<: *defaults
     steps:
       - attach_workspace:
           at: ~/
       - run:
-          command: yarn test
+          command: yarn test:ci
           environment:
             CIRCLE_BRANCH: local
             JEST_JUNIT_OUTPUT_DIR: ./junit.xml
@@ -39,6 +46,20 @@ jobs:
 workflows:
   build-test:
     jobs:
+      - typecheck:
+          name: typecheck-dev
+          context: dev
+          filters:
+            branches:
+              ignore:
+                - master
+      - typecheck:
+          name: typecheck-prod
+          context: prod
+          filters:
+            branches:
+              only:
+                - master
       - build:
           name: build-dev
           context: dev
