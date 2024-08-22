@@ -1,20 +1,3 @@
-const withGLSLLoader = (nextConfig = {}) => ({
-  ...nextConfig,
-  webpack: (config, options) => {
-    config.module.rules.push({
-      test: /\.(glsl|vs|fs)$/,
-      exclude: /node_modules/,
-      use: ['raw-loader', 'glslify-loader'],
-    });
-
-    if (typeof nextConfig.webpack === 'function') {
-      return nextConfig.webpack(config, options);
-    }
-
-    return config;
-  },
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -50,7 +33,4 @@ const nextConfig = {
   },
 };
 
-export default () => {
-  const plugins = [withGLSLLoader];
-  return plugins.reduce((acc, plugin) => plugin(acc), { ...nextConfig });
-};
+export default nextConfig;
