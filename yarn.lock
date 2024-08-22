@@ -2319,6 +2319,7 @@ __metadata:
     "@iamnick/ui": "*"
     "@react-three/drei": 9.111.2
     "@react-three/fiber": 8.17.5
+    "@react-three/postprocessing": 2.16.2
     "@tailwindcss/typography": 0.5.13
     "@testing-library/jest-dom": 6.4.8
     "@testing-library/react": 16.0.0
@@ -4068,6 +4069,23 @@ __metadata:
     react-native:
       optional: true
   checksum: 50833bd35fb7d2910d840e8a85df292e02fbb9e1af22c5aee34a89c145109ebda16069aa42f0370601d59c7c9c49c622b4090d432882b592f1c21add3fff5043
+  languageName: node
+  linkType: hard
+
+"@react-three/postprocessing@npm:2.16.2":
+  version: 2.16.2
+  resolution: "@react-three/postprocessing@npm:2.16.2"
+  dependencies:
+    buffer: ^6.0.3
+    maath: ^0.6.0
+    n8ao: ^1.6.6
+    postprocessing: ^6.32.1
+    three-stdlib: ^2.23.4
+  peerDependencies:
+    "@react-three/fiber": ">=8.0"
+    react: ">=18.0"
+    three: ">= 0.138.0"
+  checksum: b3b2396c9cfcf95f3ae7e4473b98b446ac5cabce070675e1264a26d8ff15c543c1148919b447b620c3d30be594e5f89dd618e5b32ec05e24b8f5370af7438009
   languageName: node
   linkType: hard
 
@@ -12895,6 +12913,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"maath@npm:^0.6.0":
+  version: 0.6.0
+  resolution: "maath@npm:0.6.0"
+  peerDependencies:
+    "@types/three": ">=0.144.0"
+    three: ">=0.144.0"
+  checksum: 6b8da7789f5607f77030bac5cdc50697fe81ac3bd0939883430f33340768ccf0e5528465b039d8328181bfb9e966d2ad60f694c45825b7d6be944f3f735c5023
+  languageName: node
+  linkType: hard
+
 "magic-string@npm:^0.30.5":
   version: 0.30.11
   resolution: "magic-string@npm:0.30.11"
@@ -13824,6 +13852,16 @@ __metadata:
     object-assign: ^4.0.1
     thenify-all: ^1.0.0
   checksum: 8427de0ece99a07e9faed3c0c6778820d7543e3776f9a84d22cf0ec0a8eb65f6e9aee9c9d353ff9a105ff62d33a9463c6ca638974cc652ee8140cd1e35951c87
+  languageName: node
+  linkType: hard
+
+"n8ao@npm:^1.6.6":
+  version: 1.8.4
+  resolution: "n8ao@npm:1.8.4"
+  peerDependencies:
+    postprocessing: ">=6.30.0"
+    three: ">=0.137"
+  checksum: 29b3728da6564745f14ce68700d55c88500dc14dff83cace377c80435733f8a42446e12b91d701d508edfa59ab8f7eabdab8301145f3e59b0c0f77218d465bb6
   languageName: node
   linkType: hard
 
@@ -14965,6 +15003,15 @@ __metadata:
     picocolors: ^1.0.1
     source-map-js: ^1.2.0
   checksum: f865894929eb0f7fc2263811cc853c13b1c75103028b3f4f26df777e27b201f1abe21cb4aa4c2e901c80a04f6fb325ee22979688fe55a70e2ea82b0a517d3b6f
+  languageName: node
+  linkType: hard
+
+"postprocessing@npm:^6.32.1":
+  version: 6.36.0
+  resolution: "postprocessing@npm:6.36.0"
+  peerDependencies:
+    three: ">= 0.157.0 < 0.168.0"
+  checksum: d5619313a053ddb2512f9768aa372f06c9a9cef4a7b28c4427e61e7f724115a9d90f2ae3d107662e48501b8d1309ae5a0553a523098e1df9067591ad65b02a18
   languageName: node
   linkType: hard
 
@@ -17266,7 +17313,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"three-stdlib@npm:^2.29.9":
+"three-stdlib@npm:^2.23.4, three-stdlib@npm:^2.29.9":
   version: 2.32.2
   resolution: "three-stdlib@npm:2.32.2"
   dependencies:
