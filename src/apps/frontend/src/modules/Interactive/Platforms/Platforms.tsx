@@ -10,12 +10,9 @@ export function PlatformLarge(props: GroupProps) {
   return (
     <group {...props} dispose={null}>
       <group position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={100}>
-        <mesh
-          castShadow
-          receiveShadow
-          geometry={allNodes.Platform_4x4_1.geometry}
-          material={materials.Texture_Signs}
-        />
+        <mesh castShadow receiveShadow geometry={allNodes.Platform_4x4_1.geometry}>
+          <meshBasicMaterial {...materials.Texture_Signs} color={[10, 10, 10]} toneMapped={false} />
+        </mesh>
         <mesh
           castShadow
           receiveShadow
@@ -58,6 +55,7 @@ export function PlatformSmall(props: GroupProps) {
 
   return (
     <group {...props} dispose={null}>
+      <pointLight intensity={0.03} color={[10, 2, 5]} distance={2.5} />
       <group rotation={[-Math.PI / 2, 0, 0]} scale={100}>
         <mesh
           castShadow
@@ -71,12 +69,9 @@ export function PlatformSmall(props: GroupProps) {
           geometry={allNodes.Platform_2x2_2.geometry}
           material={materials.Grey}
         />
-        <mesh
-          castShadow
-          receiveShadow
-          geometry={allNodes.Platform_2x2_3.geometry}
-          material={materials.Texture_Signs}
-        />
+        <mesh castShadow receiveShadow geometry={allNodes.Platform_2x2_3.geometry}>
+          <meshBasicMaterial {...materials.Texture_Signs} color={[10, 10, 10]} toneMapped={false} />
+        </mesh>
         <mesh
           castShadow
           receiveShadow

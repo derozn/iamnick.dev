@@ -2,22 +2,26 @@ import { PlatformLarge, PlatformSmall, PlatformLong } from '@/modules/Interactiv
 import {
   OrbitControls,
   BakeShadows,
-  useHelper,
   OrthographicCamera,
   Stage,
   Bounds,
   Float,
-  Sky,
   Text3D,
   Center,
   Billboard,
-  BBAnchor,
+  MeshDistortMaterial,
 } from '@react-three/drei';
+import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { SpaceDust } from '../SpaceDust';
+import { FlyingGunman } from '../Enemies/FlyingGunman';
 
 export const World = () => {
   return (
     <>
+      <EffectComposer>
+        <Bloom luminanceThreshold={0.5} mipmapBlur luminanceSmoothing={0.0} intensity={0.7} />
+      </EffectComposer>
+      <fog attach="fog" args={['black', 10, 70]} />
       <OrthographicCamera position={[10, 10, 10]} zoom={10} />
       <Bounds fit clip observe margin={0.35}>
         <Stage adjustCamera={false}>
@@ -41,25 +45,30 @@ export const World = () => {
               >
                 <PlatformSmall scale={0.1} rotation={[0, Math.PI / 2, 0]} />
                 <PlatformLarge scale={0.1} position={[0.35, 0, 0]} />
-                <PlatformLong
-                  scale={0.1}
-                  position={[0.35, 0, -0.5]}
-                  rotation={[0, Math.PI / 2, 0]}
-                />
+                <PlatformLong scale={0.1} position={[0.35, 0, -0.5]} rotation={[0, Math.PI / 2, 0]}>
+                  <FlyingGunman scale={0.1} position={[0, -2, 0]} />
+                </PlatformLong>
               </Float>
             </group>
           </group>
         </Stage>
-        <Billboard
-          follow={true}
-          lockX={true}
-          lockY={true}
-          lockZ={true} // Lock the rotation on the z axis (default=false)
-        >
+        <Billboard follow={true} lockX={true} lockY={true} lockZ={true}>
           <Center top>
-            <Text3D font="/font/punk.json" scale={0.2} letterSpacing={0.2} rotation={[0, 0, 0]}>
+            <Text3D
+              font="/font/punk.json"
+              scale={0.2}
+              letterSpacing={0.2}
+              rotation={[0, 0, 0]}
+              renderOrder={999}
+            >
               I AM NICK
-              <meshNormalMaterial />
+              <MeshDistortMaterial
+                distort={0.1}
+                speed={1}
+                depthTest={false}
+                depthWrite={false}
+                transparent={true}
+              />
             </Text3D>
           </Center>
         </Billboard>
@@ -71,8 +80,8 @@ export const World = () => {
         maxAzimuthAngle={Math.PI / 2}
         minPolarAngle={Math.PI / 3}
         maxPolarAngle={Math.PI / 3}
-        enableZoom={true}
-        enablePan={true}
+        enableZoom={false}
+        enablePan={false}
         zoomSpeed={0.3}
       />
       <SpaceDust />
