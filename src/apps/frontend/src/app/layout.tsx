@@ -16,7 +16,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'iamnick.dev',
+  title: 'iamnick.dev | Full stack developer',
   description: 'A Creative Full Stack Developers personal portfolio',
   manifest: '/site.webmanifest',
   icons: {
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'iamnick.dev',
+    title: 'iamnick.dev | Full stack developer',
     description: 'A Creative Full Stack Developers personal portfolio',
     url: 'https://iamnick.dev',
     siteName: 'iamnick.dev',
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary',
-    title: 'iamnick.dev',
+    title: 'iamnick.dev | Full stack developer',
     description: 'A Creative Full Stack Developers personal portfolio',
     creator: '@pk_marval',
     images: [
@@ -79,7 +79,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
       <body>
         <ThemeProvider>
           <main>
-            <Suspense fallback={<PageLoader className="pb-footer" />}>{children}</Suspense>
+            <Suspense fallback={<PageLoader />}>{children}</Suspense>
           </main>
         </ThemeProvider>
         <div id={uiPortalId} className="relative z-10" />

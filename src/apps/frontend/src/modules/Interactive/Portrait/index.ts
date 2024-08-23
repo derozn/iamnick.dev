@@ -1,0 +1,1 @@
+export { FaceParticles } from './FaceParticles';

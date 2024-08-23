@@ -18,7 +18,7 @@ export const PageLoader = ({ className }: IPageLoaderProps) => {
         className,
       )}
     >
-      <Spinner width={theme.spacing[19]} height={theme.spacing[19]} />
+      <Spinner width={theme.spacing[12]} height={theme.spacing[12]} />
     </div>
   );
 };
