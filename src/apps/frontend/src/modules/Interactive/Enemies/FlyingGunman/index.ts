@@ -1,1 +1,0 @@
-export { FlyingGunman } from './FlyingGunman';

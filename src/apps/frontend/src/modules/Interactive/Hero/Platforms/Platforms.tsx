@@ -1,6 +1,6 @@
 import { GroupProps } from '@react-three/fiber';
-import { useGLTF } from '@react-three/drei';
-import type { Mesh } from 'three';
+import { MeshReflectorMaterial, useGLTF } from '@react-three/drei';
+import { type Mesh } from 'three';
 
 export function PlatformLarge(props: GroupProps) {
   const { nodes, materials } = useGLTF('/models/Cyberpunk Platform-ctQ5CDmraQ.glb');
@@ -8,7 +8,7 @@ export function PlatformLarge(props: GroupProps) {
   const allNodes = nodes as Record<string, Mesh>;
 
   return (
-    <group {...props} dispose={null}>
+    <group scale={0.1} {...props} dispose={null}>
       <group position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} scale={100}>
         <mesh castShadow receiveShadow geometry={allNodes.Platform_4x4_1.geometry}>
           <meshBasicMaterial {...materials.Texture_Signs} color={[10, 10, 10]} toneMapped={false} />
@@ -54,7 +54,7 @@ export function PlatformSmall(props: GroupProps) {
   const allNodes = nodes as Record<string, Mesh>;
 
   return (
-    <group {...props} dispose={null}>
+    <group scale={0.1} {...props} dispose={null}>
       <pointLight intensity={0.03} color={[10, 2, 5]} distance={2.5} />
       <group rotation={[-Math.PI / 2, 0, 0]} scale={100}>
         <mesh
@@ -62,7 +62,9 @@ export function PlatformSmall(props: GroupProps) {
           receiveShadow
           geometry={allNodes.Platform_2x2_1.geometry}
           material={materials.LightGrey}
-        />
+        >
+          <MeshReflectorMaterial mirror={1} />
+        </mesh>
         <mesh
           castShadow
           receiveShadow
@@ -95,20 +97,22 @@ export function PlatformSmall(props: GroupProps) {
   );
 }
 
-export function PlatformLong(props: GroupProps) {
+export function PlatformLong({ children, ...props }: GroupProps) {
   const { nodes, materials } = useGLTF('/models/Cyberpunk Platform-J3AJSwqmBJ.glb');
 
   const allNodes = nodes as Record<string, Mesh>;
 
   return (
-    <group {...props} dispose={null}>
+    <group scale={0.1} {...props} dispose={null}>
       <group rotation={[-Math.PI / 2, 0, 0]} scale={100}>
         <mesh
           castShadow
           receiveShadow
           geometry={allNodes.Platform_4x2_1.geometry}
           material={materials.Texture_Signs}
-        />
+        >
+          <meshBasicMaterial {...materials.Texture_Signs} color={[10, 10, 10]} toneMapped={false} />
+        </mesh>
         <mesh
           castShadow
           receiveShadow
@@ -139,6 +143,7 @@ export function PlatformLong(props: GroupProps) {
           geometry={allNodes.Platform_4x2_6.geometry}
           material={materials.DarkGrey}
         />
+        {children}
       </group>
     </group>
   );
