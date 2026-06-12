@@ -4,15 +4,24 @@ import type { Metadata, Viewport } from 'next';
 import { PropsWithChildren } from 'react';
 
 import { montserratFont, openSansFont } from '@/components/ui-modules/next/fonts/local';
+import { JsonLd } from '@/components/organisms/JsonLd';
 import { cn } from '@/lib/cn';
+import { profile } from '@/content/cv';
 
 export const viewport: Viewport = {
-  themeColor: '#ffffff',
+  themeColor: '#070810',
 };
 
+/** First sentence of shortBio — used as the meta description. */
+const metaDescription = profile.shortBio.split('. ')[0] + '.';
+
 export const metadata: Metadata = {
-  title: 'iamnick.dev | Full stack developer',
-  description: 'A Creative Full Stack Developers personal portfolio',
+  metadataBase: new URL('https://iamnick.dev'),
+  title: {
+    default: 'Nick de Rozarieux — Lead Software Engineer',
+    template: '%s · iamnick.dev',
+  },
+  description: metaDescription,
   manifest: '/site.webmanifest',
   icons: {
     apple: {
@@ -33,32 +42,17 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: 'iamnick.dev | Full stack developer',
-    description: 'A Creative Full Stack Developers personal portfolio',
+    title: 'Nick de Rozarieux — Lead Software Engineer',
+    description: metaDescription,
     url: 'https://iamnick.dev',
     siteName: 'iamnick.dev',
-    images: [
-      {
-        url: 'https://iamnick.dev/social-icon-260.jpg',
-        width: 260,
-        height: 260,
-      },
-    ],
-    locale: 'en-GB',
+    locale: 'en_GB',
     type: 'website',
   },
   twitter: {
-    card: 'summary',
-    title: 'iamnick.dev | Full stack developer',
-    description: 'A Creative Full Stack Developers personal portfolio',
-    creator: '@pk_marval',
-    images: [
-      {
-        url: 'https://iamnick.dev/social-icon-260.jpg',
-        width: 260,
-        height: 260,
-      },
-    ],
+    card: 'summary_large_image',
+    title: 'Nick de Rozarieux — Lead Software Engineer',
+    description: metaDescription,
   },
   other: {
     'mask-icon': '/safari-pinned-tab.svg',
@@ -67,11 +61,14 @@ export const metadata: Metadata = {
 
 export const dynamic = 'auto';
 
-export default async function RootLayout({ children }: PropsWithChildren) {
+export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" className={cn(montserratFont.variable, openSansFont.variable)}>
       <head />
-      <body>{children}</body>
+      <body className="bg-background-primary font-functional text-text-primary">
+        <JsonLd />
+        {children}
+      </body>
     </html>
   );
 }

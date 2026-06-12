@@ -14,8 +14,10 @@
   --color-background-feedback-negative: #c00408;
   --color-border-primary: #d6d6d6;
 
-  /* Accent slots (extend as needed in future phases) */
+  /* Accent slots */
   --color-accent-primary: #d6d6d6;
+  --color-accent: #4cc9f0;
+  --color-accent-dim: #1a7fa0;
 
   /* ── Fonts ───────────────────────────────────────────── */
   --font-expressive: var(--font-montserrat), sans-serif;
@@ -117,6 +119,15 @@
     background-color: var(--color-background-primary);
     color: var(--color-text-primary);
     font-family: var(--font-functional);
+  }
+}
+
+/* ── Focus-visible ring ───────────────────────────────── */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 }
 
