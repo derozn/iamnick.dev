@@ -1,9 +1,10 @@
 'use client';
 
-import { AnimatePresence, AnimatePresenceProps } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
+import type { AnimatePresenceProps } from 'motion/react';
 import { FC, PropsWithChildren, ReactElement, ReactNode } from 'react';
 
-import { IFadeItemProps } from './FadeItem';
+import type { IFadeItemProps } from './FadeItem';
 
 export interface IFadeAnimationProps {
   children?: ReactElement<IFadeItemProps> | ReactElement<IFadeItemProps>[] | ReactNode;

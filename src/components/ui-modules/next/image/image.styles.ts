@@ -1,35 +1,20 @@
-import { tv, VariantProps } from '@derozn/tailwind-variants';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-import { twMergeConfig } from '@/theme';
-
-export const imageStyles = tv(
-  {
-    slots: {
-      base: 'ui-w-full ui-h-full ui-block',
+export const imageStyles = cva('w-full h-full block', {
+  variants: {
+    fit: {
+      cover: 'object-cover',
+      contain: 'object-contain',
     },
-    variants: {
-      fit: {
-        cover: {
-          base: 'ui-object-cover',
-        },
-        contain: {
-          base: 'ui-object-contain',
-        },
-      },
-      position: {
-        top: 'ui-object-top',
-        center: 'ui-object-center',
-        bottom: 'ui-object-bottom',
-      },
-    },
-    defaultVariants: {
-      fit: 'cover',
+    position: {
+      top: 'object-top',
+      center: 'object-center',
+      bottom: 'object-bottom',
     },
   },
-  {
-    responsiveVariants: true,
-    twMergeConfig,
+  defaultVariants: {
+    fit: 'cover',
   },
-);
+});
 
 export type TImageStyles = VariantProps<typeof imageStyles>;

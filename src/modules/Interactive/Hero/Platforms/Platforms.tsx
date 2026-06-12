@@ -1,4 +1,6 @@
-import { GroupProps } from '@react-three/fiber';
+import { type ThreeElements } from '@react-three/fiber';
+
+type GroupProps = ThreeElements['group'];
 import { MeshReflectorMaterial, useGLTF } from '@react-three/drei';
 import { type Mesh } from 'three';
 

@@ -52,10 +52,9 @@ export class ParticlesMaterial extends RawShaderMaterial {
     addWrapModeToTexture(texture);
 
     this.uniforms.particleTexture.value = texture;
-    this.uniforms.particleTextureSize.value = new Vector2(
-      texture.image.width,
-      texture.image.height,
-    );
+    // TODO(phase-4): texture.image is typed as unknown in Three.js r160+
+    const img = texture.image as unknown as { width: number; height: number };
+    this.uniforms.particleTextureSize.value = new Vector2(img.width, img.height);
   }
 
   public update(delta: number) {

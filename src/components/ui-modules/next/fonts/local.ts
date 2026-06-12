@@ -14,11 +14,11 @@ export const montserratFont = localFont({
       weight: '600',
     },
   ],
-  variable: '--ui-expressive',
+  variable: '--font-montserrat',
 });
 
 export const openSansFont = localFont({
   src: '../../../../assets/fonts/open-sans-v17-latin-regular.woff2',
   weight: '400',
-  variable: '--ui-functional',
+  variable: '--font-open-sans',
 });

@@ -1,14 +1,13 @@
-import classnames, { Argument } from 'classnames';
 import { PropsWithChildren, FC } from 'react';
 
-import { Skeleton } from '@/components/atoms/Loader/Skeleton';
+import { cn } from '@/lib/cn';
 
 import { FadeAnimation, FadeItem } from '../Animation/Fade';
 
 import { assetStyles, TAssetStyles } from './Asset.styles';
 
 export interface IAssetProps extends TAssetStyles {
-  className?: Argument;
+  className?: string;
   isLoaded?: boolean;
   showLoader?: boolean;
 }
@@ -36,24 +35,15 @@ export const Asset: FC<PropsWithChildren<IAssetProps>> = ({
   });
 
   return (
-    <div className={classnames(assetStyle, className)}>
+    <div className={cn(assetStyle, className)}>
       {children}
 
       {showLoader && (
         <FadeAnimation mode="popLayout">
           {!isLoaded && (
-            <FadeItem
-              itemKey="skeleton"
-              className="ui-absolute ui-top-0 ui-left-0 ui-w-full ui-h-full"
-              delay={0}
-            >
-              <Skeleton
-                containerClassName="ui-w-full ui-h-full ui-transform-gpu"
-                height="100%"
-                width="100%"
-                className="ui-align-top"
-                borderRadius={0}
-              />
+            <FadeItem itemKey="skeleton" className="absolute top-0 left-0 w-full h-full" delay={0}>
+              {/* Pulse placeholder — replaces react-loading-skeleton */}
+              <div className="w-full h-full animate-pulse bg-current opacity-10 transform-gpu" />
             </FadeItem>
           )}
         </FadeAnimation>

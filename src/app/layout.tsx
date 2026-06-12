@@ -1,13 +1,10 @@
-import '@/styles/global.css';
+import '@/styles/globals.css';
 
-import classnames from 'classnames';
 import type { Metadata, Viewport } from 'next';
-import { PropsWithChildren, Suspense } from 'react';
+import { PropsWithChildren } from 'react';
 
 import { montserratFont, openSansFont } from '@/components/ui-modules/next/fonts/local';
-import { ThemeProvider } from '@/components/ui-modules/theme/components';
-import { PageLoader } from '@/components/atoms/Loader/PageLoader';
-import { uiPortalId } from '@/utils/portal';
+import { cn } from '@/lib/cn';
 
 export const viewport: Viewport = {
   themeColor: '#ffffff',
@@ -72,16 +69,9 @@ export const dynamic = 'auto';
 
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (
-    <html lang="en" className={classnames(montserratFont.variable, openSansFont.variable)}>
+    <html lang="en" className={cn(montserratFont.variable, openSansFont.variable)}>
       <head />
-      <body>
-        <ThemeProvider>
-          <main>
-            <Suspense fallback={<PageLoader />}>{children}</Suspense>
-          </main>
-        </ThemeProvider>
-        <div id={uiPortalId} className="relative z-10" />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

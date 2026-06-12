@@ -1,0 +1,140 @@
+@import 'tailwindcss';
+
+@theme {
+  /* ── Colors ──────────────────────────────────────────── */
+  --color-background-primary: #070810;
+  --color-text-primary: #d6d6d6;
+  --color-text-secondary: #000000;
+  --color-text-error: #c00408;
+  --color-snow-white: #ffffff;
+  --color-black: #000000;
+  --color-rich-black: #070810;
+
+  /* Semantic feedback / border colors used by components */
+  --color-background-feedback-negative: #c00408;
+  --color-border-primary: #d6d6d6;
+
+  /* Accent slots (extend as needed in future phases) */
+  --color-accent-primary: #d6d6d6;
+
+  /* ── Fonts ───────────────────────────────────────────── */
+  --font-expressive: var(--font-montserrat), sans-serif;
+  --font-functional: var(--font-open-sans), sans-serif;
+  --font-fallback: sans-serif;
+
+  /* ── Spacing scale (0-20) ───────────────────────────── */
+  --spacing-0: 0px;
+  --spacing-1: 2px;
+  --spacing-2: 4px;
+  --spacing-3: 8px;
+  --spacing-4: 12px;
+  --spacing-5: 16px;
+  --spacing-6: 20px;
+  --spacing-7: 24px;
+  --spacing-8: 32px;
+  --spacing-9: 40px;
+  --spacing-10: 48px;
+  --spacing-11: 56px;
+  --spacing-12: 64px;
+  --spacing-13: 72px;
+  --spacing-14: 80px;
+  --spacing-15: 88px;
+  --spacing-16: 96px;
+  --spacing-17: 104px;
+  --spacing-18: 112px;
+  --spacing-19: 128px;
+  --spacing-20: 144px;
+
+  /* ── Border radius ──────────────────────────────────── */
+  --radius-0: 0px;
+  --radius-1: 2px;
+  --radius-2: 4px;
+  --radius-3: 8px;
+  --radius-4: 12px;
+  --radius-5: 16px;
+  --radius-6: 20px;
+  --radius-7: 24px;
+  --radius-8: 32px;
+  --radius-9: 40px;
+  --radius-10: 48px;
+  --radius-11: 56px;
+  --radius-12: 64px;
+
+  /* ── Border width ───────────────────────────────────── */
+  --border-width-0: 0px;
+  --border-width-1: 1px;
+  --border-width-2: 2px;
+  --border-width-3: 4px;
+
+  /* ── Breakpoints ────────────────────────────────────── */
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 960px;
+  --breakpoint-lg: 1280px;
+  --breakpoint-xl: 1920px;
+
+  /* ── Type scale ─────────────────────────────────────── */
+  --font-size-12: 12px;
+  --font-size-14: 14px;
+  --font-size-16: 16px;
+  --font-size-18: 18px;
+  --font-size-20: 20px;
+  --font-size-24: 24px;
+  --font-size-28: 28px;
+  --font-size-32: 32px;
+  --font-size-36: 36px;
+  --font-size-40: 40px;
+  --font-size-44: 44px;
+  --font-size-48: 48px;
+  --font-size-56: 56px;
+  --font-size-64: 64px;
+  --font-size-80: 80px;
+
+  /* ── Custom aspect ratios ───────────────────────────── */
+  --aspect-standard: 4 / 3;
+  --aspect-portrait: 2 / 3;
+  --aspect-classic: 3 / 2;
+  --aspect-tall: 9 / 16;
+  --aspect-print: 3 / 4;
+  --aspect-photo: 4 / 5;
+  --aspect-large-portrait: 3 / 5;
+  --aspect-tv: 16 / 9;
+}
+
+/* ── Base styles ──────────────────────────────────────── */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-functional);
+  }
+}
+
+/* ── Custom utilities ─────────────────────────────────── */
+@utility no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@utility img-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-background-primary);
+  opacity: 0.5;
+}

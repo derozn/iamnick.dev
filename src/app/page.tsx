@@ -1,17 +1,14 @@
 import { HeroScene } from '@/modules/Interactive/Hero/Scene';
-import { HolyGrail } from '@/components/templates/HolyGrail';
 
 export const dynamic = 'auto';
 
 const Homepage = async () => {
   return (
-    <HolyGrail>
-      <div className="w-full">
-        <section className="h-screen">
-          <HeroScene />
-        </section>
-      </div>
-    </HolyGrail>
+    <main>
+      <section className="h-screen w-full">
+        <HeroScene />
+      </section>
+    </main>
   );
 };
 

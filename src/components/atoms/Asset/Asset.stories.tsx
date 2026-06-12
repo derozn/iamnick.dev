@@ -16,7 +16,7 @@ type TStory = StoryObj<typeof Asset>;
 
 const Img = () => (
   <img
-    className="ui-w-full ui-h-full ui-object-cover ui-block"
+    className="w-full h-full object-cover block"
     src="https://placehold.co/540x540"
     width={540}
     height={540}

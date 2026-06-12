@@ -29,10 +29,10 @@ const useMedia = (query: string, defaultMatch: boolean) => {
 
     updateMatch();
 
-    queryList.addListener(updateMatch);
+    queryList.addEventListener('change', updateMatch);
 
     return () => {
-      queryList.removeListener(updateMatch);
+      queryList.removeEventListener('change', updateMatch);
     };
   }, [matchQuery, supportMatchMedia]);
 

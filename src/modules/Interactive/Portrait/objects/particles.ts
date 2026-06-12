@@ -1,5 +1,8 @@
 import { InstancedBufferGeometry, BufferAttribute, Texture, InstancedBufferAttribute } from 'three';
 
+// TODO(phase-4): Three.js r160+ types texture.image as unknown; helper cast until upgraded
+type TextureImage = HTMLImageElement & { width: number; height: number };
+
 export class Particles extends InstancedBufferGeometry {
   texture: Texture;
 
@@ -45,11 +48,15 @@ export class Particles extends InstancedBufferGeometry {
     return new BufferAttribute(new Uint16Array([0, 2, 1, 2, 3, 1]), 1);
   }
 
+  private getImage(): TextureImage {
+    return this.texture.image as unknown as TextureImage;
+  }
+
   private generatePixelAttributes() {
     const indices = new Uint16Array(this.visiblePixelCount);
     const offsets = new Float32Array(this.visiblePixelCount * 3);
     const angles = new Float32Array(this.visiblePixelCount);
-    const { width } = this.texture.image;
+    const { width } = this.getImage();
 
     let pixelIndex = 0;
 
@@ -70,7 +77,7 @@ export class Particles extends InstancedBufferGeometry {
   }
 
   private discardPixels() {
-    const { image } = this.texture;
+    const image = this.getImage();
     const { width, height } = image;
 
     const canvas = document.createElement('canvas');
@@ -92,8 +99,7 @@ export class Particles extends InstancedBufferGeometry {
   }
 
   public create() {
-    const { image } = this.texture;
-    const { width, height } = image;
+    const { width, height } = this.getImage();
 
     this.totalPixelCount = width * height;
 

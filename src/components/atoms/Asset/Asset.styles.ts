@@ -1,60 +1,50 @@
-import { tv, VariantProps } from '@derozn/tailwind-variants';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-import { twMergeConfig } from '@/theme';
-
-export const assetStyles = tv(
-  {
-    base: 'ui-overflow-hidden ui-relative',
-    variants: {
-      aspect: {
-        square: 'ui-aspect-square',
-        video: 'ui-aspect-video',
-        standard: 'ui-aspect-standard',
-        portrait: 'ui-aspect-portrait',
-        auto: 'ui-aspect-auto',
-        classic: 'ui-aspect-classic',
-        tall: 'ui-aspect-tall',
-        print: 'ui-aspect-print',
-        photo: 'ui-aspect-photo',
-        'large-portrait': 'ui-aspect-large-portrait',
-        tv: 'ui-aspect-tv',
-      },
-      rounded: {
-        xxs: 'ui-rounded-2',
-        xs: 'ui-rounded-3',
-        sm: 'ui-rounded-4',
-        md: 'ui-rounded-5',
-        lg: 'ui-rounded-7',
-      },
-      size: {
-        inline: 'ui-w-max',
-        fill: 'ui-w-full ui-h-full',
-      },
-      hover: {
-        true: 'hover:after:ui-img-overlay after:ui-transition-colors',
-      },
-      selected: {
-        true: 'ui-border-2 ui-border-border-primary',
-      },
-      showLoader: {
-        true: 'ui-bg-background-feedback-negative',
-      },
-      cursor: {
-        pointer: 'ui-cursor-pointer',
-      },
+export const assetStyles = cva('overflow-hidden relative', {
+  variants: {
+    aspect: {
+      square: 'aspect-square',
+      video: 'aspect-video',
+      standard: 'aspect-standard',
+      portrait: 'aspect-portrait',
+      auto: 'aspect-auto',
+      classic: 'aspect-classic',
+      tall: 'aspect-tall',
+      print: 'aspect-print',
+      photo: 'aspect-photo',
+      'large-portrait': 'aspect-large-portrait',
+      tv: 'aspect-tv',
     },
-
-    defaultVariants: {
-      aspect: 'auto',
-      size: 'fill',
-      hover: false,
-      selected: false,
+    rounded: {
+      xxs: 'rounded-2',
+      xs: 'rounded-3',
+      sm: 'rounded-4',
+      md: 'rounded-5',
+      lg: 'rounded-7',
+    },
+    size: {
+      inline: 'w-max',
+      fill: 'w-full h-full',
+    },
+    hover: {
+      true: 'hover:after:img-overlay after:transition-colors',
+    },
+    selected: {
+      true: 'border-2 border-border-primary',
+    },
+    showLoader: {
+      true: 'bg-background-feedback-negative',
+    },
+    cursor: {
+      pointer: 'cursor-pointer',
     },
   },
-  {
-    responsiveVariants: true,
-    twMergeConfig,
+  defaultVariants: {
+    aspect: 'auto',
+    size: 'fill',
+    hover: false,
+    selected: false,
   },
-);
+});
 
 export type TAssetStyles = VariantProps<typeof assetStyles>;

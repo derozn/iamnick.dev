@@ -27,4 +27,11 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
     },
   },
+  {
+    // react-three-fiber JSX uses three.js scene-graph props unknown to eslint-plugin-react
+    files: ['src/modules/Interactive/**', 'src/components/three/**'],
+    rules: {
+      'react/no-unknown-property': 'off',
+    },
+  },
 );

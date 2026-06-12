@@ -1,30 +1,25 @@
 'use client';
 
-import classnames, { Argument } from 'classnames';
-import { motion, LayoutProps, HTMLMotionProps } from 'framer-motion';
-import { forwardRef, PropsWithChildren, ReactHTML, useMemo } from 'react';
+import { motion, type MotionProps } from 'motion/react';
+import { forwardRef, PropsWithChildren } from 'react';
+
+import { cn } from '@/lib/cn';
 
 export interface IFadeItemProps {
-  itemKey?: any;
+  itemKey?: string | number;
   delay?: number;
   duration?: number;
-  className?: Argument;
-  layout?: LayoutProps['layout'];
+  className?: string;
+  layout?: MotionProps['layout'];
   isActive?: boolean; // Allows for controlling the fade item instead
-  as?: keyof ReactHTML;
 }
 
 export const FadeItem = forwardRef<HTMLSpanElement, PropsWithChildren<IFadeItemProps>>(
-  (
-    { children, itemKey, className, delay, layout, isActive = true, duration = 0.25, as = 'span' },
-    ref,
-  ) => {
-    const MotionElement = useMemo(() => motion<HTMLMotionProps<typeof as>>(as), [as]);
-
+  ({ children, itemKey, className, delay, layout, isActive = true, duration = 0.25 }, ref) => {
     return (
-      <MotionElement
+      <motion.span
         ref={ref}
-        className={classnames(className, 'ui-w-[inherit] ui-h-[inherit]')}
+        className={cn('w-[inherit] h-[inherit]', className)}
         key={itemKey}
         initial={{ opacity: 0 }}
         animate={{
@@ -35,7 +30,9 @@ export const FadeItem = forwardRef<HTMLSpanElement, PropsWithChildren<IFadeItemP
         layout={layout}
       >
         {children}
-      </MotionElement>
+      </motion.span>
     );
   },
 );
+
+FadeItem.displayName = 'FadeItem';

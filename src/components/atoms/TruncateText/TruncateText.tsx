@@ -1,14 +1,11 @@
-import { VariantProps } from '@derozn/tailwind-variants';
 import { FC, ReactNode } from 'react';
 
-import { truncateTextStyles } from './TruncateText.styles';
+import { truncateTextStyles, type TTruncateTextStyles } from './TruncateText.styles';
 
-export interface ITruncateText extends VariantProps<typeof truncateTextStyles> {
+export interface ITruncateText extends TTruncateTextStyles {
   children?: ReactNode;
 }
 
 export const TruncateText: FC<ITruncateText> = ({ children, lines }) => {
-  const { base } = truncateTextStyles({ lines });
-
-  return <span className={base()}>{children}</span>;
+  return <span className={truncateTextStyles({ lines })}>{children}</span>;
 };

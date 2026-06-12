@@ -27,19 +27,15 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@derozn/tailwind-variants": "latest",
     "@react-three/drei": "latest",
     "@react-three/fiber": "latest",
     "@react-three/postprocessing": "latest",
     "class-variance-authority": "latest",
-    "classnames": "latest",
     "clsx": "latest",
-    "framer-motion": "latest",
     "motion": "latest",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "react-loader-spinner": "latest",
     "tailwind-merge": "latest",
     "three": "latest",
     "zustand": "latest"
