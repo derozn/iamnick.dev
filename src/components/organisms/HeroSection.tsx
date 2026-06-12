@@ -44,6 +44,7 @@ export function HeroSection() {
   return (
     <section
       aria-label="Introduction"
+      data-journey-stop="hero"
       className="relative flex min-h-svh w-full items-end justify-center pb-16 text-center md:justify-start md:pb-20 md:text-left"
     >
       <div className="max-w-[1280px] w-full mx-auto px-5 md:px-10">

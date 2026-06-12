@@ -18,7 +18,7 @@ export function AboutSection({ skillGroups }: AboutSectionProps) {
   const reduced = useReducedMotion();
 
   return (
-    <section aria-labelledby={headingId} className="w-full">
+    <section aria-labelledby={headingId} data-journey-stop="about" className="w-full">
       <SectionShell>
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 24 }}

@@ -24,7 +24,7 @@ export default function Homepage() {
         Skip to main content
       </a>
 
-      {/* Phase 4 3-D canvas stub — fixed, behind all content */}
+      {/* Scroll-driven 3-D journey — fixed, behind all content */}
       <JourneyCanvas />
 
       <main id="main">

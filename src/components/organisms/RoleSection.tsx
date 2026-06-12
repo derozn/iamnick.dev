@@ -29,7 +29,12 @@ export function RoleSection({ role, index }: RoleSectionProps) {
   const dateRange = `${formatYearMonth(role.start)} – ${formatYearMonth(role.end)}`;
 
   return (
-    <section aria-labelledby={headingId} className="relative flex min-h-screen w-full items-center">
+    <section
+      aria-labelledby={headingId}
+      // Journey stop id — 'travelex-lead' → 'travelex', 'lick-tech-lead' → 'lick', …
+      data-journey-stop={role.id.split('-')[0]}
+      className="relative flex min-h-screen w-full items-center"
+    >
       {/* Max-width container — card occupies roughly half the width on desktop */}
       <div
         className={cn(

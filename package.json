@@ -32,6 +32,7 @@
     "@react-three/postprocessing": "latest",
     "class-variance-authority": "latest",
     "clsx": "latest",
+    "maath": "^0.10.8",
     "motion": "latest",
     "next": "latest",
     "react": "latest",
