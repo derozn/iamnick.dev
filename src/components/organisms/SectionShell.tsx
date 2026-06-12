@@ -28,6 +28,7 @@ export function ContentCard({ children, className }: PropsWithChildren<SectionSh
         'rounded-3 bg-background-primary/70 backdrop-blur-md',
         'border border-border-primary/10',
         'p-6 md:p-10',
+        'neon-border',
         className,
       )}
     >

@@ -48,20 +48,20 @@ export function HeroSection() {
       className="relative flex min-h-svh w-full items-end justify-center pb-16 text-center md:justify-start md:pb-20 md:text-left"
     >
       <div className="max-w-[1280px] w-full mx-auto px-5 md:px-10">
-        <div className="rounded-3 bg-background-primary/70 backdrop-blur-md inline-block p-6 md:p-10 max-w-2xl">
+        <div className="rounded-3 bg-background-primary/70 backdrop-blur-md inline-block p-6 md:p-8 max-w-md">
           <p className="mb-3 font-expressive text-[14px] font-semibold uppercase tracking-widest text-accent">
             {profile.location}
           </p>
 
-          <h1 className="font-expressive text-[36px] font-semibold leading-[1.1] text-text-primary md:text-[56px] lg:text-[64px]">
+          <h1 className="font-expressive text-[36px] font-semibold leading-[1.1] text-text-primary md:text-[44px] lg:text-[48px]">
             {profile.name}
           </h1>
 
-          <p className="mt-3 font-expressive text-[18px] font-semibold text-accent md:text-[24px]">
+          <p className="mt-3 font-expressive text-[18px] font-semibold text-accent md:text-[20px]">
             {profile.headline}
           </p>
 
-          <p className="mt-4 max-w-prose text-[14px] leading-relaxed text-text-primary/80 md:text-[16px]">
+          <p className="mt-4 max-w-prose text-[14px] leading-relaxed text-text-primary/80 md:text-[16px] md:line-clamp-1">
             {tagline}
           </p>
 

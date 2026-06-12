@@ -43,58 +43,58 @@ export const JOURNEY_STOPS: JourneyStop[] = [
   {
     id: 'hero',
     position: [0, 0, 0],
-    scale: 1.6,
-    camOffset: { desktop: [0.9, 0.55, 2.4], mobile: [0.4, 0.5, 3.0] },
-    lookAtOffset: { desktop: [-0.45, -0.15, 0], mobile: [0, -0.45, 0] },
+    scale: 1.3,
+    camOffset: { desktop: [0.7, 0.5, 2.75], mobile: [0, 0.55, 4.8] },
+    lookAtOffset: { desktop: [-0.5, -0.05, 0], mobile: [0, -0.75, 0] },
   },
   {
     id: 'travelex', // card LEFT → island framed RIGHT
     position: [2.4, -1.2, -5],
     scale: 1.3,
-    camOffset: { desktop: [0.6, 0.45, 2.2], mobile: [0.2, 0.45, 2.8] },
-    lookAtOffset: { desktop: [-0.55, 0, 0], mobile: [0, -0.4, 0] },
+    camOffset: { desktop: [0.6, 0.45, 2.2], mobile: [0.1, 0.55, 4.4] },
+    lookAtOffset: { desktop: [-0.55, 0, 0], mobile: [0, -1.25, 0] },
   },
   {
     id: 'lick', // card RIGHT → island framed LEFT
     position: [-2.6, -2.2, -10],
     scale: 1.3,
-    camOffset: { desktop: [-0.6, 0.4, 2.2], mobile: [-0.2, 0.45, 2.8] },
-    lookAtOffset: { desktop: [0.55, 0, 0], mobile: [0, -0.4, 0] },
+    camOffset: { desktop: [-0.6, 0.4, 2.2], mobile: [-0.1, 0.55, 4.4] },
+    lookAtOffset: { desktop: [0.55, 0, 0], mobile: [0, -1.25, 0] },
   },
   {
     id: 'gousto', // card LEFT → island framed RIGHT
     position: [2.6, -3.0, -15],
     scale: 1.3,
-    camOffset: { desktop: [0.7, 0.5, 2.1], mobile: [0.2, 0.45, 2.8] },
-    lookAtOffset: { desktop: [-0.55, 0.05, 0], mobile: [0, -0.4, 0] },
+    camOffset: { desktop: [0.7, 0.5, 2.1], mobile: [0.1, 0.55, 4.4] },
+    lookAtOffset: { desktop: [-0.55, 0.05, 0], mobile: [0, -1.25, 0] },
   },
   {
     id: 'earlier', // full-width card → island above-centre
     position: [-1.8, -3.6, -20],
     scale: 1.0,
-    camOffset: { desktop: [0.3, 0.35, 2.6], mobile: [0.1, 0.4, 3.0] },
-    lookAtOffset: { desktop: [0, -0.4, 0], mobile: [0, -0.45, 0] },
+    camOffset: { desktop: [0.3, 0.35, 2.9], mobile: [0.05, 0.5, 4.0] },
+    lookAtOffset: { desktop: [-0.1, -0.5, 0], mobile: [0, -1.15, 0] },
   },
   {
     id: 'projects',
     position: [1.6, -4.6, -25],
     scale: 1.0,
-    camOffset: { desktop: [-0.3, 0.4, 2.6], mobile: [-0.1, 0.4, 3.0] },
-    lookAtOffset: { desktop: [0, -0.4, 0], mobile: [0, -0.45, 0] },
+    camOffset: { desktop: [-0.3, 0.4, 2.4], mobile: [-0.05, 0.4, 3.2] },
+    lookAtOffset: { desktop: [-0.2, -0.85, 0], mobile: [0, -0.95, 0] },
   },
   {
     id: 'about',
     position: [-2.0, -5.4, -30],
     scale: 1.0,
-    camOffset: { desktop: [0.4, 0.35, 2.5], mobile: [0.1, 0.4, 3.0] },
-    lookAtOffset: { desktop: [0, -0.4, 0], mobile: [0, -0.45, 0] },
+    camOffset: { desktop: [0.4, 0.35, 2.2], mobile: [0.05, 0.5, 4.0] },
+    lookAtOffset: { desktop: [-0.55, -0.5, 0], mobile: [0, -1.15, 0] },
   },
   {
     id: 'contact',
     position: [0, -6.2, -35],
     scale: 1.0,
-    camOffset: { desktop: [0, 0.45, 2.6], mobile: [0, 0.45, 3.0] },
-    lookAtOffset: { desktop: [0, -0.35, 0], mobile: [0, -0.45, 0] },
+    camOffset: { desktop: [0, 0.45, 2.35], mobile: [0, 0.5, 3.4] },
+    lookAtOffset: { desktop: [0, -0.5, 0], mobile: [0, -1.08, 0] },
   },
 ];
 
@@ -104,7 +104,7 @@ export const JOURNEY_STOPS: JourneyStop[] = [
  * Fraction of each stop's scroll band (around its centre) during which the
  * camera holds docked at the island. The remainder is smoothstepped transit.
  */
-export const HOLD_FRACTION = 0.45;
+export const HOLD_FRACTION = 0.55;
 
 /** Critically-damped smoothing times (seconds) — maath/easing damp3. */
 export const POSITION_SMOOTHING = 0.35;
