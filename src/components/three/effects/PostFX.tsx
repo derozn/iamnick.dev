@@ -8,7 +8,7 @@ import { Bloom, EffectComposer } from '@react-three/postprocessing';
 export function PostFX() {
   return (
     <EffectComposer>
-      <Bloom mipmapBlur intensity={0.6} luminanceThreshold={0.4} luminanceSmoothing={0.1} />
+      <Bloom mipmapBlur intensity={0.5} luminanceThreshold={0.7} luminanceSmoothing={0.25} />
     </EffectComposer>
   );
 }

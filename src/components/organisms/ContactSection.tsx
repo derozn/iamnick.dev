@@ -1,9 +1,8 @@
 'use client';
 
-import { motion, useReducedMotion } from 'motion/react';
-
 import { contact } from '@/content/cv';
-import { SectionShell, ContentCard } from './SectionShell';
+import { SectionShell } from './SectionShell';
+import { MotionCard, MotionItem } from './MotionCard';
 
 const headingId = 'contact-heading';
 const currentYear = new Date().getFullYear();
@@ -105,54 +104,51 @@ const links = [
  * ContactSection — contact links with large tappable targets, and a footer line.
  */
 export function ContactSection() {
-  const reduced = useReducedMotion();
-
   return (
     <section aria-labelledby={headingId} data-journey-stop="contact" className="w-full">
       <SectionShell>
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-15%' }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-        >
-          <ContentCard>
-            <p className="mb-2 font-expressive text-[12px] font-semibold uppercase tracking-widest text-accent">
+        <MotionCard>
+          <MotionItem className="mb-3 flex items-center gap-3">
+            <span aria-hidden="true" className="h-px w-6 shrink-0 bg-accent/70" />
+            <p className="font-expressive text-[12px] font-semibold uppercase tracking-widest text-accent">
               Let&apos;s talk
             </p>
+          </MotionItem>
+
+          <MotionItem>
             <h2
               id={headingId}
               className="font-expressive text-[28px] font-semibold text-text-primary md:text-[36px]"
             >
               Get in touch
             </h2>
+          </MotionItem>
 
-            <nav aria-label="Contact links" className="mt-8">
-              <ul className="grid gap-3 sm:grid-cols-2">
-                {links.map(({ href, label, detail, icon, external, download }) => (
-                  <li key={label}>
-                    <a
-                      href={href}
-                      {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
-                      {...(download && { download: true })}
-                      className="flex min-h-[56px] items-center gap-4 rounded-3 border border-border-primary/10 bg-background-primary/50 px-5 py-4 transition-colors hover:border-accent/40 hover:text-accent focus-visible:outline-accent"
-                    >
-                      <span className="text-accent">{icon}</span>
-                      <span className="flex flex-col">
-                        <span className="font-expressive text-[15px] font-semibold text-text-primary">
-                          {label}
-                        </span>
-                        <span className="font-functional text-[12px] text-text-primary/50">
-                          {detail}
-                        </span>
+          <nav aria-label="Contact links" className="mt-8">
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {links.map(({ href, label, detail, icon, external, download }) => (
+                <MotionItem key={label} as="li">
+                  <a
+                    href={href}
+                    {...(external && { target: '_blank', rel: 'noopener noreferrer' })}
+                    {...(download && { download: true })}
+                    className="hud-button flex min-h-[56px] items-center gap-4 px-5 py-4 transition-colors hover:text-accent"
+                  >
+                    <span className="text-accent">{icon}</span>
+                    <span className="flex flex-col">
+                      <span className="font-expressive text-[15px] font-semibold text-text-primary">
+                        {label}
                       </span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </ContentCard>
-        </motion.div>
+                      <span className="font-functional text-[12px] text-text-primary/60">
+                        {detail}
+                      </span>
+                    </span>
+                  </a>
+                </MotionItem>
+              ))}
+            </ul>
+          </nav>
+        </MotionCard>
 
         {/* Footer */}
         <p className="mt-12 text-center font-functional text-[12px] text-text-primary/30">

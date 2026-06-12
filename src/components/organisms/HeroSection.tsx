@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from 'motion/react';
 
 import { profile } from '@/content/cv';
+import { MotionCard, MotionItem } from './MotionCard';
 
 /** First sentence of shortBio — used as the tagline. */
 const tagline = profile.shortBio.split('. ')[0] + '.';
@@ -11,7 +12,7 @@ function ScrollCue() {
   const reduced = useReducedMotion();
 
   return (
-    <div aria-hidden="true" className="mt-10 flex justify-center md:justify-start">
+    <div aria-hidden="true" className="mt-8 flex justify-center md:justify-start">
       <motion.div
         animate={reduced ? {} : { y: [0, 8, 0] }}
         transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
@@ -37,8 +38,7 @@ function ScrollCue() {
 
 /**
  * HeroSection — 100svh opening section.
- * The LCP element is server-rendered text; only the scroll cue is a client motion node.
- * Text is anchored bottom-left on desktop, centred on mobile.
+ * Compact HUD caption panel anchored bottom-left on desktop, centred on mobile.
  */
 export function HeroSection() {
   return (
@@ -47,26 +47,39 @@ export function HeroSection() {
       data-journey-stop="hero"
       className="relative flex min-h-svh w-full items-end justify-center pb-16 text-center md:justify-start md:pb-20 md:text-left"
     >
-      <div className="max-w-[1280px] w-full mx-auto px-5 md:px-10">
-        <div className="rounded-3 bg-background-primary/70 backdrop-blur-md inline-block p-6 md:p-8 max-w-md">
-          <p className="mb-3 font-expressive text-[14px] font-semibold uppercase tracking-widest text-accent">
-            {profile.location}
-          </p>
+      <div className="mx-auto w-full max-w-[1280px] px-5 md:px-10">
+        <MotionCard
+          immediate
+          className="inline-block w-full max-w-md"
+          cardClassName="p-6 md:p-8 [--hud-cut:16px]"
+        >
+          <MotionItem className="mb-3 flex items-center justify-center gap-3 md:justify-start">
+            <span aria-hidden="true" className="h-px w-6 shrink-0 bg-accent/70" />
+            <p className="font-expressive text-[14px] font-semibold uppercase tracking-widest text-accent">
+              {profile.location}
+            </p>
+          </MotionItem>
 
-          <h1 className="font-expressive text-[36px] font-semibold leading-[1.1] text-text-primary md:text-[44px] lg:text-[48px]">
-            {profile.name}
-          </h1>
+          <MotionItem>
+            <h1 className="font-expressive text-[36px] font-semibold leading-[1.1] text-text-primary md:text-[44px] lg:text-[48px]">
+              {profile.name}
+            </h1>
+          </MotionItem>
 
-          <p className="mt-3 font-expressive text-[18px] font-semibold text-accent md:text-[20px]">
-            {profile.headline}
-          </p>
+          <MotionItem>
+            <p className="mt-3 font-expressive text-[18px] font-semibold text-accent md:text-[20px]">
+              {profile.headline}
+            </p>
+          </MotionItem>
 
-          <p className="mt-4 max-w-prose text-[14px] leading-relaxed text-text-primary/80 md:text-[16px] md:line-clamp-1">
-            {tagline}
-          </p>
+          <MotionItem>
+            <p className="text-shadow-scrim mt-4 max-w-prose text-[14px] leading-relaxed text-text-primary/80 md:line-clamp-1 md:text-[16px]">
+              {tagline}
+            </p>
+          </MotionItem>
 
           <ScrollCue />
-        </div>
+        </MotionCard>
       </div>
     </section>
   );

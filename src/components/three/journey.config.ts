@@ -119,9 +119,14 @@ export const BANK_SMOOTHING = 0.5;
 
 /** Canvas clear colour — sits between the legacy #252530 scene and page #070810. */
 export const BACKGROUND_COLOR = '#0a0a14';
-/** Fog matches the background so distant islands dissolve into the page. */
-export const FOG_NEAR = 3.5;
-export const FOG_FAR = 14;
+/**
+ * Fog matches the background so distant islands dissolve into the page.
+ * Near must clear the docked island entirely: camera sits ~2.1–2.9 out and
+ * island geometry extends ~1.1 further, so near ≥ 4.5 keeps the docked stop
+ * crisp while the next stop (~5.6 away) reads as a half-dissolved silhouette.
+ */
+export const FOG_NEAR = 4.75;
+export const FOG_FAR = 15;
 
 export const ACCENT = '#4cc9f0';
 

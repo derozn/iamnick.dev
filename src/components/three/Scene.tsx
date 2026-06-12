@@ -2,6 +2,7 @@
 
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
+import { AgXToneMapping } from 'three';
 
 import { CameraRig } from './CameraRig';
 import { ScrollDriver } from './ScrollDriver';
@@ -33,13 +34,20 @@ export default function Scene({ tier }: SceneProps) {
     <Canvas
       frameloop="demand"
       dpr={tier === 'high' ? [1, 2] : [1, 1.5]}
-      gl={{ antialias: false, powerPreference: 'high-performance' }}
+      gl={{
+        antialias: false,
+        powerPreference: 'high-performance',
+        // AgX rolls saturated neon highlights off smoothly where ACES clips
+        // them to white — keeps the signs readable instead of blown pink.
+        toneMapping: AgXToneMapping,
+        toneMappingExposure: 1.15,
+      }}
       camera={{ fov: 50, near: 0.1, far: 60, position: INITIAL_CAMERA }}
     >
       <color attach="background" args={[BACKGROUND_COLOR]} />
       <fog attach="fog" args={[BACKGROUND_COLOR, FOG_NEAR, FOG_FAR]} />
 
-      <SceneLighting />
+      <SceneLighting tier={tier} />
       <ScrollDriver />
       <CameraRig />
 

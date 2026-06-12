@@ -64,10 +64,11 @@ export function Island({
           <Center>
             <Text3D font="/font/punk.json" scale={labelScale} letterSpacing={0.2} height={0.25}>
               {label}
+              {/* ~1.1 keeps the glyph faces legible; bloom catches the >1 luminance */}
               <meshStandardMaterial
                 color={ACCENT}
                 emissive={ACCENT}
-                emissiveIntensity={1.8}
+                emissiveIntensity={1.1}
                 toneMapped={false}
               />
             </Text3D>

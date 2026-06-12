@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from 'motion/react';
 
 import { type SideProject } from '@/content/cv';
 import { SectionShell } from './SectionShell';
-import { cn } from '@/lib/cn';
+import { MotionCard } from './MotionCard';
 
 interface SideProjectsSectionProps {
   projects: SideProject[];
@@ -31,54 +31,52 @@ function ExternalIcon() {
   );
 }
 
-function ProjectCard({ project }: { project: SideProject }) {
+function ProjectCard({ project, flip }: { project: SideProject; flip: boolean }) {
   return (
-    <article
-      aria-label={project.name}
-      className={cn(
-        'flex flex-col rounded-3 bg-background-primary/70 backdrop-blur-md',
-        'border border-border-primary/10 p-6 md:p-8',
-      )}
-    >
-      <div className="flex items-start justify-between gap-4">
-        <h3 className="font-expressive text-[22px] font-semibold text-text-primary">
-          {project.name}
-        </h3>
-        {project.url && (
-          <a
-            href={project.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 rounded-2 border border-accent/30 px-3 py-1 font-functional text-[12px] text-accent transition-colors hover:border-accent hover:text-accent focus-visible:outline-accent"
-            aria-label={`Visit ${project.name} (opens in a new tab)`}
-          >
-            Visit site <ExternalIcon />
-          </a>
-        )}
-      </div>
+    <MotionCard flip={flip} className="h-full" cardClassName="p-6 md:p-8 [--hud-cut:16px]">
+      <article aria-label={project.name} className="flex h-full flex-col">
+        <div className="flex items-start justify-between gap-4">
+          <h3 className="font-expressive text-[22px] font-semibold text-text-primary">
+            {project.name}
+          </h3>
+          {project.url && (
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hud-button shrink-0 px-3 py-1.5 font-functional text-[12px] text-accent [--hud-cut:8px]"
+              aria-label={`Visit ${project.name} (opens in a new tab)`}
+            >
+              Visit site <ExternalIcon />
+            </a>
+          )}
+        </div>
 
-      <p className="mt-3 text-[14px] leading-relaxed text-text-primary/70">{project.blurb}</p>
+        <p className="text-shadow-scrim mt-3 text-[14px] leading-relaxed text-text-primary/75">
+          {project.blurb}
+        </p>
 
-      <ul className="mt-4 space-y-2">
-        {project.highlights.map((h, i) => (
-          <li key={i} className="flex gap-2 text-[13px] leading-relaxed text-text-primary/70">
-            <span className="mt-[6px] h-1 w-1 shrink-0 rounded-full bg-accent/60" />
-            <span>{h}</span>
-          </li>
-        ))}
-      </ul>
+        <ul className="mt-4 space-y-2">
+          {project.highlights.map((h, i) => (
+            <li
+              key={i}
+              className="text-shadow-scrim flex gap-2 text-[13px] leading-relaxed text-text-primary/75"
+            >
+              <span className="mt-[7px] h-1 w-3 shrink-0 bg-accent/60" />
+              <span>{h}</span>
+            </li>
+          ))}
+        </ul>
 
-      <ul aria-label="Technologies" className="mt-6 flex flex-wrap gap-2">
-        {project.tech.map((t) => (
-          <li
-            key={t}
-            className="rounded-2 border border-accent/30 px-3 py-1 font-functional text-[12px] text-accent/80"
-          >
-            {t}
-          </li>
-        ))}
-      </ul>
-    </article>
+        <ul aria-label="Technologies" className="mt-auto flex flex-wrap gap-2 pt-6">
+          {project.tech.map((t) => (
+            <li key={t} className="hud-chip px-3 py-1 font-functional text-[12px] text-accent/90">
+              {t}
+            </li>
+          ))}
+        </ul>
+      </article>
+    </MotionCard>
   );
 }
 
@@ -99,22 +97,25 @@ export function SideProjectsSection({ projects }: SideProjectsSectionProps) {
           viewport={{ once: true, margin: '-15%' }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-          <p className="mb-2 font-expressive text-[12px] font-semibold uppercase tracking-widest text-accent">
-            Side work
-          </p>
+          <div className="mb-3 flex items-center gap-3">
+            <span aria-hidden="true" className="h-px w-6 shrink-0 bg-accent/70" />
+            <p className="font-expressive text-[12px] font-semibold uppercase tracking-widest text-accent">
+              Side work
+            </p>
+          </div>
           <h2
             id={headingId}
-            className="font-expressive text-[28px] font-semibold text-text-primary md:text-[36px]"
+            className="text-shadow-scrim font-expressive text-[28px] font-semibold text-text-primary md:text-[36px]"
           >
             Projects
           </h2>
-
-          <div className="mt-8 grid gap-6 sm:grid-cols-2">
-            {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
         </motion.div>
+
+        <div className="mt-8 grid items-stretch gap-6 sm:grid-cols-2">
+          {projects.map((project, i) => (
+            <ProjectCard key={project.id} project={project} flip={i % 2 !== 0} />
+          ))}
+        </div>
       </SectionShell>
     </section>
   );

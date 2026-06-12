@@ -7,7 +7,9 @@ type GroupProps = ThreeElements['group'];
 /**
  * Cyberpunk platform bases — ported from the legacy Interactive Hero module.
  * Sign meshes use an HDR basic material (colour > 1, toneMapped off) so Bloom
- * picks up the neon signage texture.
+ * picks up the neon signage texture. The 2.5× multiplier keeps the sign art
+ * legible (10× blew the texture out to white) while still clearing the bloom
+ * luminance threshold on bright pixels.
  */
 
 function signMap(materials: Record<string, unknown>, key: string) {
@@ -25,7 +27,7 @@ export function PlatformLarge(props: GroupProps) {
         <mesh geometry={allNodes.Platform_4x4_1.geometry}>
           <meshBasicMaterial
             map={signMap(materials, 'Texture_Signs')}
-            color={[10, 10, 10]}
+            color={[2.5, 2.5, 2.5]}
             toneMapped={false}
           />
         </mesh>
@@ -54,7 +56,6 @@ export function PlatformSmall({ reflector = false, ...props }: PlatformSmallProp
 
   return (
     <group scale={0.1} {...props} dispose={null}>
-      <pointLight intensity={0.03} color={[10, 2, 5]} distance={2.5} />
       <group rotation={[-Math.PI / 2, 0, 0]} scale={100}>
         {reflector ? (
           <mesh geometry={allNodes.Platform_2x2_1.geometry}>
@@ -67,7 +68,7 @@ export function PlatformSmall({ reflector = false, ...props }: PlatformSmallProp
         <mesh geometry={allNodes.Platform_2x2_3.geometry}>
           <meshBasicMaterial
             map={signMap(materials, 'Texture_Signs')}
-            color={[10, 10, 10]}
+            color={[2.5, 2.5, 2.5]}
             toneMapped={false}
           />
         </mesh>
@@ -90,7 +91,7 @@ export function PlatformLong({ children, ...props }: GroupProps) {
         <mesh geometry={allNodes.Platform_4x2_1.geometry}>
           <meshBasicMaterial
             map={signMap(materials, 'Texture_Signs')}
-            color={[10, 10, 10]}
+            color={[2.5, 2.5, 2.5]}
             toneMapped={false}
           />
         </mesh>

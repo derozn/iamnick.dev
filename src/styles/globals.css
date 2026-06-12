@@ -163,36 +163,180 @@
   opacity: 0.5;
 }
 
-@utility neon-border {
+/*
+ * HUD glass card — cyberpunk corner-cut panel that sits over the 3-D scene.
+ *
+ * Three layers:
+ *   root     — clip-path hex shape (two 45° corner cuts) + faint backdrop blur
+ *   ::before — beam layer: static accent edge + rotating conic beam. Fully visible
+ *              only at the 1px rim left exposed by ::after; the remainder bleeds
+ *              through the translucent scrim as a subtle light sweep.
+ *   ::after  — scrim fill, inset 1px, same clip shape. Directional gradient:
+ *              ≥0.85 alpha behind the text column, falling away at the open edge
+ *              so the scene glows through the card fringe.
+ */
+@utility hud-card {
+  --hud-cut: 20px;
+  --hud-clip: polygon(
+    0 0,
+    calc(100% - var(--hud-cut)) 0,
+    100% var(--hud-cut),
+    100% 100%,
+    var(--hud-cut) 100%,
+    0 calc(100% - var(--hud-cut))
+  );
   position: relative;
+  isolation: isolate;
+  clip-path: var(--hud-clip);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 
   &::before {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: inherit;
-    padding: 1px;
-    background: conic-gradient(
-      from var(--beam-angle),
-      transparent 0%,
-      transparent 80%,
-      #4cc9f0 92%,
-      #b16cea 96%,
-      transparent 100%
-    );
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: destination-out;
-    mask-composite: exclude;
-    opacity: 0.7;
-    animation: beam-rotate 6s linear infinite;
+    z-index: -2;
+    background:
+      conic-gradient(
+        from var(--beam-angle),
+        transparent 0%,
+        transparent 76%,
+        rgb(76 201 240 / 0.95) 89%,
+        rgb(177 108 234 / 0.95) 95%,
+        transparent 100%
+      ),
+      linear-gradient(rgb(76 201 240 / 0.28), rgb(76 201 240 / 0.28));
+    animation: beam-rotate 7s linear infinite;
 
     @media (prefers-reduced-motion: reduce) {
       animation: none;
     }
   }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    clip-path: var(--hud-clip);
+    background:
+      radial-gradient(120% 90% at 0% 0%, rgb(76 201 240 / 0.07), transparent 55%),
+      linear-gradient(
+        115deg,
+        rgb(7 8 16 / 0.93) 0%,
+        rgb(7 8 16 / 0.87) 55%,
+        rgb(7 8 16 / 0.78) 82%,
+        rgb(7 8 16 / 0.45) 100%
+      );
+  }
+}
+
+/* Mirrors the corner cuts (top-left + bottom-right) for right-aligned cards. */
+@utility hud-flip {
+  --hud-clip: polygon(
+    var(--hud-cut, 20px) 0,
+    100% 0,
+    100% calc(100% - var(--hud-cut, 20px)),
+    calc(100% - var(--hud-cut, 20px)) 100%,
+    0 100%,
+    0 var(--hud-cut, 20px)
+  );
+}
+
+/* Outline-only tech chip with a single corner cut — outer bg acts as the 1px stroke. */
+@utility hud-chip {
+  --chip-cut: 8px;
+  --chip-clip: polygon(
+    0 0,
+    calc(100% - var(--chip-cut)) 0,
+    100% var(--chip-cut),
+    100% 100%,
+    0 100%
+  );
+  position: relative;
+  isolation: isolate;
+  clip-path: var(--chip-clip);
+  background: rgb(76 201 240 / 0.4);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    clip-path: var(--chip-clip);
+    background: rgb(7 8 16 / 0.72);
+  }
+}
+
+/* HUD button — corner-cut outline, neon beam ignites on hover/focus. */
+@utility hud-button {
+  --hud-cut: 12px;
+  --hud-clip: polygon(
+    0 0,
+    calc(100% - var(--hud-cut)) 0,
+    100% var(--hud-cut),
+    100% 100%,
+    var(--hud-cut) 100%,
+    0 calc(100% - var(--hud-cut))
+  );
+  position: relative;
+  isolation: isolate;
+  clip-path: var(--hud-clip);
+  background: rgb(214 214 214 / 0.18);
+  transition: background-color 0.25s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background: conic-gradient(
+      from var(--beam-angle),
+      transparent 0%,
+      transparent 62%,
+      rgb(76 201 240 / 0.95) 84%,
+      rgb(177 108 234 / 0.95) 94%,
+      transparent 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: beam-rotate 3.5s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    clip-path: var(--hud-clip);
+    background: rgb(7 8 16 / 0.72);
+    transition: background-color 0.25s ease;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: rgb(76 201 240 / 0.45);
+
+    &::before {
+      opacity: 1;
+    }
+
+    &::after {
+      background: rgb(13 18 32 / 0.78);
+    }
+  }
+
+  /* clip-path swallows an outside outline — draw the focus ring inside the shape */
+  &:focus-visible {
+    outline-offset: -4px;
+  }
+}
+
+/* Lifts body copy off low-opacity scrim regions over bright 3-D backdrops. */
+@utility text-shadow-scrim {
+  text-shadow: 0 1px 8px rgb(7 8 16 / 0.8);
 }
