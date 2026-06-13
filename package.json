@@ -47,12 +47,14 @@
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
     "@testing-library/user-event": "latest",
+    "@types/css-mediaquery": "^0.1.4",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@types/three": "latest",
     "@vitejs/plugin-react": "latest",
     "@vitest/coverage-v8": "latest",
+    "css-mediaquery": "^0.1.2",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "latest",
     "eslint-plugin-jsx-a11y": "latest",
@@ -65,7 +67,6 @@
     "tailwindcss": "latest",
     "typescript": "latest",
     "typescript-eslint": "latest",
-    "vite-tsconfig-paths": "latest",
     "vitest": "latest"
   }
 }

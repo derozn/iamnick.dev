@@ -1,19 +1,21 @@
-import { renderHook } from '@testing-library/react-hooks';
-import { createMatchMedia } from '@/test/helpers/createMatchMedia';
+import { renderHook } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+
+import { setupMatchMedia } from '@test/helpers/matchMedia';
 
 import useMedia from './useMedia';
 
 describe('hooks/useMedia', () => {
-  it('returns true when width is greater that the given min-width', () => {
-    createMatchMedia({ width: 769 });
+  it('returns true when the viewport is wider than the given min-width', () => {
+    setupMatchMedia({ width: 769 });
 
     const { result } = renderHook(() => useMedia('(min-width: 768px)', false));
 
     expect(result.current).toBe(true);
   });
 
-  it('returns false when width is less than the given min-width', () => {
-    createMatchMedia({ width: 400 });
+  it('returns false when the viewport is narrower than the given min-width', () => {
+    setupMatchMedia({ width: 400 });
 
     const { result } = renderHook(() => useMedia('(min-width: 768px)', false));
 

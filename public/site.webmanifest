@@ -1,6 +1,7 @@
 {
-  "name": "iamnick.dev",
+  "name": "iamnick.dev — Nick de Rozarieux",
   "short_name": "iamnick",
+  "description": "iamnick.dev — Nick de Rozarieux",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

@@ -1,6 +1,11 @@
-import { render, act } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { mockIntersection } from '@/test/helpers/IntersectionObserver';
+import {
+  installIntersectionObserver,
+  mockIntersection,
+  resetIntersectionObserver,
+} from '@test/helpers/IntersectionObserver';
 
 import useOnScreen from './useOnScreen';
 
@@ -14,14 +19,22 @@ const UseOnScreenComponent = ({ rootMargin }: { rootMargin?: string }) => {
   );
 };
 
-describe('components/useOnScreen', () => {
-  it('returns false when element is not in view', () => {
+describe('hooks/useOnScreen', () => {
+  beforeEach(() => {
+    installIntersectionObserver();
+  });
+
+  afterEach(() => {
+    resetIntersectionObserver();
+  });
+
+  it('returns false when the element is not in view', () => {
     const { getByText } = render(<UseOnScreenComponent />);
 
     expect(getByText('false')).toBeTruthy();
   });
 
-  it('returns true when element is in view', () => {
+  it('returns true when the element scrolls into view', () => {
     const { getByText, getByTestId } = render(<UseOnScreenComponent />);
 
     act(() => {

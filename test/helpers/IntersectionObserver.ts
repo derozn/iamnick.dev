@@ -1,45 +1,57 @@
-const observerMap = new Map();
+import { vi } from 'vitest';
 
-const IntersectionObserver = jest.fn().mockImplementation((cb, options) => {
-  return {
-    thresholds: Array.isArray(options.threshold) ? options.threshold : [options.threshold],
-    root: options.root,
-    rootMargin: options.rootMargin,
-    observe: jest.fn((element: Element) => {
-      observerMap.set(element, cb);
-    }),
-    unobserve: jest.fn((element: Element) => {
-      observerMap.delete(element);
-    }),
-    disconnect: jest.fn(),
-  };
-});
+type Cb = IntersectionObserverCallback;
 
-beforeAll(() => {
-  Object.assign(global, { IntersectionObserver });
-});
+const observerMap = new Map<Element, Cb>();
 
-afterEach(() => {
-  // @ts-ignore
-  global.IntersectionObserver.mockClear();
+/**
+ * Installs a controllable IntersectionObserver on `global`; pair with
+ * `mockIntersection` to drive callbacks. Call inside a test's beforeEach so it
+ * overrides the inert global stub from setup.ts.
+ */
+export function installIntersectionObserver() {
+  class ControllableIntersectionObserver {
+    readonly thresholds: ReadonlyArray<number>;
+    readonly root: Element | Document | null;
+    readonly rootMargin: string;
+
+    constructor(
+      private readonly cb: Cb,
+      options: IntersectionObserverInit = {},
+    ) {
+      this.thresholds = Array.isArray(options.threshold)
+        ? options.threshold
+        : [options.threshold ?? 0];
+      this.root = options.root ?? null;
+      this.rootMargin = options.rootMargin ?? '';
+    }
+
+    observe = (element: Element) => observerMap.set(element, this.cb);
+    unobserve = (element: Element) => observerMap.delete(element);
+    disconnect = () => observerMap.clear();
+    takeRecords = () => [];
+  }
+
+  vi.stubGlobal('IntersectionObserver', ControllableIntersectionObserver);
+}
+
+export function resetIntersectionObserver() {
   observerMap.clear();
-});
+}
 
-afterAll(() => {
-  // @ts-ignore
-  global.IntersectionObserver.mockReset();
-  Object.assign(global, { IntersectionObserver: undefined });
-});
-
+/** Fire the observed element's callback with the given intersection state. */
 export function mockIntersection(element: Element, isIntersecting: boolean) {
   const cb = observerMap.get(element);
   if (cb) {
-    cb([
-      {
-        isIntersecting,
-        target: element,
-        intersectionRatio: isIntersecting ? 1 : -1,
-      },
-    ]);
+    cb(
+      [
+        {
+          isIntersecting,
+          target: element,
+          intersectionRatio: isIntersecting ? 1 : 0,
+        } as IntersectionObserverEntry,
+      ],
+      {} as IntersectionObserver,
+    );
   }
 }
