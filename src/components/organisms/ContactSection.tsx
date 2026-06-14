@@ -105,7 +105,7 @@ const links = [
  */
 export function ContactSection() {
   return (
-    <section aria-labelledby={headingId} data-journey-stop="contact" className="w-full">
+    <section id="contact" aria-labelledby={headingId} data-attraction="contact" className="w-full">
       <SectionShell>
         <MotionCard>
           <MotionItem className="mb-3 flex items-center gap-3">

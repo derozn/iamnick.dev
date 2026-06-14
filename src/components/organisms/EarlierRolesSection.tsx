@@ -1,6 +1,6 @@
 'use client';
 
-import { type Role } from '@/content/cv';
+import { education, type Role } from '@/content/cv';
 import { formatYearMonth } from '@/lib/formatDate';
 import { SectionShell } from './SectionShell';
 import { MotionCard, MotionItem } from './MotionCard';
@@ -46,19 +46,23 @@ function EarlierRoleItem({ role }: EarlierRoleItemProps) {
 }
 
 /**
- * EarlierRolesSection — condensed timeline for non-featured roles.
+ * EarlierRolesSection — opens the Career Highlights run (attraction #2), the
+ * earliest beat: education + the earliest roles, condensed. Earlier roles each
+ * get a compact line rather than their own attraction; the later featured roles
+ * (Gousto → Lick → Travelex) follow as full attractions, earliest → present.
+ * Carries the "Work" nav anchor as the start of the run.
  */
 export function EarlierRolesSection({ roles }: EarlierRolesSectionProps) {
   const headingId = 'earlier-roles-heading';
 
   return (
-    <section aria-labelledby={headingId} data-journey-stop="earlier" className="w-full">
+    <section id="work" aria-labelledby={headingId} data-attraction="earlier" className="w-full">
       <SectionShell>
         <MotionCard>
           <MotionItem className="mb-3 flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-6 shrink-0 bg-accent/70" />
             <p className="font-expressive text-[12px] font-semibold uppercase tracking-widest text-accent">
-              Earlier experience
+              Career Highlights
             </p>
           </MotionItem>
 
@@ -67,8 +71,21 @@ export function EarlierRolesSection({ roles }: EarlierRolesSectionProps) {
               id={headingId}
               className="font-expressive text-[28px] font-semibold text-text-primary md:text-[36px]"
             >
-              Previous Roles
+              Where it started
             </h2>
+          </MotionItem>
+
+          {/* Education — the earliest beat of all */}
+          <MotionItem>
+            <div className="mt-8 border-l-2 border-accent/40 pl-4">
+              <p className="font-expressive text-[16px] font-semibold text-text-primary">
+                {education.degree}
+              </p>
+              <p className="font-functional text-[14px] text-text-primary/70">
+                {education.institution} · {education.grade}
+              </p>
+              <p className="mt-1 font-functional text-[12px] text-accent/70">{education.period}</p>
+            </div>
           </MotionItem>
 
           <MotionItem>

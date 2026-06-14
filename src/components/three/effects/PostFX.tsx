@@ -1,9 +1,9 @@
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
 /**
- * PostFX — conservative bloom pass picking up the HDR sign textures, neon
- * Text3D labels, and accent point lights. Mounted only on the 'high' quality
- * tier (JourneyWorld gates it).
+ * PostFX — conservative bloom pass picking up the neon trim, neon Text3D signs,
+ * and accent point lights. Mounted only on the 'high' quality tier (MidwayWorld
+ * gates it).
  */
 export function PostFX() {
   return (

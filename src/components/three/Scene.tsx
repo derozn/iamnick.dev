@@ -6,21 +6,21 @@ import { AgXToneMapping } from 'three';
 
 import { CameraRig } from './CameraRig';
 import { ScrollDriver } from './ScrollDriver';
-import { JourneyWorld } from './JourneyWorld';
+import { MidwayWorld } from './MidwayWorld';
 import { SceneLighting } from './shared/SceneLighting';
 import { type QualityTier } from './hooks/useQualityTier';
-import { BACKGROUND_COLOR, FOG_FAR, FOG_NEAR, JOURNEY_STOPS } from './journey.config';
+import { BACKGROUND_COLOR, FOG_FAR, FOG_NEAR, MIDWAY_ATTRACTIONS } from './midway.config';
 
 interface SceneProps {
   tier: Exclude<QualityTier, 'none'>;
 }
 
-/* Initial camera = hero stop's desktop control point (CameraRig snaps on first frame). */
-const heroStop = JOURNEY_STOPS[0];
+/* Initial camera = the entrance attraction's desktop control point (CameraRig snaps on first frame). */
+const entrance = MIDWAY_ATTRACTIONS[0];
 const INITIAL_CAMERA: [number, number, number] = [
-  heroStop.position[0] + heroStop.camOffset.desktop[0],
-  heroStop.position[1] + heroStop.camOffset.desktop[1],
-  heroStop.position[2] + heroStop.camOffset.desktop[2],
+  entrance.position[0] + entrance.camOffset.desktop[0],
+  entrance.position[1] + entrance.camOffset.desktop[1],
+  entrance.position[2] + entrance.camOffset.desktop[2],
 ];
 
 /**
@@ -52,7 +52,7 @@ export default function Scene({ tier }: SceneProps) {
       <CameraRig />
 
       <Suspense fallback={null}>
-        <JourneyWorld tier={tier} />
+        <MidwayWorld tier={tier} />
       </Suspense>
     </Canvas>
   );

@@ -24,8 +24,8 @@ export function RoleSection({ role, index }: RoleSectionProps) {
   return (
     <section
       aria-labelledby={headingId}
-      // Journey stop id — 'travelex-lead' → 'travelex', 'lick-tech-lead' → 'lick', …
-      data-journey-stop={role.id.split('-')[0]}
+      // Attraction id — 'travelex-lead' → 'travelex', 'lick-tech-lead' → 'lick', …
+      data-attraction={role.id.split('-')[0]}
       className="relative flex min-h-screen w-full items-center"
     >
       {/* Max-width container — card occupies roughly half the width on desktop */}

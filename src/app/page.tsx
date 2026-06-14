@@ -1,15 +1,21 @@
 import { roles, sideProjects, skillGroups } from '@/content/cv';
-import { JourneyCanvas } from '@/components/three/JourneyCanvas';
-import { HeroSection } from '@/components/organisms/HeroSection';
+import { MidwayCanvas } from '@/components/three/MidwayCanvas';
+import { HeaderSection } from '@/components/organisms/HeaderSection';
 import { RoleSection } from '@/components/organisms/RoleSection';
 import { EarlierRolesSection } from '@/components/organisms/EarlierRolesSection';
 import { SideProjectsSection } from '@/components/organisms/SideProjectsSection';
-import { AboutSection } from '@/components/organisms/AboutSection';
 import { ContactSection } from '@/components/organisms/ContactSection';
 
-// Split roles into featured (newest first) and earlier (non-featured)
-const featuredRoles = roles.filter((r) => r.featured);
-const earlierRoles = roles.filter((r) => !r.featured);
+const byStartAscending = (a: { start: string }, b: { start: string }) =>
+  a.start.localeCompare(b.start);
+
+/**
+ * Career Highlights run **earliest → present** (CONTEXT.md):
+ *   - earlier (non-featured) roles open the run, condensed and earliest-first
+ *   - featured roles follow as their own attractions, earliest-first, current last
+ */
+const featuredRoles = roles.filter((r) => r.featured).sort(byStartAscending);
+const earlierRoles = roles.filter((r) => !r.featured).sort(byStartAscending);
 
 export const dynamic = 'auto';
 
@@ -24,29 +30,29 @@ export default function Homepage() {
         Skip to main content
       </a>
 
-      {/* Scroll-driven 3-D journey — fixed, behind all content */}
-      <JourneyCanvas />
+      {/* On-rails Dark Carnival — fixed, behind all content */}
+      <MidwayCanvas />
 
       <main id="main">
-        {/* Hero — LCP element */}
-        <HeroSection />
+        {/* Attraction 1 — Entrance: name, title, bio + skills (About folded in). LCP <h1>. */}
+        <HeaderSection skillGroups={skillGroups} />
 
-        {/* Featured roles — each gets a full-screen section with alternating card alignment */}
+        {/* Attraction 2 — Career Highlights, earliest → present.
+            Opens with education + earliest roles, then each featured role. */}
+        <EarlierRolesSection roles={earlierRoles} />
         {featuredRoles.map((role, index) => (
           <RoleSection key={role.id} role={role} index={index} />
         ))}
 
-        {/* Earlier non-featured roles — condensed timeline */}
-        <EarlierRolesSection roles={earlierRoles} />
+        {/* TODO(phase-3): Ball-toss stall here (Full only; scenery on Lite). */}
 
-        {/* Side projects */}
+        {/* Attraction — Side projects */}
         <SideProjectsSection projects={sideProjects} />
 
-        {/* About + skills */}
-        <AboutSection skillGroups={skillGroups} />
-
-        {/* Contact */}
+        {/* Attraction — Contact */}
         <ContactSection />
+
+        {/* TODO(phase-4): Doodle wall stall after contact. */}
       </main>
     </>
   );

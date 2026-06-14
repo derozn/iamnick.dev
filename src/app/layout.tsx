@@ -5,6 +5,7 @@ import { PropsWithChildren } from 'react';
 
 import { montserratFont, openSansFont } from '@/components/ui-modules/next/fonts/local';
 import { JsonLd } from '@/components/organisms/JsonLd';
+import { SiteNav } from '@/components/nav/SiteNav';
 import { cn } from '@/lib/cn';
 import { profile } from '@/content/cv';
 
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <head />
       <body className="bg-background-primary font-functional text-text-primary">
         <JsonLd />
+        <SiteNav />
         {children}
       </body>
     </html>

@@ -8,21 +8,21 @@ import { useQualityTier } from './hooks/useQualityTier';
 const Scene = dynamic(() => import('./Scene'), { ssr: false });
 
 /**
- * JourneyCanvas — fixed, full-viewport 3-D journey behind the page content.
+ * MidwayCanvas — fixed, full-viewport on-rails Dark Carnival behind the page.
  *
  * Contract: fixed inset-0 -z-10 aria-hidden.
  *
  * The gradient div doubles as the loading backdrop and the permanent fallback
  * for the 'none' tier (prefers-reduced-motion / SSR first paint) — content is
- * fully usable without the canvas.
+ * fully usable without the canvas (ADR-0003).
  */
-export function JourneyCanvas() {
+export function MidwayCanvas() {
   const tier = useQualityTier();
 
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 -z-10 bg-gradient-to-b from-[#252530] to-[#070810]"
+      className="fixed inset-0 -z-10 bg-gradient-to-b from-[#14141f] to-[#070810]"
     >
       {tier !== 'none' && <Scene tier={tier} />}
     </div>

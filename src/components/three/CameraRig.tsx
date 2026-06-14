@@ -5,32 +5,32 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { CatmullRomCurve3, Vector3 } from 'three';
 import { damp, damp3 } from 'maath/easing';
 
-import { useScrollStore, type SectionRange } from '@/store/scroll';
+import { useSceneStore, type SectionRange } from '@/store/scene';
 import {
-  JOURNEY_STOPS,
+  MIDWAY_ATTRACTIONS,
   HOLD_FRACTION,
   POSITION_SMOOTHING,
   TARGET_SMOOTHING,
   MAX_BANK,
   BANK_GAIN,
   BANK_SMOOTHING,
-} from './journey.config';
+} from './midway.config';
 
 /* Pre-allocated scratch — never allocate inside useFrame. */
 const desiredPosition = new Vector3();
 const desiredLook = new Vector3();
 
-const LAST = JOURNEY_STOPS.length - 1;
+const LAST = MIDWAY_ATTRACTIONS.length - 1;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const smooth = (u: number) => u * u * (3 - 2 * u); // smoothstep 0..1
 
 /** Scroll band for stop i — measured DOM band, or a uniform fallback pre-measure. */
 function bandStart(i: number, sections: Record<string, SectionRange>): number {
-  return sections[JOURNEY_STOPS[i].id]?.start ?? i / JOURNEY_STOPS.length;
+  return sections[MIDWAY_ATTRACTIONS[i].id]?.start ?? i / MIDWAY_ATTRACTIONS.length;
 }
 function bandEnd(i: number, sections: Record<string, SectionRange>): number {
-  return sections[JOURNEY_STOPS[i].id]?.end ?? (i + 1) / JOURNEY_STOPS.length;
+  return sections[MIDWAY_ATTRACTIONS[i].id]?.end ?? (i + 1) / MIDWAY_ATTRACTIONS.length;
 }
 
 /** Centre ± HOLD_FRACTION of the band — the camera holds docked inside this range. */
@@ -88,14 +88,14 @@ export function CameraRig() {
   const { curve, lookTargets } = useMemo(() => {
     const mode = isMobile ? 'mobile' : 'desktop';
 
-    const points = JOURNEY_STOPS.map((stop) =>
+    const points = MIDWAY_ATTRACTIONS.map((stop) =>
       new Vector3(...stop.position).add(new Vector3(...stop.camOffset[mode])),
     );
     const curve = new CatmullRomCurve3(points, false, 'centripetal');
     curve.arcLengthDivisions = 256;
     curve.getLength(); // warm the arc-length cache outside the frameloop
 
-    const lookTargets = JOURNEY_STOPS.map((stop) =>
+    const lookTargets = MIDWAY_ATTRACTIONS.map((stop) =>
       new Vector3(...stop.position).add(new Vector3(...stop.lookAtOffset[mode])),
     );
 
@@ -106,7 +106,7 @@ export function CameraRig() {
   useEffect(() => invalidate(), [curve, invalidate]);
 
   useFrame(({ camera }, delta) => {
-    const { progress, sections } = useScrollStore.getState();
+    const { progress, sections } = useSceneStore.getState();
 
     const t = clamp01(mapProgressToT(progress, sections));
     curve.getPointAt(t, desiredPosition);
