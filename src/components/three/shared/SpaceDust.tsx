@@ -11,12 +11,12 @@ interface SpaceDustProps {
   count: number;
 }
 
-/* Journey bounding volume — stops run x ±2.6, y 0…-6.2, z 0…-35. */
-const SPREAD_X = 14;
-const TOP_Y = 2.5;
-const SPAN_Y = 12;
-const FRONT_Z = 4;
-const SPAN_Z = 46;
+/* Midway volume — fog motes drift low over the street (x ±7, y 0…4.5, z +5…-58). */
+const SPREAD_X = 16;
+const TOP_Y = 4.5;
+const SPAN_Y = 4.4;
+const FRONT_Z = 5;
+const SPAN_Z = 64;
 
 /** Deterministic PRNG (mulberry32) — render-pure and stable across re-renders. */
 function mulberry32(seed: number) {
@@ -48,11 +48,11 @@ export function SpaceDust({ count }: SpaceDustProps) {
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.02}
+        size={0.03}
         sizeAttenuation
-        color="#9ad8ff"
+        color="#cdbfa6"
         transparent
-        opacity={0.5}
+        opacity={0.32}
         depthWrite={false}
       />
     </points>

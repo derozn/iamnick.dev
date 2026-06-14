@@ -21,8 +21,8 @@ The work-history portion of the Midway, told as a run of neon-lit attractions �
 _Avoid_: career tree, career islands, timeline, work history wall
 
 **Dark Carnival**:
-The world/setting the entire site takes place in — an abandoned neon-lit funfair at night: faded tents, quiet stalls, flickering bulbs, neon glow in the fog. The register is **stylish-abandoned and atmospheric — cool, melancholy, "a funfair after closing time" — NOT horror.** No clowns, gore, grime, or dread; the quirk comes from the unexpected setting and playfulness, never from creepiness. The unifying metaphor that lets a career exhibit, a fairground game, and a communal doodle wall share one street. Keeps the existing neon-noir lighting; reframes the former "cyberpunk city" framing.
-_Avoid_: cyberpunk city, neon city, funfair (too bright/cheerful), haunted/horror carnival, creepy clowns
+The world/setting the entire site takes place in — a neon-lit funfair at night: tents, lit stalls, string lights and bulbs, neon glow in the fog, a ferris wheel closing the street. The register is **atmospheric and a touch eerie — moody, "a carnival after dark" — but never gory** (ADR-0005, revised). A few **static figures** (animatronics, silhouettes) give it life and unease; there is no blood, gore or grime. The unifying metaphor that lets a career exhibit, a fairground game, and a communal doodle wall share one street. Keeps the neon-noir lighting; reframes the former "cyberpunk city" framing.
+_Avoid_: cyberpunk city, neon city, funfair (too bright/cheerful), gore/blood/grime, jump-scares
 
 **Step-in**:
 Opting into an interactive stall (a game). By default the visitor travels past a stall as scenery; tapping its Play affordance "steps in" — scroll locks and input switches to driving the game until they exit. The opposite of travelling.

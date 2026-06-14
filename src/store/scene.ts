@@ -11,7 +11,7 @@ import { create } from 'zustand';
  *     position.
  *
  * Written by ScrollDriver (DOM side) and step-in affordances; read imperatively
- * by CameraRig inside useFrame via `useSceneStore.getState()` so per-scroll
+ * by FirstPersonRig inside useFrame via `useSceneStore.getState()` so per-scroll
  * updates never trigger React re-renders.
  *
  * Note: no stall is interactive until Phase 3 (ball-toss) / Phase 4 (doodle wall),
