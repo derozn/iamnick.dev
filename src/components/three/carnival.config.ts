@@ -132,6 +132,37 @@ export const MODELS = {
   rocks2: '/models/carnival/rocks-02.glb',
   flags: '/models/carnival/flags.glb',
   fence: '/models/carnival/fence.glb',
+  fenceGate: '/models/carnival/fence-gate.glb',
+  // attractions + decoration
+  bumperArena: '/models/carnival/bumper-arena.glb',
+  targetDucks: '/models/carnival/target-ducks.glb',
+  pieWall: '/models/carnival/pie-wall.glb',
+  waterTower: '/models/carnival/water-tower.glb',
+  barricade1: '/models/carnival/barricade-1.glb',
+  barricade2: '/models/carnival/barricade-2.glb',
+  barricade3: '/models/carnival/barricade-3.glb',
+  barricadeConn: '/models/carnival/barricade-conn.glb',
+  buntingPole: '/models/carnival/bunting-pole.glb',
+  loudspeaker: '/models/carnival/loudspeaker.glb',
+  papers: '/models/carnival/papers.glb',
+  plushiesHanging2: '/models/carnival/plushies-hanging2.glb',
+  rubberDucky: '/models/carnival/rubber-ducky.glb',
+  signTickets: '/models/carnival/sign-tickets.glb',
+  signFood: '/models/carnival/sign-food.glb',
+  signBillboard: '/models/carnival/sign-billboard.glb',
+  // spooky (reviewable)
+  skeleton: '/models/carnival/skeleton.glb',
+  skull: '/models/carnival/skull.glb',
+  spider1: '/models/carnival/spider-1.glb',
+  spider2: '/models/carnival/spider-2.glb',
+  jack1: '/models/carnival/jack-1.glb',
+  jack2: '/models/carnival/jack-2.glb',
+  jack3: '/models/carnival/jack-3.glb',
+  crystalBall: '/models/carnival/crystal-ball.glb',
+  jackInBox: '/models/carnival/jack-in-box.glb',
+  clownBox: '/models/carnival/clown-box.glb',
+  laughingClown: '/models/carnival/laughing-clown.glb',
+  monkey: '/models/carnival/monkey.glb',
 } as const;
 
 export type ModelKey = keyof typeof MODELS;
@@ -204,7 +235,9 @@ export const PLACEMENTS: Placement[] = [
     warm: true,
   },
   { model: 'swingRide', position: [-44, 0, -31], rotationY: face(-44, -31), size: 6.5 },
-  { model: 'bumperCars', position: [-44, 0, -17], rotationY: face(-44, -17), size: 5.5 },
+  // bumper-car ARENA (the proper attraction) + cars inside it
+  { model: 'bumperArena', position: [-44, 0, -17], rotationY: face(-44, -17), size: 7, warm: true },
+  { model: 'bumperCars', position: [-44, 0.05, -17], rotationY: face(-44, -17), size: 4 },
   {
     model: 'bouncyCastle',
     position: [-30, 0, -18],
@@ -212,6 +245,13 @@ export const PLACEMENTS: Placement[] = [
     size: 4.4,
     warm: true,
   },
+
+  // Extra game attractions (duck gallery + pie wall) on the food row
+  { model: 'targetDucks', position: [-27, 0, -20], rotationY: Math.PI, size: 2.6, warm: true },
+  { model: 'pieWall', position: [-8, 0, -28], rotationY: 0, size: 2.6 },
+
+  // Water-tower landmark on the skyline behind the plaza
+  { model: 'waterTower', position: [-52, 0, -34], rotationY: 0.6, size: 9 },
 
   // Stall interiors — prizes/food on the counters (toward the road)
   { model: 'plushiesPinned', position: [-4.2, 1.2, -7], rotationY: ROT_LEFT, size: 1.0 },
@@ -363,11 +403,59 @@ const GROUND_SCATTER: Placement[] = (() => {
   return out;
 })();
 
+/** Extra decoration — signage, speakers, bunting poles, prizes, litter. */
+const DECOR: Placement[] = [
+  { model: 'buntingPole', position: [-5.5, 0, -4], rotationY: 0, size: 3.4 },
+  { model: 'buntingPole', position: [5.5, 0, -4], rotationY: 0, size: 3.4 },
+  { model: 'buntingPole', position: [-6, 0, -24], rotationY: 0, size: 3.4 },
+  { model: 'buntingPole', position: [-30, 0, -18], rotationY: 0, size: 3.4 },
+  { model: 'loudspeaker', position: [-5.5, 2.6, -9], rotationY: ROT_LEFT, size: 0.9 },
+  { model: 'loudspeaker', position: [5.5, 2.6, -15], rotationY: ROT_RIGHT, size: 0.9 },
+  { model: 'loudspeaker', position: [-40, 3, -18], rotationY: face(-40, -18), size: 0.9 },
+  { model: 'signTickets', position: [4.6, 1.9, -3], rotationY: ROT_RIGHT, size: 1.6 },
+  { model: 'signFood', position: [-14, 2.4, -19.5], rotationY: Math.PI, size: 1.8 },
+  { model: 'signBillboard', position: [11, 0, -6], rotationY: ROT_RIGHT, size: 3.4 },
+  { model: 'papers', position: [-2, 0, -10], rotationY: 0.4, size: 0.6 },
+  { model: 'papers', position: [2.2, 0, -16], rotationY: 1.2, size: 0.6 },
+  { model: 'papers', position: [-18, 0, -24.5], rotationY: 0.8, size: 0.6 },
+  { model: 'rubberDucky', position: [-26, 0.8, -20], rotationY: 0, size: 0.4 },
+  { model: 'plushiesHanging2', position: [4.2, 1.4, -7], rotationY: ROT_RIGHT, size: 1.2 },
+  { model: 'plushiesPinned', position: [-4.2, 1.3, -12], rotationY: ROT_LEFT, size: 1.0 },
+  { model: 'balloon', position: [-5, 0, -20], rotationY: 0, size: 1.4 },
+  { model: 'balloon', position: [-40, 0, -28], rotationY: 0, size: 1.5 },
+  { model: 'barrel', position: [-32, 0, -20], rotationY: 0, size: 0.9 },
+  { model: 'crate2', position: [-46, 0, -30], rotationY: 0.3, size: 0.9 },
+];
+
+/** Spooky zone (Nick to review) — a fortune-teller corner + a haunted nook + carved pumpkins. */
+const SPOOKY: Placement[] = [
+  // fortune-teller corner at the ring tent
+  { model: 'stool', position: [4.0, 0, -7.6], rotationY: 0, size: 0.7 },
+  { model: 'crystalBall', position: [4.0, 0.75, -7.6], rotationY: 0, size: 0.5 },
+  { model: 'skull', position: [4.6, 0, -6.6], rotationY: 0.5, size: 0.5 },
+  { model: 'spider1', position: [5.2, 1.6, -7], rotationY: 0, size: 0.5 },
+  // haunted nook behind the food row
+  { model: 'skeleton', position: [-22, 0, -33], rotationY: 0.5, size: 2.0 },
+  { model: 'jack1', position: [-20.5, 0, -32], rotationY: 0, size: 0.8 },
+  { model: 'jack2', position: [-23.5, 0, -32.5], rotationY: 0.6, size: 0.8 },
+  { model: 'jack3', position: [-21.5, 0, -33.5], rotationY: 1.2, size: 0.7 },
+  { model: 'spider2', position: [-24.5, 0, -33], rotationY: 0, size: 0.7 },
+  { model: 'clownBox', position: [-19, 0, -33.5], rotationY: 0.3, size: 1.1 },
+  { model: 'laughingClown', position: [-25.5, 0, -34], rotationY: 0.4, size: 1.8 },
+  { model: 'jackInBox', position: [-18, 0, -32], rotationY: 0, size: 0.9 },
+  { model: 'monkey', position: [-26.5, 0, -32.5], rotationY: 0, size: 0.8 },
+  // carved pumpkins sprinkled at the bend (spooky-autumn)
+  { model: 'jack1', position: [-3.5, 0, -22], rotationY: 0, size: 0.8 },
+  { model: 'jack2', position: [-2.5, 0, -21], rotationY: 0.5, size: 0.7 },
+];
+
 export const DENSE_PLACEMENTS: Placement[] = [
   ...CLUSTER_SPOTS.flatMap(([x, z], i) => scatterCluster(x, z, i)),
   ...STALL_DRESSING,
   ...GROUND_SCATTER,
   ...FILLERS,
+  ...DECOR,
+  ...SPOOKY,
 ];
 
 /* ── Lighting fixtures ──────────────────────────────────────────────────── */
@@ -414,12 +502,26 @@ export const FLAG_PLACEMENTS: Placement[] = [
   { model: 'flags', position: [-22, 3.2, -24], rotationY: ROT_LEFT, size: 4.5 },
 ];
 
-/** Fence segments lining the games-corridor edges (high tier only). */
+/** Fencing — lines both road legs, a gate at the entrance, barricades queueing the rides. */
 export const FENCE_PLACEMENTS: Placement[] = (() => {
   const out: Placement[] = [];
-  for (let z = -3; z >= -19; z -= 2.2) {
+  // games corridor edges (run along Z)
+  for (let z = -4; z >= -18; z -= 2.2) {
     out.push({ model: 'fence', position: [-6.6, 0, z], rotationY: ROT_LEFT, size: 2.3 });
     out.push({ model: 'fence', position: [6.6, 0, z], rotationY: ROT_RIGHT, size: 2.3 });
   }
+  // food corridor edges (run along X)
+  for (let x = -8; x >= -30; x -= 2.2) {
+    out.push({ model: 'fence', position: [x, 0, -18.5], rotationY: 0, size: 2.3 });
+    out.push({ model: 'fence', position: [x, 0, -29.5], rotationY: 0, size: 2.3 });
+  }
+  // entrance gate flanking the arch
+  out.push({ model: 'fenceGate', position: [-5.4, 0, -3], rotationY: ROT_LEFT, size: 2.6 });
+  out.push({ model: 'fenceGate', position: [5.4, 0, -3], rotationY: ROT_RIGHT, size: 2.6 });
+  // barricades queueing the ferris + bumper arena
+  out.push({ model: 'barricade1', position: [-41, 0, -22], rotationY: 0.4, size: 2.2 });
+  out.push({ model: 'barricade2', position: [-39, 0, -22.5], rotationY: 0.4, size: 2.2 });
+  out.push({ model: 'barricadeConn', position: [-40, 0, -22.2], rotationY: 0.4, size: 0.6 });
+  out.push({ model: 'barricade3', position: [-41, 0, -19], rotationY: 1.6, size: 2.2 });
   return out;
 })();

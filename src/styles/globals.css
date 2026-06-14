@@ -14,10 +14,10 @@
   --color-background-feedback-negative: #c00408;
   --color-border-primary: #d6d6d6;
 
-  /* Accent slots */
+  /* Accent slots — brand red */
   --color-accent-primary: #d6d6d6;
-  --color-accent: #4cc9f0;
-  --color-accent-dim: #1a7fa0;
+  --color-accent: #c50201;
+  --color-accent-dim: #7a0f0f;
 
   /* ── Fonts ───────────────────────────────────────────── */
   --font-expressive: var(--font-montserrat), sans-serif;

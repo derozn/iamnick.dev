@@ -58,7 +58,10 @@ export function SiteNav() {
               </li>
             ) : (
               <li key={label}>
-                <a href={href} className={cn(itemClass, 'text-text-primary/80 hover:text-accent')}>
+                <a
+                  href={href}
+                  className={cn(itemClass, 'text-accent transition-colors hover:text-accent/70')}
+                >
                   {label}
                 </a>
               </li>
