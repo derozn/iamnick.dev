@@ -11,12 +11,13 @@
 - **Walk feel.** A subtle head-bob (derived from progress) sells the walk; position + gaze are critically damped so nothing snaps.
 - **Frameloop:** high tier renders continuously so the string lights twinkle (the carnival feels alive); low tier stays demand-driven (renders only while scrolling) to save battery.
 
-## Coordinate system
+## Coordinate system & structure
 
-- Ground plane at `y = 0`. Forward = **−Z** (camera walks into the scene).
-- Street runs `z = +2` (behind the start) → `z ≈ −64` (ride plaza).
-- Clear walking path ≈ 6 units wide (camera weaves within ±1). Structures line the sides at `x ≈ ±4.5`, facing **inward** toward the path. Fences/edges at `x ≈ ±6.5`.
-- Props are **normalised** (scaled to a target size, base dropped to `y = 0`) so placement is just `position + yaw` — see `CarnivalProp`.
+- Ground at `y = 0`. Forward = **−Z**; the **dirt road** runs down `x = 0` from `z ≈ +5` to the plaza.
+- **Stalls line the road in neat rows facing it:** front rows at `x = ±5` (left opens +X = `ROT_LEFT`, right opens −X = `ROT_RIGHT`), back rows at `x = ±9` for depth. Foliage frames the field at `x ≈ ±13–16`.
+- The road passes through **sections** (entrance → games → food) and opens into a **plaza** (`z ≈ −44 … −60`) whose rides face the centre `C = (0, −52)` via `face()`.
+- **Floor is textured:** real Synty `ground-dirt` tiles tile the road, a `ground-dirt-round` tile is the plaza circle (see `shared/Ground.tsx`); grass plane underneath.
+- Props are **normalised** (scaled to `size`, base dropped to `y = 0`) so a placement is just `position + yaw` — see `CarnivalProp`. Tune everything in `carnival.config.ts`.
 
 ## Zones (front → back)
 
