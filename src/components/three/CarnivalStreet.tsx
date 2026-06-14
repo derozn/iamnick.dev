@@ -8,8 +8,10 @@ import {
   FLAG_PLACEMENTS,
   LAMP_BULB_Y,
   LAMP_PLACEMENTS,
+  LAMP_SIZE,
   MODELS,
   PLACEMENTS,
+  type Lamp,
   type Placement,
 } from './carnival.config';
 import { CarnivalProp } from './attractions/CarnivalProp';
@@ -35,22 +37,34 @@ function Prop({ model, position, rotationY = 0, size }: Placement) {
 function WarmPool({ position }: { position: [number, number, number] }) {
   return (
     <pointLight
-      position={[position[0] * 0.78, 1.7, position[2]]}
-      color="#ff9d5c"
-      intensity={7}
-      distance={7.5}
+      position={[position[0] * 0.82, 1.8, position[2]]}
+      color="#ffae6b"
+      intensity={11}
+      distance={9}
       decay={2}
     />
   );
 }
 
-/** Emissive bulb atop a lamp post — self-lit, blooms, no real light cost. */
-function LampBulb({ position }: { position: [number, number, number] }) {
+/** A lamp post: the model + an emissive bulb (blooms) + an optional real warm pool. */
+function LampPost({ position, lit }: Lamp) {
   return (
-    <mesh position={[position[0], LAMP_BULB_Y, position[2]]}>
-      <sphereGeometry args={[0.08, 8, 8]} />
-      <meshBasicMaterial color="#ffd9a0" toneMapped={false} />
-    </mesh>
+    <group>
+      <CarnivalProp url={MODELS.lampPost} targetSize={LAMP_SIZE} position={position} />
+      <mesh position={[position[0], LAMP_BULB_Y, position[2]]}>
+        <sphereGeometry args={[0.11, 10, 10]} />
+        <meshBasicMaterial color="#ffe6b0" toneMapped={false} />
+      </mesh>
+      {lit && (
+        <pointLight
+          position={[position[0], LAMP_BULB_Y - 0.2, position[2]]}
+          color="#ffd49a"
+          intensity={10}
+          distance={10}
+          decay={2}
+        />
+      )}
+    </group>
   );
 }
 
@@ -59,40 +73,39 @@ interface CarnivalStreetProps {
 }
 
 /**
- * CarnivalStreet — the linear midway: ground, structures lining both sides,
- * overhead bunting + string lights, lamp posts, and the ride plaza closing the
- * street. Neon-noir night: warm pools glow from lit stalls, emissive bulbs +
- * string lights bloom, the ferris wheel looms through the fog.
+ * CarnivalStreet — the carnival come to life: a short avenue you walk in through,
+ * opening into a plaza ringed with stalls, tents and rides, the ferris wheel
+ * closing the back, framed by dark trees. Strategic lighting — warm pools from
+ * lit stalls, lit lamp posts, twinkling string lights and neon ride accents over
+ * a lifted ambient base so it glows like a fairground at night, not a void.
  *
- * Phase 1 dresses the environment only — figures (rigs need posing) and the
- * content spine come next. Tier gates the heavier dressing (fences, full set of
- * warm lights, dust density). Nothing does per-frame work; the demand frameloop
- * renders only while the camera walks.
+ * Figures (rigs need posing) and the content spine come next. Tier gates the
+ * heavier dressing (fences, full warm-light set, dust density).
  */
 export function CarnivalStreet({ tier }: CarnivalStreetProps) {
   const high = tier === 'high';
-  const warm = PLACEMENTS.filter((p) => p.warm).filter((_, i) => high || i % 2 === 0);
+  const warm = PLACEMENTS.filter((p) => p.warm).slice(0, high ? 7 : 4);
+  const lamps = high ? LAMP_PLACEMENTS : LAMP_PLACEMENTS.map((l) => ({ ...l, lit: false }));
 
   return (
     <>
       <Ground />
 
-      {/* Structures + dressing */}
+      {/* Structures, scenery, landscape */}
       {PLACEMENTS.map((p, i) => (
         <Prop key={`p${i}`} {...p} />
       ))}
       {FLAG_PLACEMENTS.map((p, i) => (
-        <Prop key={`f${i}`} {...p} />
-      ))}
-      {LAMP_PLACEMENTS.map((p, i) => (
-        <Prop key={`l${i}`} {...p} />
-      ))}
-      {LAMP_PLACEMENTS.map((p, i) => (
-        <LampBulb key={`lb${i}`} position={p.position} />
+        <Prop key={`fl${i}`} {...p} />
       ))}
       {high && FENCE_PLACEMENTS.map((p, i) => <Prop key={`fe${i}`} {...p} />)}
 
-      {/* Overhead string lights */}
+      {/* Lamp posts (lit) */}
+      {lamps.map((l, i) => (
+        <LampPost key={`lp${i}`} {...l} />
+      ))}
+
+      {/* Overhead twinkling string lights */}
       <StringLights />
 
       {/* Warm pools from lit stalls */}
@@ -100,17 +113,27 @@ export function CarnivalStreet({ tier }: CarnivalStreetProps) {
         <WarmPool key={`w${i}`} position={p.position} />
       ))}
 
+      {/* Soft warm fill so the plaza floor reads (the carnival glow) */}
+      <pointLight position={[0, 5, -44]} color="#ffbb7d" intensity={7} distance={26} decay={1.4} />
+
       {/* Neon ride accents */}
-      <pointLight position={[-6, 5, -55]} color="#6fe9ff" intensity={9} distance={16} decay={1.6} />
+      <pointLight position={[0, 7, -64]} color="#7fe9ff" intensity={14} distance={26} decay={1.5} />
       <pointLight
-        position={[5.3, 2.5, -49]}
+        position={[6.5, 3, -58]}
         color="#ff8fd6"
+        intensity={8}
+        distance={12}
+        decay={1.7}
+      />
+      <pointLight
+        position={[-6.5, 3, -58]}
+        color="#7fe9ff"
         intensity={7}
-        distance={10}
+        distance={12}
         decay={1.8}
       />
 
-      {/* Drifting fog motes */}
+      {/* Sparse drifting dust */}
       <SpaceDust count={high ? DUST_COUNT_HIGH : DUST_COUNT_LOW} />
 
       {high && <PostFX />}

@@ -23,19 +23,22 @@ interface SceneLightingProps {
 export function SceneLighting({ tier }: SceneLightingProps) {
   return (
     <>
-      {/* Moon key — dim, cool, high front */}
-      <directionalLight position={[6, 12, 8]} intensity={0.55} color="#9fb4ff" />
+      {/* Soft ambient base so nothing reads as a black void */}
+      <ambientLight intensity={0.35} color="#5a567e" />
 
-      {/* Hemisphere fill — cool night sky over warm-violet ground */}
-      <hemisphereLight args={['#2a3566', '#2a1d2e', 0.35]} />
+      {/* Moon key — cool, high front */}
+      <directionalLight position={[6, 12, 8]} intensity={0.95} color="#bcc7ff" />
+
+      {/* Hemisphere fill — night sky over warm-violet ground */}
+      <hemisphereLight args={['#48528f', '#3a2a40', 0.85]} />
 
       {tier === 'high' && (
         <>
           {/* Magenta rim from behind the ride plaza for depth */}
-          <directionalLight position={[-8, 4, -40]} intensity={0.3} color="#b86cff" />
+          <directionalLight position={[-8, 4, -52]} intensity={0.4} color="#b86cff" />
 
           {/* Tiny procedural env (rendered once) for PBR specular response */}
-          <Environment resolution={64} frames={1} environmentIntensity={0.25}>
+          <Environment resolution={64} frames={1} environmentIntensity={0.4}>
             <Lightformer intensity={2} color="#6fe9ff" position={[0, 5, -20]} scale={[14, 5, 1]} />
             <Lightformer
               intensity={1.6}

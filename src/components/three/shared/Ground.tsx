@@ -6,16 +6,20 @@
 export function Ground() {
   return (
     <group>
-      {/* Base ground — extends well past the fog so there's no visible edge */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -25]} receiveShadow>
-        <planeGeometry args={[60, 150]} />
-        <meshStandardMaterial color="#13101d" roughness={1} metalness={0} />
+      {/* Base ground — grassy dark field, extends past the fog so there's no edge */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -30]} receiveShadow>
+        <planeGeometry args={[120, 200]} />
+        <meshStandardMaterial color="#1d2320" roughness={1} metalness={0} />
       </mesh>
 
-      {/* Worn central path — a touch lighter, picks up the lamp/stall light */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, -25]} receiveShadow>
-        <planeGeometry args={[8.5, 150]} />
-        <meshStandardMaterial color="#1c1726" roughness={1} metalness={0} />
+      {/* Trodden dirt — the avenue + plaza floor, lighter so it picks up the warm light */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, -10]}>
+        <planeGeometry args={[10, 36]} />
+        <meshStandardMaterial color="#2a2230" roughness={1} metalness={0} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, -44]}>
+        <circleGeometry args={[16, 40]} />
+        <meshStandardMaterial color="#2a2230" roughness={1} metalness={0} />
       </mesh>
     </group>
   );

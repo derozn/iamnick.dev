@@ -48,11 +48,11 @@ export function SpaceDust({ count }: SpaceDustProps) {
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.03}
+        size={0.028}
         sizeAttenuation
         color="#cdbfa6"
         transparent
-        opacity={0.32}
+        opacity={0.18}
         depthWrite={false}
       />
     </points>

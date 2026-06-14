@@ -14,18 +14,17 @@ import {
   CAMERA_FAR,
   CAMERA_FOV,
   CAMERA_NEAR,
-  EYE_HEIGHT,
+  CAMERA_PATH,
   FOG_FAR,
   FOG_NEAR,
-  START_Z,
 } from './carnival.config';
 
 interface SceneProps {
   tier: Exclude<QualityTier, 'none'>;
 }
 
-/* Initial camera = the start of the street at eye level (FirstPersonRig snaps on first frame). */
-const INITIAL_CAMERA: [number, number, number] = [0, EYE_HEIGHT, START_Z];
+/* Initial camera = the start of the path (FirstPersonRig snaps on first frame). */
+const INITIAL_CAMERA: [number, number, number] = CAMERA_PATH[0];
 
 /**
  * Scene — the single persistent R3F canvas behind the page: a first-person walk
@@ -37,14 +36,16 @@ const INITIAL_CAMERA: [number, number, number] = [0, EYE_HEIGHT, START_Z];
 export default function Scene({ tier }: SceneProps) {
   return (
     <Canvas
-      frameloop="demand"
+      // High tier renders continuously so the string lights twinkle; low tier
+      // stays demand-driven (renders only while scrolling) to save battery.
+      frameloop={tier === 'high' ? 'always' : 'demand'}
       dpr={tier === 'high' ? [1, 2] : [1, 1.5]}
       gl={{
         antialias: false,
         powerPreference: 'high-performance',
         // AgX rolls saturated neon highlights off smoothly where ACES clips them.
         toneMapping: AgXToneMapping,
-        toneMappingExposure: 1.1,
+        toneMappingExposure: 1.3,
       }}
       camera={{
         fov: CAMERA_FOV,

@@ -1,13 +1,15 @@
 # The Midway — scene layout map
 
-> The physical design of the Dark Carnival scene: a **linear first-person walk down a neon midway street** at night, stalls and tents lining both sides, a ferris wheel glowing through fog at the far end. This maps the world out **before** the content spine and HUD are layered on. Reference: Synty POLYGON Horror Carnival promo (atmosphere + density), tuned to **atmospheric, not gory** (figures allowed, no blood/jump-scares — see ADR-0005, revised).
+> The physical design of the Dark Carnival scene: a **first-person walk that enters down a short neon avenue and opens into a plaza** ringed with stalls, tents and rides — the ferris wheel glowing at the back, the carnival's bustle laid out around you. Trees frame it in a dark field; lamps and string lights are lit; it glows like a fairground at night, not a void. Maps the world out **before** the content spine and HUD are layered on. Reference: Synty POLYGON Horror Carnival promo (atmosphere + density), tuned to **atmospheric, not gory** (figures allowed, no blood/jump-scares — see ADR-0005, revised).
+>
+> Live layout lives in `src/components/three/carnival.config.ts` (CAMERA_PATH/LOOK_PATH + PLACEMENTS/LAMP/FLAG arrays) — tune the scene there. Verified via headless screenshots (entrance → avenue → plaza reveal → plaza centre).
 
 ## Camera & navigation (ADR-0004 — on-rails)
 
-- **First-person, eye level.** Camera height ≈ 1.65 m, FOV ≈ 68°.
-- **On a rail.** Document scroll progress `0 → 1` maps to forward travel down the street centreline (`z ≈ +2 → −58`). No free-roam, no controls to learn.
-- **Walk feel.** A gentle S-curve drift in X (±0.8) and a subtle damped head-bob/sway so it reads as _walking_, not dollying. Look direction is forward down the street, easing toward points of interest.
-- Demand frameloop preserved — motion (and therefore rendering) only happens while scrolling / damping settles.
+- **First-person, eye level.** Camera height ≈ 1.7 m, FOV ≈ 70°.
+- **On a rail, choreographed.** Scroll progress `0 → 1` samples two CatmullRom curves: `CAMERA_PATH` (position) walks in down the avenue and arcs into the plaza centre; `LOOK_PATH` (gaze) pans across the plaza and settles on the ferris wheel — so you "arrive" and survey the bustle. No free-roam, no controls to learn.
+- **Walk feel.** A subtle head-bob (derived from progress) sells the walk; position + gaze are critically damped so nothing snaps.
+- **Frameloop:** high tier renders continuously so the string lights twinkle (the carnival feels alive); low tier stays demand-driven (renders only while scrolling) to save battery.
 
 ## Coordinate system
 
@@ -18,14 +20,14 @@
 
 ## Zones (front → back)
 
-| z range   | Zone             | Left (x−)                         | Right (x+)                        | Overhead / centre                                  |
-| --------- | ---------------- | --------------------------------- | --------------------------------- | -------------------------------------------------- |
-| 0 … −4    | **Entrance**     | welcome neon sign                 | ticket booth                      | **Carnival entrance arch** spanning the path (z−2) |
-| −8 … −24  | **Games row**    | stall · striped tent · can-toss   | high striker · stall · ring-toss  | bunting + string lights across                     |
-| −26 … −40 | **Food & tents** | big-top tent · candyfloss cart    | fortune-teller tent · hay/barrels | bunting; balloons                                  |
-| −46 … −64 | **Ride plaza**   | **ferris wheel** (hero, set back) | merry-go-round                    | the destination — glows through fog                |
+| z range   | Zone          | Layout                                                                                                                                                          |
+| --------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| +8 … −2   | **Entrance**  | **Carnival arch** spanning the path, welcome sign, ticket booth; fences funnel you in.                                                                          |
+| −4 … −24  | **Avenue**    | A tight neon corridor — striped stall + tent, candyfloss cart, lamp posts, bunting + string lights overhead — leading inward.                                   |
+| −28 … −56 | **Plaza**     | Opens out: stalls, tents and games ring the centre (x ≈ ±8–10) **facing inward**; floor scattered with benches, stools, hay, barrels, balloons, plushies, food. |
+| −56 … −64 | **Ride bank** | Closes the plaza: **ferris wheel** (hero, back-centre), merry-go-round + teacup ride flanking, high striker behind.                                             |
 
-**Dressing threaded throughout:** fence segments lining both edges (instanced), lamp posts every ~8 z, string-light poles, scattered balloons / barrels / hay bales, neon signage on stalls, a few **static figures** (animatronic + carny silhouettes) standing among the stalls for life and unease.
+**Around it:** trees / bushes / rocks frame the carnival in a dark field (x ≈ ±10–17). Lamp posts ring the plaza (bulbs lit + warm pools), string-light strands twinkle overhead, bunting spans across. **Figures** (animatronic / carny) are the remaining add — deferred until posed (the rigs export T-pose).
 
 ## Lighting (neon-noir night)
 
