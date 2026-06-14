@@ -45,7 +45,7 @@ export default function Scene({ tier }: SceneProps) {
         powerPreference: 'high-performance',
         // AgX rolls saturated neon highlights off smoothly where ACES clips them.
         toneMapping: AgXToneMapping,
-        toneMappingExposure: 1.3,
+        toneMappingExposure: 1.4,
       }}
       camera={{
         fov: CAMERA_FOV,

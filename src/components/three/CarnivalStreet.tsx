@@ -2,6 +2,7 @@ import { useGLTF } from '@react-three/drei';
 
 import { type QualityTier } from './hooks/useQualityTier';
 import {
+  DENSE_PLACEMENTS,
   DUST_COUNT_HIGH,
   DUST_COUNT_LOW,
   FENCE_PLACEMENTS,
@@ -91,13 +92,15 @@ export function CarnivalStreet({ tier }: CarnivalStreetProps) {
     <>
       <Ground />
 
-      {/* Structures, scenery, landscape */}
+      {/* Core: avenue, plaza ring, rides, vehicles, stall interiors */}
       {PLACEMENTS.map((p, i) => (
         <Prop key={`p${i}`} {...p} />
       ))}
       {FLAG_PLACEMENTS.map((p, i) => (
         <Prop key={`fl${i}`} {...p} />
       ))}
+      {/* Dense dressing — fillers + foliage + fences (high tier only) */}
+      {high && DENSE_PLACEMENTS.map((p, i) => <Prop key={`d${i}`} {...p} />)}
       {high && FENCE_PLACEMENTS.map((p, i) => <Prop key={`fe${i}`} {...p} />)}
 
       {/* Lamp posts (lit) */}

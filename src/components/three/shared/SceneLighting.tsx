@@ -24,13 +24,13 @@ export function SceneLighting({ tier }: SceneLightingProps) {
   return (
     <>
       {/* Soft ambient base so nothing reads as a black void */}
-      <ambientLight intensity={0.35} color="#5a567e" />
+      <ambientLight intensity={0.45} color="#615d86" />
 
       {/* Moon key — cool, high front */}
-      <directionalLight position={[6, 12, 8]} intensity={0.95} color="#bcc7ff" />
+      <directionalLight position={[6, 12, 8]} intensity={1.05} color="#bcc7ff" />
 
       {/* Hemisphere fill — night sky over warm-violet ground */}
-      <hemisphereLight args={['#48528f', '#3a2a40', 0.85]} />
+      <hemisphereLight args={['#525d9e', '#42313f', 1.0]} />
 
       {tier === 'high' && (
         <>
