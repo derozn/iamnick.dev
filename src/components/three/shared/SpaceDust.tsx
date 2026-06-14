@@ -11,12 +11,13 @@ interface SpaceDustProps {
   count: number;
 }
 
-/* Midway volume — fog motes drift low over the street (x ±7, y 0…4.5, z +5…-58). */
-const SPREAD_X = 16;
+/* Carnival volume — fog motes drift low over the L-shaped footprint. */
+const CENTER_X = -18;
+const SPREAD_X = 76;
 const TOP_Y = 4.5;
 const SPAN_Y = 4.4;
-const FRONT_Z = 5;
-const SPAN_Z = 64;
+const FRONT_Z = 6;
+const SPAN_Z = 44;
 
 /** Deterministic PRNG (mulberry32) — render-pure and stable across re-renders. */
 function mulberry32(seed: number) {
@@ -34,7 +35,7 @@ export function SpaceDust({ count }: SpaceDustProps) {
     const random = mulberry32(0x9ad8ff);
     const array = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      array[i * 3] = (random() - 0.5) * SPREAD_X;
+      array[i * 3] = CENTER_X + (random() - 0.5) * SPREAD_X;
       array[i * 3 + 1] = TOP_Y - random() * SPAN_Y;
       array[i * 3 + 2] = FRONT_Z - random() * SPAN_Z;
     }

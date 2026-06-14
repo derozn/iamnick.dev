@@ -1,38 +1,44 @@
 /**
- * carnival.config — the Dark Carnival as data, built with STRUCTURE: a textured
- * dirt road runs down the spine; stalls and tents line it in neat rows facing
- * the road; the fairway passes through sections (entrance → games → food) and
- * opens into a plaza ringed with rides. Foliage frames the whole field.
+ * carnival.config — the Dark Carnival as data: a first-person **dog-leg** walk.
+ * You enter under the arch, walk a games corridor heading −Z, the road bends
+ * left at a big-top, and a food corridor heading −X opens into a plaza of rides
+ * (the ferris wheel is hidden until you round the bend — the reveal). Decor is an
+ * **autumn fair**: plain pumpkins, hay, leaves, lanterns, warm lights.
  *
- * Forward = −Z, road centred on x = 0. Front rows sit at x = ±5 facing the road
- * (ROT_LEFT / ROT_RIGHT); back rows at x = ±9 add depth. Plaza structures face
- * the plaza centre via `face()`. Props are normalised (scaled to `size`, base on
- * the ground) so a placement is just position + yaw.
+ * Forward = −Z then −X. Camera follows CAMERA_PATH; gaze follows LOOK_PATH (it
+ * swings west at the bend to reveal the plaza). Props are normalised (scaled to
+ * `size`, base on the ground) so a placement is just position + yaw.
+ *
+ * Spatial grammar (so it reads as a place, not scattered clutter):
+ *  - structures sit in tidy ROWS facing the road; the road is textured gravel.
+ *  - life-like SCATTER ZONES (tree + rock pile + pumpkins + bench + leaves) ring
+ *    the attractions and edge the field — see `scatterCluster()`.
  */
 
 export type Vec3 = [number, number, number];
 
-/* ── Camera / first-person rail ─────────────────────────────────────────── */
+/* ── Camera / first-person rail (the dog-leg) ───────────────────────────── */
 
 export const EYE_HEIGHT = 1.7;
 
-/** Straight walk down the road into the plaza — the road leads the eye. */
 export const CAMERA_PATH: Vec3[] = [
-  [0, EYE_HEIGHT, 9],
-  [0, EYE_HEIGHT, -2],
-  [0, EYE_HEIGHT, -12],
-  [0, EYE_HEIGHT, -22],
-  [0, EYE_HEIGHT, -32],
-  [0, EYE_HEIGHT, -42],
+  [0, EYE_HEIGHT, 6],
+  [0, EYE_HEIGHT, -8],
+  [0, EYE_HEIGHT, -18],
+  [-4, EYE_HEIGHT, -23],
+  [-13, EYE_HEIGHT, -24],
+  [-23, EYE_HEIGHT, -24],
+  [-31, EYE_HEIGHT, -24],
 ];
 
 export const LOOK_PATH: Vec3[] = [
-  [0, EYE_HEIGHT - 0.02, -4],
-  [0, EYE_HEIGHT - 0.02, -14],
-  [0, EYE_HEIGHT - 0.02, -24],
-  [0, EYE_HEIGHT - 0.03, -34],
-  [0, EYE_HEIGHT - 0.05, -46],
-  [0, EYE_HEIGHT - 0.05, -58],
+  [0, EYE_HEIGHT - 0.02, -6],
+  [0, EYE_HEIGHT - 0.02, -16],
+  [-2, EYE_HEIGHT - 0.04, -22],
+  [-14, EYE_HEIGHT - 0.06, -24],
+  [-26, EYE_HEIGHT - 0.06, -24],
+  [-40, EYE_HEIGHT - 0.04, -24],
+  [-46, EYE_HEIGHT - 0.04, -24],
 ];
 
 export const BOB_AMP = 0.035;
@@ -40,19 +46,19 @@ export const BOB_CYCLES = 30;
 
 export const CAMERA_FOV = 70;
 export const CAMERA_NEAR = 0.1;
-export const CAMERA_FAR = 130;
+export const CAMERA_FAR = 140;
 
-export const POSITION_SMOOTHING = 0.28;
-export const TARGET_SMOOTHING = 0.32;
+export const POSITION_SMOOTHING = 0.3;
+export const TARGET_SMOOTHING = 0.34;
 
 /* ── Atmosphere ─────────────────────────────────────────────────────────── */
 
-export const BACKGROUND_COLOR = '#171326';
-export const FOG_NEAR = 11;
-export const FOG_FAR = 82;
+export const BACKGROUND_COLOR = '#161325';
+export const FOG_NEAR = 12;
+export const FOG_FAR = 78;
 
-export const DUST_COUNT_HIGH = 260;
-export const DUST_COUNT_LOW = 90;
+export const DUST_COUNT_HIGH = 240;
+export const DUST_COUNT_LOW = 80;
 
 /* ── Models ─────────────────────────────────────────────────────────────── */
 
@@ -82,8 +88,6 @@ export const MODELS = {
   truckFood: '/models/carnival/truck-food.glb',
   wagon1: '/models/carnival/wagon-01.glb',
   wagonCage: '/models/carnival/wagon-cage.glb',
-  train: '/models/carnival/train.glb',
-  trainCarriage: '/models/carnival/train-carriage.glb',
   cartCandyfloss: '/models/carnival/cart-candyfloss.glb',
   hotdog: '/models/carnival/hotdog.glb',
   burger: '/models/carnival/burger.glb',
@@ -102,13 +106,18 @@ export const MODELS = {
   crate2: '/models/carnival/crate-02.glb',
   barrel: '/models/carnival/barrel.glb',
   generator: '/models/carnival/generator.glb',
-  speaker: '/models/carnival/speaker.glb',
-  spotlight: '/models/carnival/spotlight.glb',
   bin: '/models/carnival/bin.glb',
   hayBale: '/models/carnival/hay-bale.glb',
+  haySeat: '/models/carnival/hay-seat.glb',
   bench: '/models/carnival/bench.glb',
   stool: '/models/carnival/stool.glb',
   balloon: '/models/carnival/balloon.glb',
+  pumpkin1: '/models/carnival/pumpkin-1.glb',
+  pumpkin2: '/models/carnival/pumpkin-2.glb',
+  pumpkin3: '/models/carnival/pumpkin-3.glb',
+  leaves: '/models/carnival/leaves.glb',
+  leafPile: '/models/carnival/leaf-pile.glb',
+  lantern: '/models/carnival/lantern.glb',
   lampPost: '/models/carnival/lamp-post.glb',
   tree1: '/models/carnival/tree-01.glb',
   tree2: '/models/carnival/tree-02.glb',
@@ -127,12 +136,12 @@ export const MODELS = {
 
 export type ModelKey = keyof typeof MODELS;
 
-export const ROT_LEFT = Math.PI / 2; // left row opens toward +X (the road)
-export const ROT_RIGHT = -Math.PI / 2; // right row opens toward −X (the road)
+export const ROT_LEFT = Math.PI / 2;
+export const ROT_RIGHT = -Math.PI / 2;
 
-/** Plaza focus the ringed structures face. */
-const C: [number, number] = [0, -52];
-const face = (x: number, z: number) => Math.atan2(C[0] - x, C[1] - z);
+/** Plaza centre the rides face. */
+export const PLAZA_C: [number, number] = [-37, -24];
+const face = (x: number, z: number) => Math.atan2(PLAZA_C[0] - x, PLAZA_C[1] - z);
 
 export interface Placement {
   model: ModelKey;
@@ -142,165 +151,273 @@ export interface Placement {
   warm?: boolean;
 }
 
-/* ── Core: rows along the road + plaza ring + interiors ─────────────────── */
+/* ── Core: rows + bend + plaza ring + stall interiors ───────────────────── */
 
 export const PLACEMENTS: Placement[] = [
-  // ── Entrance ──
+  // Entrance
   { model: 'entrance', position: [0, 0, -2], rotationY: 0, size: 5 },
   { model: 'signWelcome', position: [0, 3.0, -2.4], rotationY: 0, size: 3.6 },
-  { model: 'ticketBooth', position: [3.5, 0, -0.5], rotationY: ROT_RIGHT, size: 2.4, warm: true },
+  { model: 'ticketBooth', position: [3.5, 0, -1], rotationY: ROT_RIGHT, size: 2.4, warm: true },
 
-  // ── Games section — front rows (x ±5) face the road ──
-  { model: 'stall3', position: [-5, 0, -8], rotationY: ROT_LEFT, size: 2.8, warm: true },
-  { model: 'tent', position: [-5, 0, -14], rotationY: ROT_LEFT, size: 3.2, warm: true },
-  { model: 'stall1', position: [-5, 0, -20], rotationY: ROT_LEFT, size: 2.8, warm: true },
-  { model: 'canToss', position: [-5, 0, -26], rotationY: ROT_LEFT, size: 2.4, warm: true },
-  { model: 'tentRing', position: [5, 0, -8], rotationY: ROT_RIGHT, size: 3.2, warm: true },
-  { model: 'stall2', position: [5, 0, -14], rotationY: ROT_RIGHT, size: 2.8, warm: true },
-  { model: 'ringToss', position: [5, 0, -20], rotationY: ROT_RIGHT, size: 2.4, warm: true },
-  { model: 'bullsEye', position: [5, 0, -26], rotationY: ROT_RIGHT, size: 2.2 },
-  // back rows (x ±9) — taller things for depth
-  { model: 'wagon1', position: [-9.2, 0, -11], rotationY: ROT_LEFT, size: 3.4 },
-  { model: 'highStriker', position: [-9.2, 0, -23], rotationY: ROT_LEFT, size: 4.6 },
-  { model: 'truckFood', position: [9.2, 0, -11], rotationY: ROT_RIGHT, size: 3.6, warm: true },
-  { model: 'prizeWheel', position: [9.2, 0, -23], rotationY: ROT_RIGHT, size: 2.6 },
-  // section signage over the front stalls
-  { model: 'signGames', position: [-3.3, 2.5, -8], rotationY: ROT_LEFT, size: 2.0 },
-  { model: 'signRides', position: [3.3, 2.5, -8], rotationY: ROT_RIGHT, size: 2.0 },
-  { model: 'signPrizes', position: [-3.3, 2.5, -20], rotationY: ROT_LEFT, size: 2.0 },
-  { model: 'signWin', position: [3.3, 2.5, -20], rotationY: ROT_RIGHT, size: 2.0 },
+  // Games corridor — front rows face the road
+  { model: 'stall3', position: [-5, 0, -7], rotationY: ROT_LEFT, size: 2.8, warm: true },
+  { model: 'tent', position: [-5, 0, -12], rotationY: ROT_LEFT, size: 3.2, warm: true },
+  { model: 'canToss', position: [-5, 0, -17], rotationY: ROT_LEFT, size: 2.4, warm: true },
+  { model: 'tentRing', position: [5, 0, -7], rotationY: ROT_RIGHT, size: 3.2, warm: true },
+  { model: 'stall2', position: [5, 0, -12], rotationY: ROT_RIGHT, size: 2.8, warm: true },
+  { model: 'ringToss', position: [5, 0, -17], rotationY: ROT_RIGHT, size: 2.4, warm: true },
+  // back rows (depth)
+  { model: 'wagon1', position: [-9, 0, -9], rotationY: ROT_LEFT, size: 3.4 },
+  { model: 'highStriker', position: [-9, 0, -15], rotationY: ROT_LEFT, size: 4.6 },
+  { model: 'truckFood', position: [9, 0, -9], rotationY: ROT_RIGHT, size: 3.6, warm: true },
+  { model: 'prizeWheel', position: [9, 0, -15], rotationY: ROT_RIGHT, size: 2.6 },
+  // signage over the stalls
+  { model: 'signGames', position: [-3.3, 2.5, -7], rotationY: ROT_LEFT, size: 2.0 },
+  { model: 'signRides', position: [3.3, 2.5, -7], rotationY: ROT_RIGHT, size: 2.0 },
+  { model: 'signPrizes', position: [-3.3, 2.5, -15], rotationY: ROT_LEFT, size: 2.0 },
+  { model: 'signWin', position: [3.3, 2.5, -15], rotationY: ROT_RIGHT, size: 2.0 },
 
-  // ── Food section ──
-  { model: 'cartCandyfloss', position: [-5, 0, -32], rotationY: ROT_LEFT, size: 1.9, warm: true },
-  { model: 'hotdog', position: [-5, 0, -37], rotationY: ROT_LEFT, size: 1.7, warm: true },
-  { model: 'wagonCage', position: [5, 0, -32], rotationY: ROT_RIGHT, size: 3.2 },
-  { model: 'dunkTank', position: [5, 0, -37], rotationY: ROT_RIGHT, size: 2.8 },
-  { model: 'bench', position: [-2.8, 0, -34], rotationY: ROT_LEFT, size: 1.7 },
-  { model: 'bench', position: [2.8, 0, -35], rotationY: ROT_RIGHT, size: 1.7 },
-  { model: 'stool', position: [-2.2, 0, -36], rotationY: 0, size: 0.7 },
-  { model: 'stool', position: [2.2, 0, -33], rotationY: 0, size: 0.7 },
+  // The bend — big-top blocks the plaza
+  { model: 'tentLarge', position: [-6, 0, -20], rotationY: 2.3, size: 4.8, warm: true },
 
-  // ── Plaza — rides ring the centre ──
-  { model: 'ferrisWheel', position: [0, 0, -60], rotationY: 0, size: 17 },
-  { model: 'merryGoRound', position: [7, 0, -52], rotationY: face(7, -52), size: 5.4, warm: true },
-  { model: 'teacupRide', position: [-7, 0, -52], rotationY: face(-7, -52), size: 4.2, warm: true },
-  { model: 'swingRide', position: [12, 0, -56], rotationY: face(12, -56), size: 6.5 },
-  { model: 'bumperCars', position: [-12, 0, -56], rotationY: face(-12, -56), size: 5.5 },
+  // Food corridor (road z≈-24)
+  { model: 'cartCandyfloss', position: [-12, 0, -20], rotationY: Math.PI, size: 1.9, warm: true },
+  { model: 'hotdog', position: [-20, 0, -20], rotationY: Math.PI, size: 1.7, warm: true },
+  { model: 'wagonCage', position: [-12, 0, -28], rotationY: 0, size: 3.2 },
+  { model: 'dunkTank', position: [-20, 0, -28], rotationY: 0, size: 2.8 },
+  { model: 'bleachers', position: [-27, 0, -28], rotationY: 0, size: 4.2 },
+
+  // Plaza — rides ring the centre
+  { model: 'ferrisWheel', position: [-46, 0, -24], rotationY: face(-46, -24), size: 17 },
   {
-    model: 'bouncyCastle',
-    position: [-11, 0, -45],
-    rotationY: face(-11, -45),
-    size: 4.6,
+    model: 'merryGoRound',
+    position: [-37, 0, -31],
+    rotationY: face(-37, -31),
+    size: 5,
     warm: true,
   },
-  { model: 'bleachers', position: [11, 0, -45], rotationY: face(11, -45), size: 4.2 },
-  { model: 'train', position: [4, 0, -65], rotationY: 0, size: 4.4 },
-  { model: 'trainCarriage', position: [7.6, 0, -65], rotationY: 0, size: 3.6 },
+  {
+    model: 'teacupRide',
+    position: [-37, 0, -17],
+    rotationY: face(-37, -17),
+    size: 4.2,
+    warm: true,
+  },
+  { model: 'swingRide', position: [-44, 0, -31], rotationY: face(-44, -31), size: 6.5 },
+  { model: 'bumperCars', position: [-44, 0, -17], rotationY: face(-44, -17), size: 5.5 },
+  {
+    model: 'bouncyCastle',
+    position: [-30, 0, -18],
+    rotationY: face(-30, -18),
+    size: 4.4,
+    warm: true,
+  },
 
-  // ── Stall interiors — prizes & food on the counters (toward the road) ──
-  { model: 'plushiesPinned', position: [-4.2, 1.2, -8], rotationY: ROT_LEFT, size: 1.0 },
-  { model: 'plushies', position: [-4.3, 0.9, -7.6], rotationY: ROT_LEFT, size: 0.8 },
-  { model: 'plushiesHanging', position: [-4.2, 1.4, -20], rotationY: ROT_LEFT, size: 1.2 },
-  { model: 'bowlingPin', position: [-4.3, 0.9, -26], rotationY: ROT_LEFT, size: 0.5 },
-  { model: 'plushies2', position: [4.2, 1.3, -14], rotationY: ROT_RIGHT, size: 1.2 },
-  { model: 'plushiesPinned', position: [4.2, 1.2, -20], rotationY: ROT_RIGHT, size: 1.0 },
-  { model: 'burger', position: [8.5, 1.05, -11], rotationY: ROT_RIGHT, size: 0.5 },
-  { model: 'donut', position: [8.6, 1.05, -11.4], rotationY: ROT_RIGHT, size: 0.4 },
+  // Stall interiors — prizes/food on the counters (toward the road)
+  { model: 'plushiesPinned', position: [-4.2, 1.2, -7], rotationY: ROT_LEFT, size: 1.0 },
+  { model: 'plushies', position: [-4.3, 0.9, -7.5], rotationY: ROT_LEFT, size: 0.8 },
+  { model: 'plushiesHanging', position: [-4.2, 1.4, -17], rotationY: ROT_LEFT, size: 1.2 },
+  { model: 'plushies2', position: [4.2, 1.3, -12], rotationY: ROT_RIGHT, size: 1.2 },
+  { model: 'bowlingPin', position: [4.3, 0.9, -17], rotationY: ROT_RIGHT, size: 0.5 },
+  { model: 'burger', position: [8.5, 1.05, -9], rotationY: ROT_RIGHT, size: 0.5 },
+  { model: 'donut', position: [8.6, 1.05, -9.4], rotationY: ROT_RIGHT, size: 0.4 },
 ];
 
-/* ── Dense dressing (high tier): row-gap fillers + foliage frame ─────────── */
+/* ── Life-like scatter zones (high tier) ────────────────────────────────── */
+
+const TREES: ModelKey[] = ['tree1', 'tree2', 'tree3', 'tree4'];
+const PUMPKINS: ModelKey[] = ['pumpkin1', 'pumpkin2', 'pumpkin3'];
+const ROCKS: ModelKey[] = ['rocks', 'rocks2'];
+
+/**
+ * A natural little zone you'd find around a fairground: a tree with a rock pile,
+ * pumpkins nestled at its foot, a bench or hay to sit, and fallen leaves. `i`
+ * varies species/arrangement deterministically.
+ */
+function scatterCluster(cx: number, cz: number, i: number): Placement[] {
+  const s = i % 2 ? 1 : -1;
+  return [
+    { model: TREES[i % 4], position: [cx, 0, cz], rotationY: i * 0.7, size: 6 + (i % 3) },
+    { model: ROCKS[i % 2], position: [cx + 1.6 * s, 0, cz + 0.5], rotationY: i, size: 1.5 },
+    {
+      model: ROCKS[(i + 1) % 2],
+      position: [cx - 1.1 * s, 0, cz + 1.1],
+      rotationY: i * 1.3,
+      size: 1.0,
+    },
+    { model: PUMPKINS[i % 3], position: [cx + 0.8 * s, 0, cz - 1.0], rotationY: i, size: 0.7 },
+    {
+      model: PUMPKINS[(i + 1) % 3],
+      position: [cx + 1.3 * s, 0, cz - 0.6],
+      rotationY: i * 2,
+      size: 0.6,
+    },
+    {
+      model: i % 2 ? 'bench' : 'hayBale',
+      position: [cx - 1.8 * s, 0, cz - 0.4],
+      rotationY: i + 1,
+      size: i % 2 ? 1.7 : 0.9,
+    },
+    { model: 'leafPile', position: [cx + 0.2 * s, 0, cz + 0.4], rotationY: i, size: 1.5 },
+    ...(i % 3 === 0
+      ? [
+          {
+            model: 'bush' as ModelKey,
+            position: [cx + 2.2 * s, 0, cz - 1.4] as Vec3,
+            rotationY: i,
+            size: 1.3,
+          },
+        ]
+      : []),
+  ];
+}
+
+const CLUSTER_SPOTS: [number, number][] = [
+  // games field edges
+  [-13, -3],
+  [13, -6],
+  [-13, -13],
+  [13, -14],
+  [-14, -19],
+  // food field edges
+  [-16, -17],
+  [-25, -18],
+  [-15, -32],
+  [-24, -33],
+  [-31, -30],
+  // plaza perimeter
+  [-49, -19],
+  [-46, -33],
+  [-29, -12],
+  [-37, -35],
+];
+
+/** Per games-stall autumn dressing: pumpkin + hay at the base, crate at the corner, leaves on the verge. */
+const STALL_DRESSING: Placement[] = [
+  [-5, -7],
+  [-5, -12],
+  [-5, -17],
+  [5, -7],
+  [5, -12],
+  [5, -17],
+].flatMap(([x, z], i): Placement[] => {
+  const s = Math.sign(x);
+  return [
+    { model: PUMPKINS[i % 3], position: [x - s * 0.7, 0, z + 0.7], rotationY: i, size: 0.7 },
+    { model: 'hayBale', position: [x - s * 0.4, 0, z - 0.8], rotationY: i, size: 0.85 },
+    {
+      model: i % 2 ? 'crate1' : 'crate2',
+      position: [x + s * 0.5, 0, z + 1.2],
+      rotationY: i,
+      size: 0.9,
+    },
+    { model: 'leafPile', position: [x - s * 1.7, 0, z], rotationY: i, size: 1.2 },
+  ];
+});
 
 const FILLERS: Placement[] = [
-  // tucked into the gaps between stalls in each row
-  { model: 'crate1', position: [-5.3, 0, -11], rotationY: 0.3, size: 0.9 },
-  { model: 'barrel', position: [-5.3, 0, -17], rotationY: 0, size: 0.9 },
-  { model: 'bin', position: [-5.3, 0, -23], rotationY: 0, size: 1.0 },
-  { model: 'crate2', position: [5.3, 0, -11], rotationY: -0.3, size: 0.9 },
-  { model: 'barrel', position: [5.3, 0, -17], rotationY: 0, size: 0.9 },
-  { model: 'bin', position: [5.3, 0, -23], rotationY: 0, size: 1.0 },
-  { model: 'generator', position: [-9.6, 0, -33], rotationY: 0.5, size: 1.3 },
-  { model: 'generator', position: [9.6, 0, -33], rotationY: -0.5, size: 1.3 },
-  { model: 'hayBale', position: [-3.2, 0, -39], rotationY: 0.3, size: 0.9 },
-  { model: 'hayBale', position: [3.2, 0, -40], rotationY: 0, size: 0.9 },
-  { model: 'crate1', position: [-3, 0, -44], rotationY: 0.6, size: 0.9 },
-  { model: 'barrel', position: [3, 0, -45], rotationY: 0, size: 0.9 },
-  { model: 'speaker', position: [-9, 0, -48], rotationY: 0.6, size: 1.1 },
-  { model: 'speaker', position: [9, 0, -48], rotationY: -0.6, size: 1.1 },
-  { model: 'spotlight', position: [-12.5, 0, -42], rotationY: 0.4, size: 1.4 },
-  { model: 'spotlight', position: [12.5, 0, -42], rotationY: -0.4, size: 1.4 },
+  { model: 'barrel', position: [-6.4, 0, -10], rotationY: 0, size: 0.9 },
+  { model: 'bin', position: [6.4, 0, -10], rotationY: 0, size: 1.0 },
+  { model: 'generator', position: [10.4, 0, -12], rotationY: 0.4, size: 1.3 },
+  { model: 'barrel', position: [-13.5, 0, -24], rotationY: 0, size: 0.9 },
+  { model: 'crate1', position: [-22.5, 0, -24], rotationY: 0.5, size: 0.9 },
+  // food picnic seating cluster
+  { model: 'haySeat', position: [-16, 0, -24], rotationY: 0.4, size: 1.2 },
+  { model: 'stool', position: [-15, 0, -23], rotationY: 0, size: 0.7 },
+  { model: 'bench', position: [-18, 0, -23.4], rotationY: Math.PI, size: 1.7 },
+  { model: 'pumpkin1', position: [-17, 0, -25], rotationY: 0, size: 0.7 },
+  // plaza centre autumn feature + seating ring
+  { model: 'hayBale', position: [-36, 0, -24], rotationY: 0, size: 0.9 },
+  { model: 'pumpkin2', position: [-37.6, 0, -24], rotationY: 0, size: 0.7 },
+  { model: 'bench', position: [-34, 0, -24], rotationY: face(-34, -24), size: 1.7 },
+  { model: 'bench', position: [-40, 0, -25], rotationY: face(-40, -25), size: 1.7 },
   { model: 'balloon', position: [2.7, 0, -4], rotationY: 0, size: 1.6 },
-  { model: 'balloon', position: [-2.9, 0, -28], rotationY: 0, size: 1.5 },
-  { model: 'balloon', position: [-4.5, 0, -45], rotationY: 0, size: 1.5 },
-  { model: 'balloon', position: [4.5, 0, -46], rotationY: 0, size: 1.6 },
+  { model: 'balloon', position: [-2.9, 0, -19], rotationY: 0, size: 1.5 },
+  { model: 'balloon', position: [-30, 0, -27], rotationY: 0, size: 1.5 },
 ];
 
-/* Foliage frame — dense tree line lining the whole fairway, both sides. */
-const FOLIAGE: Placement[] = (() => {
+/** Stones, fallen leaves and grass tufts scattered over the gravel for texture + life. */
+const GROUND_SCATTER: Placement[] = (() => {
   const out: Placement[] = [];
-  const trees: ModelKey[] = ['tree1', 'tree2', 'tree3', 'tree4'];
+  const stone = (i: number): ModelKey => (i % 2 ? 'rocks' : 'rocks2');
   let i = 0;
-  for (let z = 0; z >= -68; z -= 6.5) {
-    out.push({
-      model: trees[i % 4],
-      position: [-15 - (i % 2), 0, z],
-      rotationY: i * 0.6,
-      size: 6.5 + (i % 3),
-    });
-    out.push({
-      model: trees[(i + 2) % 4],
-      position: [15 + (i % 2), 0, z - 3],
-      rotationY: i * 0.9,
-      size: 6.5 + ((i + 1) % 3),
-    });
-    i++;
+  for (let z = -4; z >= -19; z -= 2.4, i++) {
+    out.push({ model: stone(i), position: [-3.6, 0, z], rotationY: i, size: 0.5 });
+    out.push({ model: 'grassPatch', position: [3.4, 0, z + 1.2], rotationY: 0, size: 0.8 });
+    if (i % 2) out.push({ model: 'leafPile', position: [3.0, 0, z - 1], rotationY: i, size: 0.8 });
   }
-  // inner verge: bushes / flowers / rocks softening the row-to-treeline gap
-  const verge: Placement[] = [
-    { model: 'bush', position: [-11, 0, -14], rotationY: 0, size: 1.4 },
-    { model: 'bush2', position: [11, 0, -18], rotationY: 1, size: 1.5 },
-    { model: 'bush', position: [-11, 0, -34], rotationY: 2, size: 1.4 },
-    { model: 'bush2', position: [11, 0, -38], rotationY: 0.5, size: 1.5 },
-    { model: 'rocks', position: [-12, 0, -26], rotationY: 0.8, size: 1.4 },
-    { model: 'rocks2', position: [12, 0, -28], rotationY: 2.2, size: 1.4 },
-    { model: 'flowers', position: [-7.5, 0, -30], rotationY: 0, size: 1.0 },
-    { model: 'sunflower', position: [7.5, 0, -30], rotationY: 0, size: 1.2 },
-    { model: 'grassPatch', position: [-8, 0, -42], rotationY: 0, size: 1.6 },
-    { model: 'grassPatch', position: [8, 0, -43], rotationY: 0, size: 1.6 },
-    { model: 'rocks', position: [10, 0, -58], rotationY: 1, size: 1.5 },
-    { model: 'rocks2', position: [-10, 0, -60], rotationY: 2, size: 1.5 },
-  ];
-  return [...out, ...verge];
+  for (let x = -8; x >= -30; x -= 3, i++) {
+    out.push({ model: stone(i), position: [x, 0, -21.5], rotationY: i, size: 0.55 });
+    out.push({ model: 'grassPatch', position: [x + 1, 0, -26.5], rotationY: 0, size: 0.8 });
+    out.push({ model: 'leafPile', position: [x - 1, 0, -22], rotationY: i, size: 0.8 });
+  }
+  for (let a = 0; a < 8; a++) {
+    const t = (a / 8) * Math.PI * 2;
+    out.push({
+      model: stone(a),
+      position: [-37 + Math.cos(t) * 6, 0, -24 + Math.sin(t) * 6],
+      rotationY: a,
+      size: 0.5,
+    });
+  }
+  return out;
 })();
 
-export const DENSE_PLACEMENTS: Placement[] = [...FILLERS, ...FOLIAGE];
-
-/** Overhead bunting spanning the road at regular intervals. */
-export const FLAG_PLACEMENTS: Placement[] = [
-  { model: 'flags', position: [0, 3.2, -6], rotationY: 0, size: 4.5 },
-  { model: 'flags', position: [0, 3.2, -14], rotationY: 0, size: 4.5 },
-  { model: 'flags', position: [0, 3.2, -22], rotationY: 0, size: 4.5 },
-  { model: 'flags', position: [0, 3.2, -30], rotationY: 0, size: 4.5 },
-  { model: 'flags', position: [0, 4.0, -44], rotationY: 0, size: 7 },
+export const DENSE_PLACEMENTS: Placement[] = [
+  ...CLUSTER_SPOTS.flatMap(([x, z], i) => scatterCluster(x, z, i)),
+  ...STALL_DRESSING,
+  ...GROUND_SCATTER,
+  ...FILLERS,
 ];
+
+/* ── Lighting fixtures ──────────────────────────────────────────────────── */
 
 export interface Lamp {
   position: Vec3;
   lit?: boolean;
 }
 
-/** Lamp posts marching down both road edges at a regular cadence. */
-export const LAMP_PLACEMENTS: Lamp[] = [-6, -14, -22, -30, -38].flatMap((z, i) => [
-  { position: [-5.7, 0, z] as Vec3, lit: i % 2 === 0 },
-  { position: [5.7, 0, z] as Vec3, lit: i % 2 === 1 },
-]);
+/** Lamp posts down both road legs + a plaza ring; lit ones cast warm pools on the gravel. */
+export const LAMP_PLACEMENTS: Lamp[] = [
+  // games corridor edges
+  ...[-6, -12, -18].flatMap((z, i): Lamp[] => [
+    { position: [-5.7, 0, z], lit: i % 2 === 0 },
+    { position: [5.7, 0, z], lit: i % 2 === 1 },
+  ]),
+  // food corridor edges
+  ...[-12, -20, -28].flatMap((x, i): Lamp[] => [
+    { position: [x, 0, -21], lit: i % 2 === 0 },
+    { position: [x, 0, -27.5], lit: i % 2 === 1 },
+  ]),
+  // plaza ring
+  ...[0, 1, 2, 3, 4, 5].map((a): Lamp => {
+    const t = (a / 6) * Math.PI * 2;
+    return { position: [-37 + Math.cos(t) * 9.5, 0, -24 + Math.sin(t) * 9.5], lit: a % 2 === 0 };
+  }),
+];
 
 export const LAMP_SIZE = 3.6;
 export const LAMP_BULB_Y = 3.1;
 
-/** Fence segments lining the road edges through the avenue (high tier only). */
+/** Warm hanging lanterns at the bend + a couple of clusters (glow + small pool). */
+export const LANTERN_PLACEMENTS: Vec3[] = [
+  [-3, 0, -21],
+  [-16, 0, -22],
+  [-37, 0, -24],
+];
+
+/** Overhead bunting + string lights spanning each road leg. */
+export const FLAG_PLACEMENTS: Placement[] = [
+  { model: 'flags', position: [0, 3.2, -6], rotationY: 0, size: 4.5 },
+  { model: 'flags', position: [0, 3.2, -13], rotationY: 0, size: 4.5 },
+  { model: 'flags', position: [-12, 3.2, -24], rotationY: ROT_LEFT, size: 4.5 },
+  { model: 'flags', position: [-22, 3.2, -24], rotationY: ROT_LEFT, size: 4.5 },
+];
+
+/** Fence segments lining the games-corridor edges (high tier only). */
 export const FENCE_PLACEMENTS: Placement[] = (() => {
   const out: Placement[] = [];
-  for (let z = -3; z >= -30; z -= 2.2) {
+  for (let z = -3; z >= -19; z -= 2.2) {
     out.push({ model: 'fence', position: [-6.6, 0, z], rotationY: ROT_LEFT, size: 2.3 });
     out.push({ model: 'fence', position: [6.6, 0, z], rotationY: ROT_RIGHT, size: 2.3 });
   }

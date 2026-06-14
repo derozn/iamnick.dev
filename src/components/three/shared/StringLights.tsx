@@ -2,31 +2,56 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Color, InstancedMesh, Object3D } from 'three';
 
+import { type Vec3 } from '../carnival.config';
+
 /**
  * StringLights — strands of glowing bulbs slung across the carnival in catenary
- * sags, the classic fairground overhead. One InstancedMesh (one draw call) of
- * emissive (toneMapped-off) bulbs that Bloom blooms; colours cycle warm / cyan /
- * magenta / amber. Bulbs **twinkle** — a gentle per-bulb brightness flicker — so
- * the carnival reads as alive (only animates while the frameloop runs, i.e. on
- * the high tier; cheap, no real lights).
+ * sags, following both legs of the dog-leg and across the plaza. One
+ * InstancedMesh (one draw call) of emissive (toneMapped-off) bulbs that Bloom
+ * blooms; warm-dominant palette with cool/neon accents. Bulbs **twinkle** (gentle
+ * per-bulb flicker) so the carnival reads as alive (animates on the high tier).
  */
 
-interface Strand {
-  z: number;
-  span: number; // x from −span/2 to +span/2
-  y: number;
-  bulbs: number;
-}
-
-const STRANDS: Strand[] = [
-  { z: -7, span: 11, y: 3.4, bulbs: 12 },
-  { z: -16, span: 11, y: 3.4, bulbs: 12 },
-  { z: -25, span: 12, y: 3.5, bulbs: 13 },
-  { z: -34, span: 18, y: 3.9, bulbs: 18 },
-  { z: -46, span: 20, y: 4.0, bulbs: 20 },
-  { z: -56, span: 16, y: 3.9, bulbs: 16 },
+/** Each strand = endpoints [a, b]; bulbs hang between them with a sag. */
+const STRANDS: [Vec3, Vec3][] = [
+  // games corridor (across the road)
+  [
+    [-6, 3.4, -7],
+    [6, 3.4, -7],
+  ],
+  [
+    [-6, 3.4, -13],
+    [6, 3.4, -13],
+  ],
+  [
+    [-6, 3.4, -19],
+    [6, 3.4, -19],
+  ],
+  // food corridor (along the road, hung across)
+  [
+    [-12, 3.5, -20],
+    [-12, 3.5, -28],
+  ],
+  [
+    [-20, 3.5, -20],
+    [-20, 3.5, -28],
+  ],
+  [
+    [-28, 3.6, -20],
+    [-28, 3.6, -28],
+  ],
+  // plaza (radiating across the open circle)
+  [
+    [-46, 4.2, -24],
+    [-28, 4.2, -24],
+  ],
+  [
+    [-37, 4.2, -32],
+    [-37, 4.2, -16],
+  ],
 ];
-const COLORS = ['#ffd9a0', '#7fe9ff', '#ff8fd6', '#ffb060'];
+const COLORS = ['#ffd9a0', '#ffc070', '#7fe9ff', '#ff8fd6', '#ffe6b0'];
+const BULBS_PER = 13;
 const SAG = 0.7;
 
 const dummy = new Object3D();
@@ -36,20 +61,19 @@ export function StringLights() {
   const ref = useRef<InstancedMesh>(null);
 
   const { positions, baseColors, phases, count } = useMemo(() => {
-    const positions: [number, number, number][] = [];
+    const positions: Vec3[] = [];
     const baseColors: Color[] = [];
     const phases: number[] = [];
-    let k = 0;
-    STRANDS.forEach((s) => {
-      for (let i = 0; i < s.bulbs; i++) {
-        const t = i / (s.bulbs - 1);
-        const x = -s.span / 2 + t * s.span;
-        const y = s.y - SAG * Math.sin(t * Math.PI); // catenary-ish sag
-        positions.push([x, y, s.z]);
-        baseColors.push(new Color(COLORS[(k + i) % COLORS.length]));
-        phases.push((k * 1.7 + i * 0.9) % (Math.PI * 2));
+    STRANDS.forEach(([a, b], s) => {
+      for (let i = 0; i < BULBS_PER; i++) {
+        const t = i / (BULBS_PER - 1);
+        const x = a[0] + (b[0] - a[0]) * t;
+        const z = a[2] + (b[2] - a[2]) * t;
+        const y = a[1] + (b[1] - a[1]) * t - SAG * Math.sin(t * Math.PI);
+        positions.push([x, y, z]);
+        baseColors.push(new Color(COLORS[(s * 2 + i) % COLORS.length]));
+        phases.push((s * 1.7 + i * 0.9) % (Math.PI * 2));
       }
-      k++;
     });
     return { positions, baseColors, phases, count: positions.length };
   }, []);
@@ -72,7 +96,7 @@ export function StringLights() {
     if (!mesh || !mesh.instanceColor) return;
     const t = state.clock.elapsedTime;
     for (let i = 0; i < count; i++) {
-      const f = 0.78 + 0.22 * Math.sin(t * 2.2 + phases[i]);
+      const f = 0.8 + 0.2 * Math.sin(t * 2.2 + phases[i]);
       tmp.copy(baseColors[i]).multiplyScalar(f);
       mesh.setColorAt(i, tmp);
     }
