@@ -2,9 +2,33 @@
 
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useGLTF } from '@react-three/drei';
-import { type BufferGeometry, InstancedMesh, type Material, Matrix4, type Mesh } from 'three';
+import {
+  type BufferGeometry,
+  Color,
+  InstancedMesh,
+  type Material,
+  Matrix4,
+  type Mesh,
+  type MeshStandardMaterial,
+  type Texture,
+} from 'three';
 
 import { CM, unityTRS } from './conversion';
+
+const WHITE = new Color('#ffffff');
+
+/** Wire the shared Synty emissive atlas onto a material so its neon pixels glow + bloom. */
+function applyEmissive(mat: Material | Material[], tex: Texture, intensity: number) {
+  for (const m of Array.isArray(mat) ? mat : [mat]) {
+    const sm = m as MeshStandardMaterial;
+    if (!sm.emissiveMap) {
+      sm.emissive = WHITE;
+      sm.emissiveMap = tex;
+      sm.emissiveIntensity = intensity;
+      sm.needsUpdate = true;
+    }
+  }
+}
 
 const cmScale = new Matrix4().makeScale(CM, CM, CM);
 
@@ -20,7 +44,19 @@ interface SubMesh {
  * sharing the prefab's instance list, so the whole demo (2.8k props) draws in a
  * few hundred calls instead of thousands of clones.
  */
-export function InstancedPrefab({ url, transforms }: { url: string; transforms: number[][] }) {
+interface InstancedPrefabProps {
+  url: string;
+  transforms: number[][];
+  emissive?: Texture;
+  emissiveIntensity?: number;
+}
+
+export function InstancedPrefab({
+  url,
+  transforms,
+  emissive,
+  emissiveIntensity = 1.8,
+}: InstancedPrefabProps) {
   const { scene } = useGLTF(url, true);
 
   const subs = useMemo<SubMesh[]>(() => {
@@ -29,6 +65,7 @@ export function InstancedPrefab({ url, transforms }: { url: string; transforms: 
     scene.traverse((o) => {
       const m = o as Mesh;
       if (m.isMesh && m.geometry) {
+        if (emissive) applyEmissive(m.material, emissive, emissiveIntensity);
         out.push({
           geometry: m.geometry,
           material: m.material,
@@ -37,7 +74,7 @@ export function InstancedPrefab({ url, transforms }: { url: string; transforms: 
       }
     });
     return out;
-  }, [scene]);
+  }, [scene, emissive, emissiveIntensity]);
 
   return (
     <>

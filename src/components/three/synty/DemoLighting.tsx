@@ -14,13 +14,14 @@ import { useMemo } from 'react';
 const warmPositions = (() => {
   const data = demoInstances as Record<string, number[][]>;
   const lit = [
-    ...(data['SM_Prop_Light_01'] ?? []),
-    ...(data['SM_Prop_Light_02'] ?? []),
-    ...(data['SM_Prop_Light_03'] ?? []),
-    ...(data['SM_Prop_Lamp_01'] ?? []),
-    ...(data['SM_Prop_Lantern_01'] ?? []),
-    ...(data['SM_Prop_Lamp_Post_01'] ?? []),
-  ];
+    'SM_Prop_Light_01',
+    'SM_Prop_Light_02',
+    'SM_Prop_Light_03',
+    'SM_Prop_Light_04',
+    'SM_Prop_Light_05',
+    'SM_Prop_Light_Pole_01',
+    'SM_Prop_Lamp_Post_02',
+  ].flatMap((n) => data[n] ?? []);
   const m = new Matrix4();
   const v = new Vector3();
   return lit.map((t) => {
@@ -44,19 +45,22 @@ export function DemoLighting({ warmCap = 22 }: { warmCap?: number }) {
 
   return (
     <>
-      <hemisphereLight args={['#33485f', '#0c0b09', 1.0]} />
-      <ambientLight intensity={0.28} color="#16202f" />
-      <directionalLight position={[60, 95, 42]} intensity={1.7} color="#8c9fd6" />
-      <directionalLight position={[-55, 55, -42]} intensity={0.78} color="#8c9fd6" />
+      {/* Neon-night base — readable at ground level, low enough that glows pop */}
+      <hemisphereLight args={['#28365e', '#0b0a10', 0.9]} />
+      <ambientLight intensity={0.32} color="#1a1636" />
+      <directionalLight position={[40, 90, 50]} intensity={0.95} color="#8b96d8" />
+      <directionalLight position={[-50, 45, -40]} intensity={0.4} color="#9a6cff" />
 
+      {/* Warm carnival glows at the demo's light props */}
       {warm.map((p, i) => (
-        <pointLight key={i} position={p} color="#e87d1d" intensity={6} distance={6} decay={2} />
+        <pointLight key={i} position={p} color="#ff9a3c" intensity={9} distance={7} decay={2} />
       ))}
 
-      {/* neon ride accents near the core */}
-      <pointLight position={[-6, 8, 4]} color="#11b3d4" intensity={20} distance={22} decay={1.6} />
-      <pointLight position={[8, 6, -4]} color="#d41e11" intensity={14} distance={18} decay={1.7} />
-      <pointLight position={[2, 6, 10]} color="#eeb968" intensity={10} distance={16} decay={1.7} />
+      {/* Vivid neon ride accents near the core */}
+      <pointLight position={[-6, 8, 4]} color="#22d3ee" intensity={28} distance={26} decay={1.5} />
+      <pointLight position={[9, 7, -5]} color="#ff2d6e" intensity={20} distance={22} decay={1.6} />
+      <pointLight position={[2, 6, 12]} color="#b06cff" intensity={16} distance={20} decay={1.6} />
+      <pointLight position={[14, 6, 6]} color="#ffb84d" intensity={12} distance={18} decay={1.7} />
     </>
   );
 }

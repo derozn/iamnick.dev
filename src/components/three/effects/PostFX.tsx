@@ -1,14 +1,13 @@
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 
 /**
- * PostFX — conservative bloom pass picking up the neon trim, neon Text3D signs,
- * and accent point lights. Mounted only on the 'high' quality tier (CarnivalStreet
- * gates it).
+ * PostFX — bloom pass that makes the Synty emissive atlas (bulbs, neon signs,
+ * ride trim) and the neon accent lights glow. High tier only.
  */
 export function PostFX() {
   return (
     <EffectComposer>
-      <Bloom mipmapBlur intensity={0.85} luminanceThreshold={0.6} luminanceSmoothing={0.32} />
+      <Bloom mipmapBlur intensity={1.1} luminanceThreshold={0.5} luminanceSmoothing={0.3} />
     </EffectComposer>
   );
 }

@@ -8,14 +8,15 @@ import { ScrollDriver } from './ScrollDriver';
 import { SyntyScene } from './synty/SyntyScene';
 import { SyntyCamera } from './synty/SyntyCamera';
 import { DemoLighting } from './synty/DemoLighting';
+import { PostFX } from './effects/PostFX';
 import { type QualityTier } from './hooks/useQualityTier';
 
 interface SceneProps {
   tier: Exclude<QualityTier, 'none'>;
 }
 
-/* Demo fog/background, translated from Demo.unity RenderSettings. */
-const FOG = '#324566';
+/* Deep neon-night — the demo geometry, our Dark Carnival mood over it. */
+const FOG = '#0e0b1c';
 
 /**
  * Scene — the single persistent R3F canvas: a faithful translation of the Synty
@@ -31,20 +32,22 @@ export default function Scene({ tier }: SceneProps) {
         antialias: false,
         powerPreference: 'high-performance',
         toneMapping: AgXToneMapping,
-        toneMappingExposure: 1.25,
+        toneMappingExposure: 1.45,
       }}
       camera={{ fov: 60, near: 0.3, far: 800, position: [50, 40, 60] }}
     >
       <color attach="background" args={[FOG]} />
-      <fogExp2 attach="fog" args={[FOG, 0.014]} />
+      <fogExp2 attach="fog" args={[FOG, 0.011]} />
 
-      <DemoLighting warmCap={tier === 'high' ? 26 : 12} />
+      <DemoLighting warmCap={tier === 'high' ? 40 : 16} />
       <ScrollDriver />
       <SyntyCamera />
 
       <Suspense fallback={null}>
         <SyntyScene />
       </Suspense>
+
+      {tier === 'high' && <PostFX />}
     </Canvas>
   );
 }
