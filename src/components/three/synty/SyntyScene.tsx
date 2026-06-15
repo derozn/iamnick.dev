@@ -24,7 +24,7 @@ entries.forEach(([name]) => useGLTF.preload(`${SYNTY}${name}.glb`, true));
  * its authored position/rotation/scale, rendered instanced. The professional
  * arrangement, 1:1.
  */
-export function SyntyScene() {
+export function SyntyScene({ cullDist }: { cullDist?: number }) {
   // configure in the load callback (glTF UV convention + sRGB glow); mostly-black
   // map so non-neon pixels stay dark.
   const emissive = useTexture(`${SYNTY}emissive-atlas.png`, (t) => {
@@ -42,6 +42,7 @@ export function SyntyScene() {
           url={`${SYNTY}${name}.glb`}
           transforms={transforms}
           emissive={emissive}
+          cullDist={cullDist}
         />
       ))}
     </>

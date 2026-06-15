@@ -7,8 +7,7 @@ import { AgXToneMapping } from 'three';
 import { ScrollDriver } from './ScrollDriver';
 import { SyntyScene } from './synty/SyntyScene';
 import { SyntyCamera } from './synty/SyntyCamera';
-import { DemoLighting } from './synty/DemoLighting';
-import { AttractionLights } from './synty/AttractionLights';
+import { DynamicLights } from './synty/DynamicLights';
 import { AttractionMarkers } from './synty/AttractionMarkers';
 import { PostFX } from './effects/PostFX';
 import { type QualityTier } from './hooks/useQualityTier';
@@ -26,33 +25,39 @@ const FOG = '#0e0b1c';
  * revealed by a scroll-driven cinematic camera.
  */
 export default function Scene({ tier }: SceneProps) {
+  const high = tier === 'high';
+  // Tighter fog on weaker GPUs both clears visual clutter and lets us cull the
+  // props past it. cullDist is set just beyond where the fog reads near-opaque,
+  // so collapsed (culled) instances are never visibly missing.
+  const fogDensity = high ? 0.03 : 0.042;
+  const cullDist = high ? 62 : 46;
+
   return (
     <Canvas
       frameloop="demand"
-      dpr={tier === 'high' ? [1, 1.5] : [1, 1.25]}
+      dpr={high ? [1, 1.5] : [1, 1.25]}
       gl={{
         antialias: false,
         powerPreference: 'high-performance',
         toneMapping: AgXToneMapping,
         toneMappingExposure: 1.45,
       }}
-      camera={{ fov: 62, near: 0.3, far: 800, position: [-1.9, 3.4, -37] }}
+      camera={{ fov: 62, near: 0.3, far: 200, position: [-1.9, 3.4, -37] }}
     >
       <color attach="background" args={[FOG]} />
-      <fogExp2 attach="fog" args={[FOG, 0.011]} />
+      <fogExp2 attach="fog" args={[FOG, fogDensity]} />
 
-      <DemoLighting warmCap={tier === 'high' ? 20 : 8} />
-      {tier === 'high' && <AttractionLights />}
+      <DynamicLights pool={high ? 8 : 4} />
       <ScrollDriver />
       <SyntyCamera />
 
       <Suspense fallback={null}>
-        <SyntyScene />
+        <SyntyScene cullDist={cullDist} />
       </Suspense>
 
       <AttractionMarkers />
 
-      {tier === 'high' && <PostFX />}
+      {high && <PostFX />}
     </Canvas>
   );
 }

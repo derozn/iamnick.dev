@@ -1,6 +1,7 @@
 'use client';
 
 import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
 import {
   type BufferGeometry,
@@ -11,11 +12,13 @@ import {
   type Mesh,
   type MeshStandardMaterial,
   type Texture,
+  Vector3,
 } from 'three';
 
 import { CM, unityTRS } from './conversion';
 
 const WHITE = new Color('#ffffff');
+const ZERO = new Matrix4().makeScale(0, 0, 0); // collapsed = covers no pixels = ~free
 
 /** Wire the shared Synty emissive atlas onto a material so its neon pixels glow + bloom. */
 function applyEmissive(mat: Material | Material[], tex: Texture, intensity: number) {
@@ -43,12 +46,18 @@ interface SubMesh {
  * A prefab GLB may contain several sub-meshes; each becomes its own InstancedMesh
  * sharing the prefab's instance list, so the whole demo (2.8k props) draws in a
  * few hundred calls instead of thousands of clones.
+ *
+ * **Distance culling:** with `cullDist` set, instances past that radius from the
+ * camera are collapsed to a zero matrix (drawn but cover no pixels), so the fog's
+ * far edge isn't paying full fragment cost. Visibility is tracked per instance and
+ * the GPU buffer only re-uploads when something actually crosses the boundary.
  */
 interface InstancedPrefabProps {
   url: string;
   transforms: number[][];
   emissive?: Texture;
   emissiveIntensity?: number;
+  cullDist?: number;
 }
 
 export function InstancedPrefab({
@@ -56,6 +65,7 @@ export function InstancedPrefab({
   transforms,
   emissive,
   emissiveIntensity = 1.8,
+  cullDist,
 }: InstancedPrefabProps) {
   const { scene } = useGLTF(url, true);
 
@@ -76,38 +86,75 @@ export function InstancedPrefab({
     return out;
   }, [scene, emissive, emissiveIntensity]);
 
+  // Per-instance world matrices (one row per sub) + a shared prop-origin position
+  // (the transform's translation — submesh offsets are negligible at cull range).
+  const { mats, origin } = useMemo(() => {
+    const u = new Matrix4();
+    const origin = transforms.map((t) => {
+      unityTRS(t, u);
+      return new Vector3().setFromMatrixPosition(u);
+    });
+    const mats = subs.map((s) =>
+      transforms.map((t) => {
+        unityTRS(t, u);
+        return new Matrix4().multiplyMatrices(u, s.base);
+      }),
+    );
+    return { mats, origin };
+  }, [subs, transforms]);
+
+  const refs = useRef<(InstancedMesh | null)[]>([]);
+  const vis = useRef<Uint8Array>(new Uint8Array(0));
+  const lastCam = useRef(new Vector3(Infinity, 0, 0));
+
+  useLayoutEffect(() => {
+    vis.current = new Uint8Array(transforms.length).fill(1);
+    lastCam.current.set(Infinity, 0, 0);
+    subs.forEach((_, s) => {
+      const im = refs.current[s];
+      if (!im) return;
+      for (let i = 0; i < transforms.length; i++) im.setMatrixAt(i, mats[s][i]);
+      im.instanceMatrix.needsUpdate = true;
+    });
+  }, [subs, mats, transforms]);
+
+  useFrame(({ camera }) => {
+    if (!cullDist) return;
+    const cp = camera.position;
+    if (cp.distanceToSquared(lastCam.current) < 4) return; // only re-cull when the camera moves
+    lastCam.current.copy(cp);
+    const seen = vis.current;
+    const cd2 = cullDist * cullDist;
+    let changed = false;
+    for (let i = 0; i < origin.length; i++) {
+      const v = origin[i].distanceToSquared(cp) < cd2 ? 1 : 0;
+      if (v === seen[i]) continue;
+      seen[i] = v;
+      changed = true;
+      for (let s = 0; s < subs.length; s++) {
+        refs.current[s]?.setMatrixAt(i, v ? mats[s][i] : ZERO);
+      }
+    }
+    if (changed) {
+      for (let s = 0; s < subs.length; s++) {
+        const im = refs.current[s];
+        if (im) im.instanceMatrix.needsUpdate = true;
+      }
+    }
+  });
+
   return (
     <>
       {subs.map((s, i) => (
-        <Sub key={i} sub={s} transforms={transforms} />
+        <instancedMesh
+          key={i}
+          ref={(el) => {
+            refs.current[i] = el;
+          }}
+          args={[s.geometry, s.material as Material, transforms.length]}
+          frustumCulled={false}
+        />
       ))}
     </>
-  );
-}
-
-function Sub({ sub, transforms }: { sub: SubMesh; transforms: number[][] }) {
-  const ref = useRef<InstancedMesh>(null);
-
-  useLayoutEffect(() => {
-    const im = ref.current;
-    if (!im) return;
-    const u = new Matrix4();
-    const m = new Matrix4();
-    for (let i = 0; i < transforms.length; i++) {
-      unityTRS(transforms[i], u);
-      m.multiplyMatrices(u, sub.base);
-      im.setMatrixAt(i, m);
-    }
-    im.instanceMatrix.needsUpdate = true;
-  }, [sub, transforms]);
-
-  // frustumCulled off: per-prefab instance bounds are unreliable here (clusters span
-  // the whole scene); proper per-instance culling/LOD is for the dedicated perf task.
-  return (
-    <instancedMesh
-      ref={ref}
-      args={[sub.geometry, sub.material as Material, transforms.length]}
-      frustumCulled={false}
-    />
   );
 }
