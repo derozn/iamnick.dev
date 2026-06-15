@@ -8,7 +8,7 @@ import { ScrollDriver } from './ScrollDriver';
 import { SyntyScene } from './synty/SyntyScene';
 import { SyntyCamera } from './synty/SyntyCamera';
 import { DynamicLights } from './synty/DynamicLights';
-import { AttractionMarkers } from './synty/AttractionMarkers';
+import { AttractionOutlines } from './synty/AttractionOutlines';
 import { PostFX } from './effects/PostFX';
 import { type QualityTier } from './hooks/useQualityTier';
 
@@ -55,7 +55,7 @@ export default function Scene({ tier }: SceneProps) {
         <SyntyScene cullDist={cullDist} />
       </Suspense>
 
-      <AttractionMarkers />
+      <AttractionOutlines />
 
       {high && <PostFX />}
     </Canvas>
