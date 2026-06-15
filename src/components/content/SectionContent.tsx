@@ -98,6 +98,42 @@ function RolePanel({ role }: { role: Role }) {
   );
 }
 
+/** The single "Career" booth HUD — every role, newest first. */
+function Work() {
+  const ordered = [...roles].sort((a, b) => (a.start < b.start ? 1 : -1));
+  return (
+    <>
+      <Kicker>Where I&apos;ve worked</Kicker>
+      <h2 className="font-expressive text-[28px] font-semibold text-text-primary md:text-[34px]">
+        Career
+      </h2>
+      <div className="mt-6 divide-y divide-white/10">
+        {ordered.map((role) => (
+          <div key={role.id} className="py-6 first:pt-0">
+            <RolePanel role={role} />
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/** Optional carnival game stepped into from its stall (built in a later phase). */
+function Game({ title }: { title: string }) {
+  return (
+    <>
+      <Kicker>Step right up</Kicker>
+      <h2 className="font-expressive text-[28px] font-semibold text-text-primary md:text-[34px]">
+        {title}
+      </h2>
+      <p className="mt-5 max-w-prose text-[15px] leading-relaxed text-text-primary/85">
+        A playable carnival game is coming to this stall — knock the bottles down for a prize. Check
+        back soon.
+      </p>
+    </>
+  );
+}
+
 function Projects() {
   return (
     <>
@@ -179,8 +215,10 @@ function Contact() {
 export function SectionContent({ section }: { section: string }) {
   if (section === 'intro') return <Intro />;
   if (section === 'about') return <About />;
+  if (section === 'work') return <Work />;
   if (section === 'projects') return <Projects />;
   if (section === 'contact') return <Contact />;
+  if (section === 'game:ball-toss') return <Game title="Ball Toss" />;
   if (section.startsWith('role:')) {
     const role = roles.find((r) => r.id === section.slice(5));
     if (role) return <RolePanel role={role} />;

@@ -1,39 +1,61 @@
 /**
- * Attractions — CV content wired to **real demo structures along the gravel path**,
- * in walk order. The camera follows the dirt road north up the midway spine, then
- * curves north-west to the Ferris wheel finale, holding briefly at each structure.
+ * Attractions + the road the camera walks.
  *
- * Each attraction names the exact Synty prefab + its authored Unity transform, so
- * the clickable **neon outline** (AttractionOutlines) traces that model precisely —
- * no floating buttons or labels. Career Highlights = one structure per role,
- * earliest → present, lining the avenue.
+ * The camera follows **ROAD** — a polyline traced down the demo's gravel path, so
+ * it never cuts through props. It pauses at each attraction's `pathT` (a point on
+ * that road) and turns to face the structure's opening, the way you'd walk up to a
+ * tent in a game. Six stops in CV order: the entrance sign, then one structure per
+ * section (a single Work booth whose HUD lists every job), the optional ball-toss
+ * game, and the Ferris wheel finale where the road curves north-west.
  */
 export type V3 = [number, number, number];
+export type V2 = [number, number];
+
+/** Camera walking path (x, z) down the gravel road, south → north → NW to the wheel. */
+export const ROAD: V2[] = [
+  [-1.5, -37], // 0  intro (entrance)
+  [-1.5, -31], // 1
+  [-4, -26], // 2
+  [-8.5, -23], // 3  about (west tent)
+  [-4, -18], // 4
+  [-1.6, -13.5], // 5  work (roadside booth)
+  [-1.4, -8], // 6
+  [-2, -5.5], // 7  ball-toss game
+  [-2, 2], // 8
+  [-2.4, 6.5], // 9  projects (roadside stall)
+  [-4, 12], // 10
+  [-7, 18], // 11
+  [-11, 22.5], // 12
+  [-13.5, 24.5], // 13 contact (Ferris, NW)
+];
 
 export interface Attraction {
   id: string;
   title: string;
   section: string;
-  /** GLB key whose silhouette the neon outline traces. */
+  /** GLB key whose silhouette the neon glow traces. */
   prefab: string;
   /** Unity TRS [px,py,pz, qx,qy,qz,qw, sx,sy,sz] of the specific instance. */
   transform: number[];
-  /** Camera position on the gravel road when stopped here. */
-  cam: V3;
-  /** Camera look target (the structure). */
+  /** Position along ROAD (0..1) where the camera pauses for this stop. */
+  pathT: number;
+  /** Camera look target — the structure's opening, roughly mid-height. */
   look: V3;
 }
 
+const LAST = ROAD.length - 1;
+/** pathT for a stop sitting on ROAD waypoint `i`. */
+const at = (i: number) => i / LAST;
+
 export const ATTRACTIONS: Attraction[] = [
-  // Entrance arch — the opening shot (no name on the sign)
   {
     id: 'intro',
     title: 'Nick de Rozarieux',
     section: 'intro',
     prefab: 'SM_Prop_Carnival_Entrance_01',
     transform: [-1.77, 0.014, 30.719, 0, 0, 0, 1, 1, 1, 1],
-    cam: [-1.5, 3.4, -37],
-    look: [-1.77, 3.4, -30.7],
+    pathT: at(0),
+    look: [-1.8, 3.6, -30.7],
   },
   {
     id: 'about',
@@ -41,92 +63,43 @@ export const ATTRACTIONS: Attraction[] = [
     section: 'about',
     prefab: 'SM_Prop_Tent_01',
     transform: [-13.258, 0.156, 22.62, 0, 0.931, 0, 0.364, 1, 1, 1],
-    cam: [-1.5, 3.4, -25.5],
-    look: [-13.26, 2.8, -22.6],
-  },
-
-  // Career Highlights — earliest → present, one structure each, up the avenue
-  {
-    id: 'vitamin',
-    title: 'Vitamin London',
-    section: 'role:vitamin-london-fe',
-    prefab: 'SM_Prop_High_Striker_02',
-    transform: [1.174, 0.063, 15.403, 0, 0.707, 0, -0.707, 1, 1, 1],
-    cam: [-1.4, 3.4, -18.8],
-    look: [1.17, 3.0, -15.4],
+    pathT: at(3),
+    look: [-13.3, 3.0, -22.6],
   },
   {
-    id: 'arcadia',
-    title: 'Arcadia Group',
-    section: 'role:arcadia-senior',
+    id: 'work',
+    title: 'Career',
+    section: 'work',
     prefab: 'SM_Prop_Stall_01',
     transform: [1.3, 0.09, 12.53, 0, -0.732, 0, 0.682, 1, 1, 1],
-    cam: [-1.5, 3.4, -15.6],
-    look: [1.3, 2.6, -12.53],
+    pathT: at(5),
+    look: [1.3, 2.6, -12.5],
   },
   {
-    id: 'yoti',
-    title: 'Yoti',
-    section: 'role:yoti-senior-fe',
-    prefab: 'SM_Prop_Stall_02_Damaged_01',
-    transform: [1.294, 0.09, 8.438, 0, -0.707, 0, 0.707, 1, 1, 1],
-    cam: [-1.5, 3.4, -11.6],
-    look: [1.29, 2.6, -8.44],
+    id: 'ball-toss',
+    title: 'Ball Toss',
+    section: 'game:ball-toss',
+    prefab: 'SM_Prop_Milk_Bottle_Toss_Stand_01',
+    transform: [0.168, 1.04, -0.503, 0, -0.689, 0, 0.725, 1, 1, 1],
+    pathT: at(7),
+    look: [0.2, 1.7, 0.5],
   },
-  {
-    id: 'lyvly',
-    title: 'Lyvly',
-    section: 'role:lyvly-fullstack',
-    prefab: 'SM_Prop_Prize_Wheel_01',
-    transform: [1.487, 0.035, 2.721, 0, -0.143, 0, 0.99, 1, 1, 1],
-    cam: [-1.5, 3.4, -6.2],
-    look: [1.49, 2.6, -2.72],
-  },
-  {
-    id: 'gousto',
-    title: 'Gousto',
-    section: 'role:gousto-senior',
-    prefab: 'SM_Prop_High_Striker_01',
-    transform: [-6.689, 0.108, -5.366, 0, -0.089, 0, 0.996, 1, 1, 1],
-    cam: [-1.2, 3.4, 1.4],
-    look: [-6.69, 3.0, 5.37],
-  },
-  {
-    id: 'lick',
-    title: 'Lick',
-    section: 'role:lick-tech-lead',
-    prefab: 'SM_Prop_Stall_03',
-    transform: [-4.613, 0.184, -10.47, 0, 0.707, 0, 0.707, 1, 1, 1],
-    cam: [-1.6, 3.4, 6.6],
-    look: [-4.61, 2.6, 10.47],
-  },
-  {
-    id: 'travelex',
-    title: 'Travelex',
-    section: 'role:travelex-lead',
-    prefab: 'SM_Prop_Swinging_Chairs_01',
-    transform: [8.21, 0.21, -13.23, 0, 0, 0, 1, 1, 1, 1],
-    cam: [-0.8, 3.6, 9.4],
-    look: [8.21, 3.6, 13.23],
-  },
-
   {
     id: 'projects',
     title: 'Side Projects',
     section: 'projects',
-    prefab: 'SM_Prop_Dunk_Tank_01',
-    transform: [-10.205, 0.131, -18.103, 0, -0.81, 0, 0.586, 1, 1, 1],
-    cam: [-3.2, 3.4, 14.2],
-    look: [-10.21, 2.8, 18.1],
+    prefab: 'SM_Prop_Stall_03',
+    transform: [-4.613, 0.184, -10.47, 0, 0.707, 0, 0.707, 1, 1, 1],
+    pathT: at(9),
+    look: [-4.6, 2.6, 10.5],
   },
-  // finale: the road curves north-west to the lit Ferris wheel
   {
     id: 'contact',
     title: 'Contact',
     section: 'contact',
     prefab: 'SM_Prop_Ferris_Wheel_01',
     transform: [-22.16, 0.22, -28.6, 0, 0.312, 0, 0.95, 1, 1, 1],
-    cam: [-11, 4.4, 23.5],
-    look: [-22.16, 6.0, 28.6],
+    pathT: at(13),
+    look: [-22.16, 5.0, 28.6],
   },
 ];
