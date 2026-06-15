@@ -84,9 +84,9 @@ const CANDIDATES: Candidate[] = [
     distance: 18,
     decay: 1.6,
   })),
-  // a warm pool at every attraction so the stop the camera holds at always reads
+  // a warm pool at every point of interest so each structure reads when focused
   ...ATTRACTIONS.map((a) => ({
-    pos: new Vector3(a.look[0], a.look[1] + 2.6, a.look[2]),
+    pos: new Vector3(a.position[0], a.position[1] + 2.6, a.position[2]),
     color: WARM,
     intensity: 10,
     distance: 12,

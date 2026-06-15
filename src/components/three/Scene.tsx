@@ -4,12 +4,11 @@ import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { AgXToneMapping } from 'three';
 
-import { ScrollDriver } from './ScrollDriver';
 import { SyntyScene } from './synty/SyntyScene';
 import { AnimatedRides } from './synty/AnimatedRides';
-import { SyntyCamera } from './synty/SyntyCamera';
+import { IsoControls } from './synty/IsoControls';
+import { Indicators } from './synty/Indicators';
 import { DynamicLights } from './synty/DynamicLights';
-import { AttractionOutlines } from './synty/AttractionOutlines';
 import { PostFX } from './effects/PostFX';
 import { type QualityTier } from './hooks/useQualityTier';
 
@@ -21,21 +20,23 @@ interface SceneProps {
 const FOG = '#0e0b1c';
 
 /**
- * Scene — the single persistent R3F canvas: a faithful translation of the Synty
- * "POLYGON Horror Carnival" Demo scene (2.8k props, the demo's own lighting/fog),
- * revealed by a scroll-driven cinematic camera.
+ * Scene — the single persistent R3F canvas. A faithful translation of the Synty
+ * "POLYGON Horror Carnival" Demo scene, explored Bruno-Simon-style: a fixed
+ * isometric camera the visitor drags/zooms around, with floating indicators that
+ * fly the camera in to each structure's content.
  */
 export default function Scene({ tier }: SceneProps) {
   const high = tier === 'high';
-  // Tighter fog on weaker GPUs both clears visual clutter and lets us cull the
-  // props past it. cullDist is set just beyond where the fog reads near-opaque,
-  // so collapsed (culled) instances are never visibly missing.
-  const fogDensity = high ? 0.03 : 0.042;
-  const cullDist = high ? 62 : 46;
+  // Light atmospheric fog only — the iso overview needs to read the whole scene
+  // (no per-instance distance culling here; the camera sees everything).
+  const fogDensity = high ? 0.01 : 0.016;
 
   return (
     <Canvas
-      frameloop="demand"
+      // Bloom's EffectComposer flickers to black between invalidations under the
+      // demand loop while the camera moves, so render continuously where bloom is
+      // on (high tier). Low tier has no bloom — keep demand to save power.
+      frameloop={high ? 'always' : 'demand'}
       dpr={high ? [1, 1.5] : [1, 1.25]}
       gl={{
         antialias: false,
@@ -43,21 +44,21 @@ export default function Scene({ tier }: SceneProps) {
         toneMapping: AgXToneMapping,
         toneMappingExposure: 1.45,
       }}
-      camera={{ fov: 62, near: 0.3, far: 200, position: [-1.9, 3.4, -37] }}
+      // Low fov flattens perspective for the isometric read; IsoControls drives it.
+      camera={{ fov: 34, near: 0.5, far: 400, position: [40, 44, 40] }}
     >
       <color attach="background" args={[FOG]} />
       <fogExp2 attach="fog" args={[FOG, fogDensity]} />
 
       <DynamicLights pool={high ? 8 : 4} />
-      <ScrollDriver />
-      <SyntyCamera />
+      <IsoControls />
 
       <Suspense fallback={null}>
-        <SyntyScene cullDist={cullDist} />
+        <SyntyScene />
         <AnimatedRides />
       </Suspense>
 
-      <AttractionOutlines />
+      <Indicators />
 
       {high && <PostFX />}
     </Canvas>

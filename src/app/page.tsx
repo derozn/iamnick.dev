@@ -4,12 +4,11 @@ import { ContentOverlay } from '@/components/content/ContentOverlay';
 export const dynamic = 'auto';
 
 /**
- * Homepage — the on-rails carnival walk + click-to-step-in content.
+ * Homepage — the isometric, explorable Dark Carnival.
  *
- * Scroll length drives the first-person walk; clicking a tent's glowing marker
- * opens that CV section in the neon HUD overlay (ContentOverlay). The scroll
- * spacer is `pointer-events-none` so clicks fall through to the canvas markers,
- * while the wheel still scrolls the page.
+ * A fixed full-screen canvas the visitor drags/zooms around; floating indicators
+ * mark each point of interest, and clicking one flies the camera in and opens that
+ * CV section in the neon HUD overlay (ContentOverlay).
  *
  * TODO(content/SEO): render all sections as always-present DOM (visually hidden)
  * so they're crawlable/keyboard-navigable, with the HUD as the enhanced view.
@@ -17,17 +16,11 @@ export const dynamic = 'auto';
 export default function Homepage() {
   return (
     <>
-      {/* First-person Dark Carnival — fixed, behind everything */}
+      {/* Isometric Dark Carnival — fixed, fills the viewport */}
       <MidwayCanvas />
 
-      {/* Content panel that rises over the dimmed scene on click */}
+      {/* Content panel that rises over the scene when a structure is focused */}
       <ContentOverlay />
-
-      {/* Scroll spacer — drives the walk (11 attraction stops); transparent to clicks
-          so the in-scene markers are reachable, while the wheel still scrolls */}
-      <main id="main" aria-hidden="true" className="pointer-events-none">
-        <div style={{ height: '900vh' }} />
-      </main>
     </>
   );
 }

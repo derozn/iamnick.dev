@@ -144,6 +144,19 @@
   }
 }
 
+/* Pulsing dot on the isometric point-of-interest indicators. */
+@keyframes isoPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.55);
+    opacity: 0.55;
+  }
+}
+
 /* ── Custom utilities ─────────────────────────────────── */
 @utility no-scrollbar {
   &::-webkit-scrollbar {

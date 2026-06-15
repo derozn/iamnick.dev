@@ -31,6 +31,10 @@ export interface SceneState {
   mode: SceneMode;
   /** Attraction id whose content panel is open (viewing), or null. */
   activeAttraction: string | null;
+  /** Attraction the iso camera is flying to / focused on (set on indicator click), or null. */
+  focusedAttraction: string | null;
+  /** Fly the iso camera in to an attraction; IsoControls opens its content on arrival. */
+  focus: (attraction: string | null) => void;
   /** Attraction id of the stall currently stepped into for a game, or null. */
   activeStall: string | null;
   /** Overall document scroll progress: scrollTop / (scrollHeight - clientHeight), clamped [0, 1]. */
@@ -52,13 +56,15 @@ export interface SceneState {
 export const useSceneStore = create<SceneState>()((set) => ({
   mode: 'travelling',
   activeAttraction: null,
+  focusedAttraction: null,
   activeStall: null,
   progress: 0,
   sections: {},
   setProgress: (progress) => set({ progress }),
   setSections: (sections) => set({ sections }),
+  focus: (attraction) => set({ focusedAttraction: attraction }),
   open: (attraction) => set({ mode: 'viewing', activeAttraction: attraction }),
-  close: () => set({ mode: 'travelling', activeAttraction: null }),
+  close: () => set({ mode: 'travelling', activeAttraction: null, focusedAttraction: null }),
   stepIn: (stall) => set({ mode: 'playing', activeStall: stall }),
   exit: () => set({ mode: 'travelling', activeStall: null }),
 }));
