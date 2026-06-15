@@ -20,13 +20,13 @@ export const ROAD: V2[] = [
   [-4, -18], // 4
   [-1.6, -13.5], // 5  work (roadside booth)
   [-1.4, -8], // 6
-  [-2, -5.5], // 7  ball-toss game
+  [-1.3, -5.2], // 7  ball-toss game (small stand in a busy corner — frame it back)
   [-2, 2], // 8
-  [-2.4, 6.5], // 9  projects (roadside stall)
+  [-2.2, 7], // 9  projects (roadside stall)
   [-4, 12], // 10
-  [-7, 18], // 11
-  [-11, 22.5], // 12
-  [-13.5, 24.5], // 13 contact (Ferris, NW)
+  [-7, 17], // 11
+  [-10, 20.5], // 12
+  [-11.5, 22], // 13 contact (Ferris, NW — back off to fit the wheel)
 ];
 
 export interface Attraction {
@@ -55,7 +55,7 @@ export const ATTRACTIONS: Attraction[] = [
     prefab: 'SM_Prop_Carnival_Entrance_01',
     transform: [-1.77, 0.014, 30.719, 0, 0, 0, 1, 1, 1, 1],
     pathT: at(0),
-    look: [-1.8, 3.6, -30.7],
+    look: [-1.77, 3.0, -30.7],
   },
   {
     id: 'about',
@@ -64,7 +64,7 @@ export const ATTRACTIONS: Attraction[] = [
     prefab: 'SM_Prop_Tent_01',
     transform: [-13.258, 0.156, 22.62, 0, 0.931, 0, 0.364, 1, 1, 1],
     pathT: at(3),
-    look: [-13.3, 3.0, -22.6],
+    look: [-13.26, 2.6, -22.63],
   },
   {
     id: 'work',
@@ -73,7 +73,7 @@ export const ATTRACTIONS: Attraction[] = [
     prefab: 'SM_Prop_Stall_01',
     transform: [1.3, 0.09, 12.53, 0, -0.732, 0, 0.682, 1, 1, 1],
     pathT: at(5),
-    look: [1.3, 2.6, -12.5],
+    look: [1.3, 2.0, -12.53],
   },
   {
     id: 'ball-toss',
@@ -82,7 +82,7 @@ export const ATTRACTIONS: Attraction[] = [
     prefab: 'SM_Prop_Milk_Bottle_Toss_Stand_01',
     transform: [0.168, 1.04, -0.503, 0, -0.689, 0, 0.725, 1, 1, 1],
     pathT: at(7),
-    look: [0.2, 1.7, 0.5],
+    look: [0.17, 1.5, 0.5],
   },
   {
     id: 'projects',
@@ -91,7 +91,7 @@ export const ATTRACTIONS: Attraction[] = [
     prefab: 'SM_Prop_Stall_03',
     transform: [-4.613, 0.184, -10.47, 0, 0.707, 0, 0.707, 1, 1, 1],
     pathT: at(9),
-    look: [-4.6, 2.6, 10.5],
+    look: [-4.61, 2.1, 10.47],
   },
   {
     id: 'contact',
@@ -100,6 +100,6 @@ export const ATTRACTIONS: Attraction[] = [
     prefab: 'SM_Prop_Ferris_Wheel_01',
     transform: [-22.16, 0.22, -28.6, 0, 0.312, 0, 0.95, 1, 1, 1],
     pathT: at(13),
-    look: [-22.16, 5.0, 28.6],
+    look: [-22.25, 8.5, 28.53],
   },
 ];
