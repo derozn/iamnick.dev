@@ -99,9 +99,10 @@ function Sub({ sub, transforms }: { sub: SubMesh; transforms: number[][] }) {
       im.setMatrixAt(i, m);
     }
     im.instanceMatrix.needsUpdate = true;
-    im.computeBoundingSphere();
   }, [sub, transforms]);
 
+  // frustumCulled off: per-prefab instance bounds are unreliable here (clusters span
+  // the whole scene); proper per-instance culling/LOD is for the dedicated perf task.
   return (
     <instancedMesh
       ref={ref}

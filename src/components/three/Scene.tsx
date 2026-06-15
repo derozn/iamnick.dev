@@ -27,7 +27,7 @@ export default function Scene({ tier }: SceneProps) {
   return (
     <Canvas
       frameloop="demand"
-      dpr={tier === 'high' ? [1, 2] : [1, 1.5]}
+      dpr={tier === 'high' ? [1, 1.5] : [1, 1.25]}
       gl={{
         antialias: false,
         powerPreference: 'high-performance',
