@@ -6,6 +6,7 @@ import { AgXToneMapping } from 'three';
 
 import { ScrollDriver } from './ScrollDriver';
 import { SyntyScene } from './synty/SyntyScene';
+import { AnimatedRides } from './synty/AnimatedRides';
 import { SyntyCamera } from './synty/SyntyCamera';
 import { DynamicLights } from './synty/DynamicLights';
 import { AttractionOutlines } from './synty/AttractionOutlines';
@@ -53,6 +54,7 @@ export default function Scene({ tier }: SceneProps) {
 
       <Suspense fallback={null}>
         <SyntyScene cullDist={cullDist} />
+        <AnimatedRides />
       </Suspense>
 
       <AttractionOutlines />

@@ -4,6 +4,7 @@ import { SRGBColorSpace, type Texture } from 'three';
 import demoInstances from './demo-instances.json';
 import manifest from './manifest.json';
 import { InstancedPrefab } from './InstancedPrefab';
+import { SPINNER_NAMES } from './AnimatedRides';
 
 const SYNTY = '/models/synty/';
 const available = new Set(manifest as string[]);
@@ -16,7 +17,7 @@ const DECAL = /Decal|Poster|Graffiti/;
 
 /** [prefabName, transforms[]] for every demo prefab we have a GLB for. */
 const entries = Object.entries(demoInstances as Record<string, number[][]>).filter(
-  ([name]) => available.has(name) && !EXCLUDE.test(name),
+  ([name]) => available.has(name) && !EXCLUDE.test(name) && !SPINNER_NAMES.has(name),
 );
 
 entries.forEach(([name]) => useGLTF.preload(`${SYNTY}${name}.glb`, true));
