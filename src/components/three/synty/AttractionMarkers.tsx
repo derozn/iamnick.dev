@@ -17,7 +17,7 @@ function Marker({ a }: { a: Attraction }) {
   const open = useSceneStore((s) => s.open);
 
   return (
-    <Billboard position={a.position}>
+    <Billboard position={a.marker}>
       <group
         scale={hover ? 1.18 : 1}
         onClick={(e: ThreeEvent<MouseEvent>) => {

@@ -11,9 +11,20 @@ import { useMemo } from 'react';
  *  - neon ride accents (cyan / red / warm) near the plaza cluster
  */
 
-const warmPositions = (() => {
-  const data = demoInstances as Record<string, number[][]>;
-  const lit = [
+const data = demoInstances as Record<string, number[][]>;
+const _m = new Matrix4();
+const _v = new Vector3();
+const posOf = (names: string[], yLift: number): [number, number, number][] =>
+  names
+    .flatMap((n) => data[n] ?? [])
+    .map((t) => {
+      unityTRS(t, _m);
+      _v.setFromMatrixPosition(_m);
+      return [_v.x, _v.y + yLift, _v.z] as [number, number, number];
+    });
+
+const warmPositions = posOf(
+  [
     'SM_Prop_Light_01',
     'SM_Prop_Light_02',
     'SM_Prop_Light_03',
@@ -21,15 +32,19 @@ const warmPositions = (() => {
     'SM_Prop_Light_05',
     'SM_Prop_Light_Pole_01',
     'SM_Prop_Lamp_Post_02',
-  ].flatMap((n) => data[n] ?? []);
-  const m = new Matrix4();
-  const v = new Vector3();
-  return lit.map((t) => {
-    unityTRS(t, m);
-    v.setFromMatrixPosition(m);
-    return [v.x, v.y + 2, v.z] as [number, number, number];
-  });
-})();
+  ],
+  2,
+);
+
+/** Neon accents AT the real ride positions (the rides sit far from the core). */
+const rideAccents: { p: [number, number, number]; c: string }[] = [
+  ...posOf(['SM_Prop_Ferris_Wheel_01'], 6).map((p) => ({ p, c: '#22d3ee' })),
+  ...posOf(['SM_Prop_Merry_Go_Round_01'], 4).map((p) => ({ p, c: '#ff2d6e' })),
+  ...posOf(['SM_Prop_Teacup_Ride_01'], 3).map((p) => ({ p, c: '#b06cff' })),
+  ...posOf(['SM_Prop_Swinging_Chairs_01'], 6).map((p) => ({ p, c: '#ffb84d' })),
+  ...posOf(['SM_Prop_Bumper_Car_Arena_01'], 3).map((p) => ({ p, c: '#22d3ee' })),
+  ...posOf(['SM_Prop_Bouncy_Castle_01'], 3).map((p) => ({ p, c: '#ff2d6e' })),
+];
 
 export function DemoLighting({ warmCap = 22 }: { warmCap?: number }) {
   // keep the warm glows nearest the carnival core (perf cap)
@@ -45,22 +60,21 @@ export function DemoLighting({ warmCap = 22 }: { warmCap?: number }) {
 
   return (
     <>
-      {/* Neon-night base — readable at ground level, low enough that glows pop */}
-      <hemisphereLight args={['#28365e', '#0b0a10', 0.9]} />
-      <ambientLight intensity={0.32} color="#1a1636" />
-      <directionalLight position={[40, 90, 50]} intensity={0.95} color="#8b96d8" />
-      <directionalLight position={[-50, 45, -40]} intensity={0.4} color="#9a6cff" />
+      {/* Night base, but bright enough to read the whole carnival everywhere */}
+      <hemisphereLight args={['#3a4a74', '#100e16', 1.5]} />
+      <ambientLight intensity={0.6} color="#222046" />
+      <directionalLight position={[40, 90, 50]} intensity={1.5} color="#9aa6de" />
+      <directionalLight position={[-50, 45, -40]} intensity={0.6} color="#9a6cff" />
 
       {/* Warm carnival glows at the demo's light props */}
       {warm.map((p, i) => (
         <pointLight key={i} position={p} color="#ff9a3c" intensity={9} distance={7} decay={2} />
       ))}
 
-      {/* Vivid neon ride accents near the core */}
-      <pointLight position={[-6, 8, 4]} color="#22d3ee" intensity={28} distance={26} decay={1.5} />
-      <pointLight position={[9, 7, -5]} color="#ff2d6e" intensity={20} distance={22} decay={1.6} />
-      <pointLight position={[2, 6, 12]} color="#b06cff" intensity={16} distance={20} decay={1.6} />
-      <pointLight position={[14, 6, 6]} color="#ffb84d" intensity={12} distance={18} decay={1.7} />
+      {/* Vivid neon accents at the actual rides */}
+      {rideAccents.map((r, i) => (
+        <pointLight key={i} position={r.p} color={r.c} intensity={22} distance={24} decay={1.5} />
+      ))}
     </>
   );
 }

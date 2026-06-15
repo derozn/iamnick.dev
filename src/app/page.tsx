@@ -23,9 +23,10 @@ export default function Homepage() {
       {/* Content panel that rises over the dimmed scene on click */}
       <ContentOverlay />
 
-      {/* Scroll spacer — drives the walk; transparent to clicks so markers are reachable */}
+      {/* Scroll spacer — drives the walk (11 attraction stops); transparent to clicks
+          so the in-scene markers are reachable, while the wheel still scrolls */}
       <main id="main" aria-hidden="true" className="pointer-events-none">
-        <div style={{ height: '600vh' }} />
+        <div style={{ height: '900vh' }} />
       </main>
     </>
   );

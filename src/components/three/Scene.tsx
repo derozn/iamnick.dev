@@ -8,6 +8,7 @@ import { ScrollDriver } from './ScrollDriver';
 import { SyntyScene } from './synty/SyntyScene';
 import { SyntyCamera } from './synty/SyntyCamera';
 import { DemoLighting } from './synty/DemoLighting';
+import { AttractionLights } from './synty/AttractionLights';
 import { AttractionMarkers } from './synty/AttractionMarkers';
 import { PostFX } from './effects/PostFX';
 import { type QualityTier } from './hooks/useQualityTier';
@@ -35,12 +36,13 @@ export default function Scene({ tier }: SceneProps) {
         toneMapping: AgXToneMapping,
         toneMappingExposure: 1.45,
       }}
-      camera={{ fov: 60, near: 0.3, far: 800, position: [50, 40, 60] }}
+      camera={{ fov: 62, near: 0.3, far: 800, position: [-1.9, 3.4, -37] }}
     >
       <color attach="background" args={[FOG]} />
       <fogExp2 attach="fog" args={[FOG, 0.011]} />
 
-      <DemoLighting warmCap={tier === 'high' ? 40 : 16} />
+      <DemoLighting warmCap={tier === 'high' ? 20 : 8} />
+      {tier === 'high' && <AttractionLights />}
       <ScrollDriver />
       <SyntyCamera />
 
