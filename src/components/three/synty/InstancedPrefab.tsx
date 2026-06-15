@@ -58,6 +58,8 @@ interface InstancedPrefabProps {
   emissive?: Texture;
   emissiveIntensity?: number;
   cullDist?: number;
+  /** Push these surfaces toward camera in depth — decals/posters sit coplanar on walls and z-fight. */
+  polygonOffset?: boolean;
 }
 
 export function InstancedPrefab({
@@ -66,6 +68,7 @@ export function InstancedPrefab({
   emissive,
   emissiveIntensity = 1.8,
   cullDist,
+  polygonOffset = false,
 }: InstancedPrefabProps) {
   const { scene } = useGLTF(url, true);
 
@@ -76,6 +79,13 @@ export function InstancedPrefab({
       const m = o as Mesh;
       if (m.isMesh && m.geometry) {
         if (emissive) applyEmissive(m.material, emissive, emissiveIntensity);
+        if (polygonOffset) {
+          for (const mm of Array.isArray(m.material) ? m.material : [m.material]) {
+            mm.polygonOffset = true;
+            mm.polygonOffsetFactor = -2;
+            mm.polygonOffsetUnits = -2;
+          }
+        }
         out.push({
           geometry: m.geometry,
           material: m.material,
@@ -84,7 +94,7 @@ export function InstancedPrefab({
       }
     });
     return out;
-  }, [scene, emissive, emissiveIntensity]);
+  }, [scene, emissive, emissiveIntensity, polygonOffset]);
 
   // Per-instance world matrices (one row per sub) + a shared prop-origin position
   // (the transform's translation — submesh offsets are negligible at cull range).
