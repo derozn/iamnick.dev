@@ -18,7 +18,7 @@ import { create } from 'zustand';
  * so nothing sets `mode = 'playing'` yet — the spine is in place ahead of them.
  */
 
-export type SceneMode = 'travelling' | 'playing';
+export type SceneMode = 'travelling' | 'viewing' | 'playing';
 
 /** Normalised [0, 1] scroll-progress band occupied by one Midway attraction. */
 export interface SectionRange {
@@ -27,9 +27,11 @@ export interface SectionRange {
 }
 
 export interface SceneState {
-  /** Current interaction mode — `travelling` on-rails, or `playing` a stepped-in stall. */
+  /** Current interaction mode — `travelling` on-rails, `viewing` a content tent, or `playing` a game. */
   mode: SceneMode;
-  /** Attraction id of the stall currently stepped into, or null while travelling. */
+  /** Attraction id whose content panel is open (viewing), or null. */
+  activeAttraction: string | null;
+  /** Attraction id of the stall currently stepped into for a game, or null. */
   activeStall: string | null;
   /** Overall document scroll progress: scrollTop / (scrollHeight - clientHeight), clamped [0, 1]. */
   progress: number;
@@ -37,6 +39,10 @@ export interface SceneState {
   sections: Record<string, SectionRange>;
   setProgress: (progress: number) => void;
   setSections: (sections: Record<string, SectionRange>) => void;
+  /** Open a content tent — locks scroll, raises the HUD panel. */
+  open: (attraction: string) => void;
+  /** Close the content panel back to travelling. */
+  close: () => void;
   /** Step into a stall — locks scroll, routes input to the game. */
   stepIn: (stall: string) => void;
   /** Exit the active stall back to travelling at the same scroll position. */
@@ -45,11 +51,14 @@ export interface SceneState {
 
 export const useSceneStore = create<SceneState>()((set) => ({
   mode: 'travelling',
+  activeAttraction: null,
   activeStall: null,
   progress: 0,
   sections: {},
   setProgress: (progress) => set({ progress }),
   setSections: (sections) => set({ sections }),
+  open: (attraction) => set({ mode: 'viewing', activeAttraction: attraction }),
+  close: () => set({ mode: 'travelling', activeAttraction: null }),
   stepIn: (stall) => set({ mode: 'playing', activeStall: stall }),
   exit: () => set({ mode: 'travelling', activeStall: null }),
 }));

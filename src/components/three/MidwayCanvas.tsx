@@ -10,7 +10,11 @@ const Scene = dynamic(() => import('./Scene'), { ssr: false });
 /**
  * MidwayCanvas — fixed, full-viewport on-rails Dark Carnival behind the page.
  *
- * Contract: fixed inset-0 -z-10 aria-hidden.
+ * Sits at `z-0` (NOT a negative z-index — that puts the canvas behind the body in
+ * hit-testing, so the in-scene attraction markers wouldn't receive clicks). It's
+ * first in the DOM so the (pointer-events-none) scroll spacer paints over it but
+ * passes clicks through to the canvas; the nav (z-40) and content overlay (z-30)
+ * sit above.
  *
  * The gradient div doubles as the loading backdrop and the permanent fallback
  * for the 'none' tier (prefers-reduced-motion / SSR first paint) — content is
@@ -22,7 +26,7 @@ export function MidwayCanvas() {
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 -z-10 bg-gradient-to-b from-[#14141f] to-[#070810]"
+      className="fixed inset-0 z-0 bg-gradient-to-b from-[#14141f] to-[#070810]"
     >
       {tier !== 'none' && <Scene tier={tier} />}
     </div>

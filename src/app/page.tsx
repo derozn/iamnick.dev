@@ -1,16 +1,18 @@
 import { MidwayCanvas } from '@/components/three/MidwayCanvas';
+import { ContentOverlay } from '@/components/content/ContentOverlay';
 
 export const dynamic = 'auto';
 
 /**
- * Homepage — scene-evaluation pass.
+ * Homepage — the on-rails carnival walk + click-to-step-in content.
  *
- * The page is intentionally reduced to the 3-D carnival + a scroll spacer so the
- * scene can be judged on its own (HUD + content are out of scope this pass —
- * see docs/redesign/scene-layout.md). Scroll length drives the first-person walk
- * down the midway; the content spine and HUD return once sections are mapped
- * onto street positions. The DOM section components (HeaderSection, RoleSection,
- * …) are kept in the tree for that step.
+ * Scroll length drives the first-person walk; clicking a tent's glowing marker
+ * opens that CV section in the neon HUD overlay (ContentOverlay). The scroll
+ * spacer is `pointer-events-none` so clicks fall through to the canvas markers,
+ * while the wheel still scrolls the page.
+ *
+ * TODO(content/SEO): render all sections as always-present DOM (visually hidden)
+ * so they're crawlable/keyboard-navigable, with the HUD as the enhanced view.
  */
 export default function Homepage() {
   return (
@@ -18,8 +20,11 @@ export default function Homepage() {
       {/* First-person Dark Carnival — fixed, behind everything */}
       <MidwayCanvas />
 
-      {/* Scroll spacer — drives the on-rails walk (≈ one screen per zone) */}
-      <main id="main" aria-hidden="true">
+      {/* Content panel that rises over the dimmed scene on click */}
+      <ContentOverlay />
+
+      {/* Scroll spacer — drives the walk; transparent to clicks so markers are reachable */}
+      <main id="main" aria-hidden="true" className="pointer-events-none">
         <div style={{ height: '600vh' }} />
       </main>
     </>

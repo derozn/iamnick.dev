@@ -32,9 +32,9 @@ export function ScrollDriver() {
     const maxScroll = () => Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
 
     const readProgress = () => {
-      // Scroll is locked while a stall is stepped into — freeze progress so the
-      // camera holds docked at the stall until the visitor exits.
-      if (useSceneStore.getState().mode === 'playing') return;
+      // Scroll is frozen while a content panel is open or a game is stepped into,
+      // so the camera holds at the attraction until the visitor closes/exits.
+      if (useSceneStore.getState().mode !== 'travelling') return;
       useSceneStore.getState().setProgress(clamp01(window.scrollY / maxScroll()));
       invalidate();
     };
