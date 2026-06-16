@@ -36,4 +36,8 @@ export const EXTRA_INSTANCES: Record<string, number[][]> = {
   ],
   // more lit street lamps along the explorable centre
   SM_Prop_Lamp_Post_02: EXTRA_LAMPS.map(([x, z]) => at(x, z, 0)),
+  // the Ball Toss booth — a stall (facing SW, toward the iso camera) in an open spot
+  SM_Prop_Stall_02: [at(13, -12, 45, 0.1)],
+  // the milk-bottle rack sits on its counter, plus a row to knock down
+  SM_Prop_Milk_Bottle_Toss_Stand_01: [at(12.3, -12.7, 45, 1.0)],
 };
