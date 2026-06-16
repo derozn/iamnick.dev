@@ -5,20 +5,26 @@ import demoInstances from './demo-instances.json';
 import manifest from './manifest.json';
 import { InstancedPrefab } from './InstancedPrefab';
 import { SPINNER_NAMES } from './AnimatedRides';
+import { EXTRA_INSTANCES } from './sceneAdditions';
 
 const SYNTY = '/models/synty/';
 const available = new Set(manifest as string[]);
 
-/** Big 2-D backdrop planes / sky elements the demo uses — they occlude + don't translate; our fog is the sky. */
-const EXCLUDE = /Background_Card|Sky_Dome|CloudRing|Tree_Background|SM_Env_Ground_Hill/;
+/**
+ * Excluded prefabs: big 2-D backdrop/sky planes (our fog is the sky), and props
+ * whose textures were dropped in conversion so they render as blank/untextured
+ * planes (beartrap, cobwebs, decals, the blank recycle bin, signs, etc.).
+ */
+const EXCLUDE =
+  /Background_Card|Sky_Dome|CloudRing|Tree_Background|SM_Env_Ground_Hill|BearTrap|Cable_01|Cobwebs|Decal|Hoops_Hoola|Milk_Bottle_Toss|Net_01|Photo_Stand|Plushie_03|Rubbish_Bin_03|Sign_Closed|Spirit_Board|Table_01|Dynamite|Needle/;
 
-/** Thin posters/decals authored flush against walls — need polygon offset or they z-fight. */
-const DECAL = /Decal|Poster|Graffiti/;
-
-/** [prefabName, transforms[]] for every demo prefab we have a GLB for. */
-const entries = Object.entries(demoInstances as Record<string, number[][]>).filter(
-  ([name]) => available.has(name) && !EXCLUDE.test(name) && !SPINNER_NAMES.has(name),
-);
+/** [prefabName, transforms[]] for every demo prefab we have a GLB for, plus our additions. */
+const entries = Object.entries(demoInstances as Record<string, number[][]>)
+  .filter(([name]) => available.has(name) && !EXCLUDE.test(name) && !SPINNER_NAMES.has(name))
+  .map(([name, tfs]) => [
+    name,
+    EXTRA_INSTANCES[name] ? [...tfs, ...EXTRA_INSTANCES[name]] : tfs,
+  ]) as [string, number[][]][];
 
 entries.forEach(([name]) => useGLTF.preload(`${SYNTY}${name}.glb`, true));
 
@@ -47,7 +53,6 @@ export function SyntyScene({ cullDist }: { cullDist?: number }) {
           transforms={transforms}
           emissive={emissive}
           cullDist={cullDist}
-          polygonOffset={DECAL.test(name)}
         />
       ))}
     </>

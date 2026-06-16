@@ -19,7 +19,7 @@ const AZ = Math.PI * 1.25; // 225° — view from the front (entrance) corner, l
 const POLAR = 0.92; // tilt down from vertical (~53°)
 const MIN_D = 13;
 const MAX_D = 64;
-const FOCUS_D = 17;
+const DEFAULT_D = 38; // overview zoom — closer than max, still sees the carnival
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 const RIGHT = new Vector3(Math.cos(AZ), 0, -Math.sin(AZ)); // screen-right on the ground
@@ -31,7 +31,7 @@ const DIR = new Vector3(
 ); // unit camera offset direction
 
 const clampTarget = (v: Vector3) => {
-  v.x = clamp(v.x, -32, 26);
+  v.x = clamp(v.x, -32, 32);
   v.z = clamp(v.z, -40, 40);
 };
 
@@ -39,27 +39,30 @@ export function IsoControls() {
   const { camera, gl, invalidate } = useThree();
   const focused = useSceneStore((s) => s.focusedAttraction);
 
-  const target = useRef(new Vector3(-2, 1.5, -10));
-  const wantTarget = useRef(new Vector3(-2, 1.5, -10));
-  const dist = useRef(MAX_D);
-  const wantDist = useRef(MAX_D);
+  const panTarget = useRef(new Vector3(-2, 1.5, -10));
+  const dist = useRef(DEFAULT_D);
+  const wantDist = useRef(DEFAULT_D);
+  const camPos = useRef(new Vector3(-2, 1.5, -10).addScaledVector(DIR, DEFAULT_D));
+  const look = useRef(new Vector3(-2, 1.5, -10));
   const drag = useRef<{ x: number; y: number } | null>(null);
+  const focusedRef = useRef<string | null>(null);
   const open = useSceneStore((s) => s.open);
 
-  // React to focus changes: fly the camera to the structure (or back to overview),
-  // and raise its content once the fly-in has had time to settle.
+  // React to focus changes: fly to a head-on view of the structure's opening (or
+  // back to the iso overview), and raise its content once the fly-in has settled.
   useEffect(() => {
+    focusedRef.current = focused;
     if (focused) {
       const a = ATTRACTIONS.find((x) => x.id === focused);
       if (a) {
-        wantTarget.current.set(a.position[0], a.position[1], a.position[2]);
-        wantDist.current = FOCUS_D;
-        const t = setTimeout(() => open(focused), 1000);
+        // re-centre the overview on this structure for the return trip
+        panTarget.current.set(a.position[0], 1.5, a.position[2]);
+        const t = setTimeout(() => open(focused), 1400);
         invalidate();
         return () => clearTimeout(t);
       }
     }
-    wantDist.current = MAX_D;
+    wantDist.current = DEFAULT_D;
     invalidate();
   }, [focused, invalidate, open]);
 
@@ -78,8 +81,8 @@ export function IsoControls() {
       const dy = e.clientY - drag.current.y;
       drag.current = { x: e.clientX, y: e.clientY };
       const k = dist.current * 0.0016;
-      wantTarget.current.addScaledVector(RIGHT, -dx * k).addScaledVector(FWD, -dy * k);
-      clampTarget(wantTarget.current);
+      panTarget.current.addScaledVector(RIGHT, -dx * k).addScaledVector(FWD, -dy * k);
+      clampTarget(panTarget.current);
       invalidate();
     };
     const onUp = (e: PointerEvent) => {
@@ -115,16 +118,36 @@ export function IsoControls() {
 
   useFrame((_, delta) => {
     const dt = Math.min(delta, 0.1);
-    const moving = damp3(target.current, wantTarget.current, 0.28, dt);
-    const dd = wantDist.current - dist.current;
-    dist.current += dd * (1 - Math.exp(-dt / 0.28));
 
-    camera.position.copy(target.current).addScaledVector(DIR, dist.current);
+    // Where do we want the camera + its look target this frame?
+    const f = focusedRef.current;
+    const a = f ? ATTRACTIONS.find((x) => x.id === f) : undefined;
+    if (a) {
+      // near eye-level, looking into the opening (out of iso, first-person feel)
+      WANT_LOOK.set(a.position[0], a.position[1], a.position[2]);
+      WANT_POS.copy(WANT_LOOK)
+        .addScaledVector(FACE.set(a.facing[0], a.facing[1], a.facing[2]).normalize(), a.focusDist)
+        .add(RISE.set(0, a.focusDist * 0.16, 0));
+    } else {
+      const dd = wantDist.current - dist.current;
+      dist.current += dd * (1 - Math.exp(-dt / 0.28));
+      WANT_LOOK.copy(panTarget.current);
+      WANT_POS.copy(panTarget.current).addScaledVector(DIR, dist.current);
+    }
+
+    const m1 = damp3(camPos.current, WANT_POS, 0.32, dt);
+    const m2 = damp3(look.current, WANT_LOOK, 0.32, dt);
+    camera.position.copy(camPos.current);
     camera.up.set(0, 1, 0);
-    camera.lookAt(target.current);
+    camera.lookAt(look.current);
 
-    if (moving || Math.abs(dd) > 0.02) invalidate();
+    if (m1 || m2) invalidate();
   });
 
   return null;
 }
+
+const WANT_POS = new Vector3();
+const WANT_LOOK = new Vector3();
+const FACE = new Vector3();
+const RISE = new Vector3();

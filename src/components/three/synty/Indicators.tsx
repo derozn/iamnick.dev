@@ -30,35 +30,12 @@ export function Indicators() {
         >
           <button
             type="button"
+            className="iso-indicator"
             aria-label={`Visit ${a.title}`}
             onClick={() => focus(a.id)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '6px 12px 6px 8px',
-              borderRadius: 999,
-              border: '1px solid rgba(197,2,1,0.55)',
-              background: 'rgba(12,11,28,0.72)',
-              backdropFilter: 'blur(6px)',
-              color: '#ffe9e9',
-              font: '600 13px/1 var(--font-expressive, sans-serif)',
-              whiteSpace: 'nowrap',
-              cursor: 'pointer',
-              boxShadow: '0 0 18px rgba(197,2,1,0.45)',
-            }}
           >
-            <span
-              style={{
-                width: 9,
-                height: 9,
-                borderRadius: 999,
-                background: '#ff3b3b',
-                boxShadow: '0 0 10px 2px #ff3b3b',
-                animation: 'isoPulse 1.6s ease-in-out infinite',
-              }}
-            />
-            {a.title}
+            <span className="iso-indicator__dot" aria-hidden="true" />
+            <span className="iso-indicator__label">{a.title}</span>
           </button>
         </Html>
       ))}

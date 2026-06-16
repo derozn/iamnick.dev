@@ -7,6 +7,7 @@ import { Color, Matrix4, type PointLight, Vector3 } from 'three';
 import demoInstances from './demo-instances.json';
 import { unityTRS } from './conversion';
 import { ATTRACTIONS } from './attractions';
+import { EXTRA_LAMPS } from './sceneAdditions';
 
 /**
  * DynamicLights — the Synty Demo lighting mood, but bounded for real GPUs.
@@ -55,6 +56,14 @@ const CANDIDATES: Candidate[] = [
     ],
     2,
   ).map((pos) => ({ pos, color: WARM, intensity: 8, distance: 8, decay: 2 })),
+  // our extra street lamps (bulb sits ~4.3m up the post)
+  ...EXTRA_LAMPS.map(([x, z]) => ({
+    pos: new Vector3(x, 4.3, z),
+    color: WARM,
+    intensity: 8,
+    distance: 8,
+    decay: 2,
+  })),
   // vivid neon accents at the actual rides
   ...posOf(['SM_Prop_Ferris_Wheel_01'], 6).map((pos) => ({
     pos,
