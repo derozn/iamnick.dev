@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from 'next';
 import { PropsWithChildren } from 'react';
 
 import { montserratFont, openSansFont } from '@/components/ui-modules/next/fonts/local';
+import { ryeFont, fellFont, fellScFont } from '@/components/ui-modules/next/fonts/google';
 import { JsonLd } from '@/components/organisms/JsonLd';
 import { SiteNav } from '@/components/nav/SiteNav';
 import { cn } from '@/lib/cn';
@@ -64,7 +65,16 @@ export const dynamic = 'auto';
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
-    <html lang="en" className={cn(montserratFont.variable, openSansFont.variable)}>
+    <html
+      lang="en"
+      className={cn(
+        montserratFont.variable,
+        openSansFont.variable,
+        ryeFont.variable,
+        fellFont.variable,
+        fellScFont.variable,
+      )}
+    >
       <head />
       <body className="bg-background-primary font-functional text-text-primary">
         <JsonLd />

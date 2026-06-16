@@ -56,22 +56,22 @@ export function BallTossHud() {
         >
           {/* Top bar: score + balls, and Exit */}
           <div className="flex items-start justify-between gap-4 p-4 md:p-6">
-            <div className="hud-chip pointer-events-auto flex items-center gap-4 px-4 py-2 font-functional text-[13px] text-text-primary">
+            <div className="ticket-frame pointer-events-auto flex items-center gap-4 rounded-[3px] px-4 py-2 font-fell-sc text-[14px] tracking-[0.08em] text-ink">
               <span>
-                Score <span className="font-semibold text-accent">{score}</span>
+                Score <span className="font-rye text-oxblood">{score}</span>
               </span>
-              <span aria-hidden className="text-text-primary/30">
+              <span aria-hidden className="text-ink-soft/50">
                 |
               </span>
               <span>
-                Balls <span className="font-semibold text-accent">{ballsLeft}</span>
+                Balls <span className="font-rye text-oxblood">{ballsLeft}</span>
               </span>
             </div>
 
             <button
               onClick={exit}
               aria-label="Exit game"
-              className="hud-button pointer-events-auto flex h-9 w-9 items-center justify-center text-[16px] text-accent [--hud-cut:8px]"
+              className="paper-button pointer-events-auto flex h-9 w-9 items-center justify-center rounded-[3px] font-rye text-[15px]"
             >
               ✕
             </button>
@@ -80,8 +80,8 @@ export function BallTossHud() {
           {/* Aiming hint */}
           {phase === 'aiming' && (
             <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
-              <p className="font-functional text-[12px] text-text-primary/70">
-                Aim · hold to charge · release to throw
+              <p className="ticket-frame rounded-[3px] px-4 py-1.5 font-fell text-[13px] italic text-ink">
+                Drag back to aim &amp; power · release to throw
               </p>
             </div>
           )}
@@ -104,24 +104,23 @@ export function BallTossHud() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 16, scale: 0.99 }}
                   transition={{ duration: 0.4, ease: EASE }}
-                  className="hud-card relative z-10 w-full max-w-md p-6 text-center md:p-8"
+                  className="ticket-frame halftone relative z-10 w-full max-w-md rounded-[5px] p-6 text-center md:p-8"
                 >
                   {phase === 'intro' && (
                     <>
-                      <p className="font-functional text-[12px] uppercase tracking-[0.2em] text-accent">
+                      <p className="font-fell-sc text-[13px] tracking-[0.22em] text-brass-text">
                         Step right up
                       </p>
-                      <h2 className="mt-2 font-expressive text-[26px] font-semibold text-text-primary">
-                        Ball Toss
-                      </h2>
-                      <p className="mt-4 text-[15px] leading-relaxed text-text-primary/85">
-                        Knock down the milk bottles. <strong>Aim</strong> where you want to throw,{' '}
-                        <strong>hold</strong> to charge your power, and <strong>release</strong> to
-                        let it fly. You get three balls — clear the stack for a prize.
+                      <h2 className="font-rye letterpress mt-2 text-[34px] text-ink">Ball Toss</h2>
+                      <p className="font-fell mt-4 text-[15px] leading-relaxed text-ink/90">
+                        Knock down the milk bottles. It&apos;s a slingshot:{' '}
+                        <strong>drag the ball back</strong> — further for more power, aim by pulling
+                        off to one side — then <strong>release</strong> to let it fly. You get three
+                        balls; clear the stack for a prize.
                       </p>
                       <button
                         onClick={startPlaying}
-                        className="hud-button mt-6 px-6 py-3 font-expressive text-[15px] font-semibold text-accent"
+                        className="paper-button mt-6 rounded-[3px] px-6 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
                       >
                         Start throwing
                       </button>
@@ -130,32 +129,30 @@ export function BallTossHud() {
 
                   {phase === 'won' && (
                     <>
-                      <h2 className="font-expressive text-[28px] font-semibold text-text-primary">
-                        🎉 Winner!
-                      </h2>
-                      <p className="mt-3 text-[15px] leading-relaxed text-text-primary/85">
+                      <h2 className="font-rye letterpress text-[36px] text-ink">🎉 Winner!</h2>
+                      <p className="font-fell mt-3 text-[15px] leading-relaxed text-ink/90">
                         You knocked &apos;em all down — final score{' '}
-                        <span className="font-semibold text-accent">{score}</span>.
+                        <span className="font-rye text-oxblood">{score}</span>.
                       </p>
-                      <p className="mt-2 text-[14px] text-text-primary/70">
+                      <p className="font-fell mt-2 text-[14px] italic text-ink-soft">
                         Prize unlocked: now go read my work →
                       </p>
                       <div className="mt-6 flex flex-wrap justify-center gap-3">
                         <button
                           onClick={seeWork}
-                          className="hud-button px-5 py-3 font-expressive text-[15px] font-semibold text-accent"
+                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
                         >
                           See my work →
                         </button>
                         <button
                           onClick={replay}
-                          className="hud-button px-5 py-3 font-functional text-[14px] text-text-primary"
+                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[14px] tracking-[0.06em]"
                         >
                           Play again
                         </button>
                         <button
                           onClick={exit}
-                          className="hud-button px-5 py-3 font-functional text-[14px] text-text-primary"
+                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[14px] tracking-[0.06em]"
                         >
                           Exit
                         </button>
@@ -165,23 +162,21 @@ export function BallTossHud() {
 
                   {phase === 'lost' && (
                     <>
-                      <h2 className="font-expressive text-[26px] font-semibold text-text-primary">
-                        Out of balls
-                      </h2>
-                      <p className="mt-3 text-[15px] leading-relaxed text-text-primary/85">
-                        Final score <span className="font-semibold text-accent">{score}</span>. So
-                        close — give it another go?
+                      <h2 className="font-rye letterpress text-[32px] text-ink">Out of balls</h2>
+                      <p className="font-fell mt-3 text-[15px] leading-relaxed text-ink/90">
+                        Final score <span className="font-rye text-oxblood">{score}</span>. So close
+                        — give it another go?
                       </p>
                       <div className="mt-6 flex flex-wrap justify-center gap-3">
                         <button
                           onClick={replay}
-                          className="hud-button px-5 py-3 font-expressive text-[15px] font-semibold text-accent"
+                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
                         >
                           Play again
                         </button>
                         <button
                           onClick={exit}
-                          className="hud-button px-5 py-3 font-functional text-[14px] text-text-primary"
+                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[14px] tracking-[0.06em]"
                         >
                           Exit
                         </button>

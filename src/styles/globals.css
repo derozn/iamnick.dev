@@ -19,10 +19,26 @@
   --color-accent: #c50201;
   --color-accent-dim: #7a0f0f;
 
+  /* ── Carnival letterpress inks (HUD overhaul) ───────────
+   * Aged sideshow-poster palette — bone stock + two spot inks.
+   * See horror-carnival-hud-spec §2.1. */
+  --color-paper: #e6dabd;
+  --color-ink: #2a2017;
+  --color-ink-soft: #5c4a36;
+  --color-oxblood: #6f2722;
+  --color-oxblood-bright: #8a322a;
+  --color-brass: #a3823f;
+  --color-brass-text: #7d5f2b;
+  --color-keyline: #241a12;
+
   /* ── Fonts ───────────────────────────────────────────── */
   --font-expressive: var(--font-montserrat), sans-serif;
   --font-functional: var(--font-open-sans), sans-serif;
   --font-fallback: sans-serif;
+  /* Period faces for the letterpress HUD */
+  --font-rye: var(--font-rye-src), 'Rye', serif;
+  --font-fell: var(--font-fell-src), 'IM Fell English', serif;
+  --font-fell-sc: var(--font-fell-sc-src), 'IM Fell English SC', serif;
 
   /* ── Spacing scale (0-20) ───────────────────────────── */
   --spacing-0: 0px;
@@ -157,21 +173,25 @@
   }
 }
 
-/* POI indicator — a neon dot that expands to reveal its label on hover. */
+/* POI indicator — a letterpress brass tag whose label unfurls on hover. */
 .iso-indicator {
   display: inline-flex;
   align-items: center;
   height: 30px;
   padding: 0;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 60%, transparent);
-  background: color-mix(in srgb, var(--color-background-primary) 72%, transparent);
-  backdrop-filter: blur(6px);
-  color: #ffe9e9;
-  font: 600 12px/1 var(--font-expressive, system-ui, sans-serif);
+  border-radius: 3px;
+  border: 1.5px solid var(--color-keyline);
+  background: color-mix(in srgb, var(--color-paper) 88%, transparent);
+  backdrop-filter: blur(4px);
+  color: var(--color-ink);
+  font: 400 12px/1 var(--font-fell-sc, 'IM Fell English SC', serif);
+  letter-spacing: 0.12em;
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: 0 0 14px color-mix(in srgb, var(--color-accent) 40%, transparent);
+  box-shadow:
+    inset 0 0 0 1.4px rgb(36 26 18 / 0.35),
+    inset 0 1px 0 rgb(255 250 235 / 0.4),
+    0 2px 6px rgb(0 0 0 / 0.35);
   transition: box-shadow 240ms ease;
 }
 .iso-indicator__dot {
@@ -186,21 +206,25 @@
   width: 9px;
   height: 9px;
   border-radius: 999px;
-  background: #ff3b3b;
-  box-shadow: 0 0 10px 2px #ff3b3b;
+  background: var(--color-oxblood);
+  box-shadow: 0 0 7px 1px color-mix(in srgb, var(--color-brass) 70%, transparent);
   animation: isoPulse 1.6s ease-in-out infinite;
 }
 .iso-indicator__label {
   max-width: 0;
   overflow: hidden;
   opacity: 0;
+  color: var(--color-brass-text);
   transition:
     max-width 300ms cubic-bezier(0.2, 0.8, 0.2, 1),
     opacity 180ms ease,
     padding 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .iso-indicator:hover {
-  box-shadow: 0 0 22px color-mix(in srgb, var(--color-accent) 65%, transparent);
+  box-shadow:
+    inset 0 0 0 1.4px rgb(36 26 18 / 0.45),
+    inset 0 1px 0 rgb(255 250 235 / 0.5),
+    0 3px 10px rgb(0 0 0 / 0.45);
 }
 .iso-indicator:hover .iso-indicator__label {
   max-width: 220px;
@@ -403,4 +427,87 @@
 /* Lifts body copy off low-opacity scrim regions over bright 3-D backdrops. */
 @utility text-shadow-scrim {
   text-shadow: 0 1px 8px rgb(7 8 16 / 0.8);
+}
+
+/* ── Letterpress carnival surfaces (HUD overhaul) ─────────
+ * Aged-poster card treatment ported from horror-carnival-hud-reference.html.
+ * Bone stock with the spec's "double-rule" emboss; ink sits *in* the paper. */
+@utility ticket-frame {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 22% 12%, rgb(120 88 46 / 0.07), transparent 26%),
+    radial-gradient(circle at 82% 78%, rgb(120 88 46 / 0.06), transparent 24%), var(--color-paper);
+  border: 1.5px solid var(--color-keyline);
+  box-shadow:
+    inset 0 0 0 3px var(--color-paper),
+    inset 0 0 0 3.7px rgb(36 26 18 / 0.4),
+    inset 0 2px 8px rgb(70 48 22 / 0.14),
+    inset 0 0 0 1px rgb(255 250 235 / 0.22);
+}
+
+/* Tear-off perforation: a dotted vertical rule near the left edge (pair with pl). */
+@utility ticket-perf {
+  &::before {
+    content: '';
+    position: absolute;
+    top: 9px;
+    bottom: 9px;
+    left: 26px;
+    width: 2px;
+    background-image: radial-gradient(circle, var(--color-keyline) 0 1.1px, transparent 1.4px);
+    background-size: 2px 9px;
+    background-repeat: repeat-y;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+/* 1px light text-shadow → the letterpress "deboss" illusion on ink/brass text. */
+@utility letterpress {
+  text-shadow: 0 1px 0 rgb(255 250 235 / 0.32);
+}
+
+/* Subtle ben-day dot screen multiplied over a fill so ink reads printed, not flat. */
+@utility halftone {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgb(0 0 0 / 0.5) 0.5px, transparent 0.7px);
+    background-size: 3px 3px;
+    mix-blend-mode: multiply;
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* Beveled bone keycap — the letterpress button (prompt keycaps, HUD actions). */
+@utility paper-button {
+  position: relative;
+  isolation: isolate;
+  background: var(--color-paper);
+  border: 1.5px solid var(--color-keyline);
+  color: var(--color-oxblood);
+  box-shadow:
+    inset 0 1px 0 rgb(255 250 235 / 0.5),
+    inset 0 -2px 3px rgb(80 55 25 / 0.18),
+    inset 0 0 0 1px rgb(255 250 235 / 0.18);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-oxblood-bright);
+    background: #efe6cf;
+  }
+}
+
+/* Outline ticket-stub chip for tech tags etc. — brass ink on bone, hairline keyline. */
+@utility paper-chip {
+  border: 1px solid color-mix(in srgb, var(--color-ink-soft) 45%, transparent);
+  color: var(--color-brass-text);
+  background: color-mix(in srgb, var(--color-paper) 30%, transparent);
 }

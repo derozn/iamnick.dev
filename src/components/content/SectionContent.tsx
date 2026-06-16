@@ -1,33 +1,31 @@
 import { profile, roles, sideProjects, skillGroups, contact, type Role } from '@/content/cv';
 import { formatYearMonth } from '@/lib/formatDate';
 
-/** Small heading kicker shared across panels. */
+/** Small letterpress kicker (brass small-caps + hairline rule) shared across panels. */
 function Kicker({ children }: { children: React.ReactNode }) {
   return (
     <div className="mb-3 flex items-center gap-3">
-      <span aria-hidden="true" className="h-px w-6 shrink-0 bg-accent/70" />
-      <p className="font-expressive text-[12px] font-semibold uppercase tracking-widest text-accent">
-        {children}
-      </p>
+      <span aria-hidden="true" className="h-px w-6 shrink-0 bg-brass/70" />
+      <p className="font-fell-sc text-[13px] tracking-[0.22em] text-brass-text">{children}</p>
     </div>
   );
 }
 
 function TechChip({ label }: { label: string }) {
-  return <li className="hud-chip px-3 py-1 font-functional text-[12px] text-accent/90">{label}</li>;
+  return <li className="paper-chip rounded-[2px] px-2.5 py-0.5 font-fell text-[12px]">{label}</li>;
 }
 
 function Intro() {
   return (
     <>
       <Kicker>{profile.location}</Kicker>
-      <h2 className="font-expressive text-[30px] font-semibold leading-tight text-text-primary md:text-[40px]">
+      <h2 className="font-rye letterpress text-[34px] leading-tight text-ink md:text-[44px]">
         {profile.name}
       </h2>
-      <p className="mt-2 font-expressive text-[18px] font-semibold text-accent md:text-[20px]">
+      <p className="mt-2 font-fell text-[18px] italic text-oxblood md:text-[20px]">
         {profile.headline}
       </p>
-      <p className="mt-5 max-w-prose text-[15px] leading-relaxed text-text-primary/85">
+      <p className="mt-5 max-w-prose font-fell text-[15px] leading-relaxed text-ink/90">
         {profile.shortBio}
       </p>
     </>
@@ -38,23 +36,23 @@ function About() {
   return (
     <>
       <Kicker>The person</Kicker>
-      <h2 className="font-expressive text-[28px] font-semibold text-text-primary md:text-[34px]">
+      <h2 className="font-rye letterpress text-[30px] leading-tight text-ink md:text-[38px]">
         About
       </h2>
-      <p className="mt-5 max-w-prose text-[15px] leading-relaxed text-text-primary/85">
+      <p className="mt-5 max-w-prose font-fell text-[15px] leading-relaxed text-ink/90">
         {profile.shortBio}
       </p>
       <div className="mt-8 space-y-6">
         {skillGroups.map((g) => (
           <div key={g.label}>
-            <h3 className="mb-3 font-expressive text-[13px] font-semibold uppercase tracking-widest text-accent/70">
+            <h3 className="mb-3 font-fell-sc text-[13px] tracking-[0.2em] text-brass-text">
               {g.label}
             </h3>
             <ul className="flex flex-wrap gap-2">
               {g.skills.map((s) => (
                 <li
                   key={s}
-                  className="hud-chip px-3 py-1 font-functional text-[13px] text-text-primary/80"
+                  className="paper-chip rounded-[2px] px-2.5 py-0.5 font-fell text-[13px]"
                 >
                   {s}
                 </li>
@@ -74,17 +72,17 @@ function RolePanel({ role }: { role: Role }) {
       <Kicker>
         {role.location} · {dateRange}
       </Kicker>
-      <h2 className="font-expressive text-[28px] font-semibold leading-tight text-text-primary md:text-[34px]">
+      <h2 className="font-rye letterpress text-[30px] leading-tight text-ink md:text-[38px]">
         {role.company}
       </h2>
-      <p className="mt-1 font-expressive text-[16px] font-semibold text-accent/80 md:text-[18px]">
-        {role.title}
-      </p>
-      <p className="mt-5 text-[14px] leading-relaxed text-text-primary/75">{role.blurb}</p>
+      <p className="mt-1 font-fell text-[16px] italic text-oxblood md:text-[18px]">{role.title}</p>
+      <p className="mt-5 font-fell text-[14px] leading-relaxed text-ink/85">{role.blurb}</p>
       <ul className="mt-5 space-y-3">
         {role.highlights.map((h, i) => (
-          <li key={i} className="flex gap-3 text-[14px] leading-relaxed text-text-primary/85">
-            <span className="mt-[7px] h-1 w-3 shrink-0 bg-accent/80" />
+          <li key={i} className="flex gap-3 font-fell text-[14px] leading-relaxed text-ink/90">
+            <span aria-hidden className="mt-[2px] shrink-0 text-brass-text">
+              ❦
+            </span>
             <span>{h}</span>
           </li>
         ))}
@@ -98,52 +96,30 @@ function RolePanel({ role }: { role: Role }) {
   );
 }
 
-/** The single "Career" booth HUD — every role, newest first. */
-function Work() {
-  const ordered = [...roles].sort((a, b) => (a.start < b.start ? 1 : -1));
-  return (
-    <>
-      <Kicker>Where I&apos;ve worked</Kicker>
-      <h2 className="font-expressive text-[28px] font-semibold text-text-primary md:text-[34px]">
-        Career
-      </h2>
-      <div className="mt-6 divide-y divide-white/10">
-        {ordered.map((role) => (
-          <div key={role.id} className="py-6 first:pt-0">
-            <RolePanel role={role} />
-          </div>
-        ))}
-      </div>
-    </>
-  );
-}
-
 function Projects() {
   return (
     <>
       <Kicker>Side work</Kicker>
-      <h2 className="font-expressive text-[28px] font-semibold text-text-primary md:text-[34px]">
+      <h2 className="font-rye letterpress text-[30px] leading-tight text-ink md:text-[38px]">
         Projects
       </h2>
       <div className="mt-6 space-y-8">
         {sideProjects.map((p) => (
           <article key={p.id} aria-label={p.name}>
             <div className="flex items-baseline justify-between gap-4">
-              <h3 className="font-expressive text-[20px] font-semibold text-text-primary">
-                {p.name}
-              </h3>
+              <h3 className="font-rye text-[22px] text-ink">{p.name}</h3>
               {p.url && (
                 <a
                   href={p.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-functional text-[12px] text-accent hover:text-accent/70"
+                  className="font-fell-sc text-[12px] tracking-[0.12em] text-brass-text hover:text-oxblood"
                 >
                   Visit ↗
                 </a>
               )}
             </div>
-            <p className="mt-2 text-[14px] leading-relaxed text-text-primary/75">{p.blurb}</p>
+            <p className="mt-2 font-fell text-[14px] leading-relaxed text-ink/85">{p.blurb}</p>
             <ul className="mt-3 flex flex-wrap gap-2">
               {p.tech.map((t) => (
                 <TechChip key={t} label={t} />
@@ -171,7 +147,7 @@ function Contact() {
   return (
     <>
       <Kicker>Let&apos;s talk</Kicker>
-      <h2 className="font-expressive text-[28px] font-semibold text-text-primary md:text-[34px]">
+      <h2 className="font-rye letterpress text-[30px] leading-tight text-ink md:text-[38px]">
         Get in touch
       </h2>
       <ul className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -181,12 +157,10 @@ function Contact() {
               href={l.href}
               {...(l.ext && { target: '_blank', rel: 'noopener noreferrer' })}
               {...(l.dl && { download: true })}
-              className="hud-button flex min-h-[56px] flex-col justify-center px-5 py-3"
+              className="paper-button flex min-h-[56px] flex-col justify-center rounded-[3px] px-5 py-3"
             >
-              <span className="font-expressive text-[15px] font-semibold text-text-primary">
-                {l.label}
-              </span>
-              <span className="font-functional text-[12px] text-text-primary/60">{l.detail}</span>
+              <span className="font-fell-sc text-[15px] tracking-[0.08em] text-ink">{l.label}</span>
+              <span className="font-fell text-[12px] text-ink-soft">{l.detail}</span>
             </a>
           </li>
         ))}
@@ -199,7 +173,7 @@ function Contact() {
 export function SectionContent({ section }: { section: string }) {
   if (section === 'intro') return <Intro />;
   if (section === 'about') return <About />;
-  if (section === 'work') return <Work />;
+  // `work` (Career) is handled by <CareerTickets> in ContentOverlay, not here.
   if (section === 'projects') return <Projects />;
   if (section === 'contact') return <Contact />;
   // `game:` sections (e.g. ball-toss) step into the in-canvas game instead of

@@ -28,7 +28,7 @@ const LINKS: NavLink[] = [
 ];
 
 const itemClass =
-  'inline-flex min-h-[44px] items-center px-3 font-functional text-[14px] transition-colors';
+  'inline-flex min-h-[40px] items-center px-3 font-fell-sc text-[15px] tracking-[0.1em] transition-colors';
 
 export function SiteNav() {
   return (
@@ -44,14 +44,14 @@ export function SiteNav() {
           iamnick<span className="text-accent">.dev</span>
         </a>
 
-        <ul className="flex items-center gap-0.5 rounded-3 bg-background-primary/40 px-1 backdrop-blur-sm sm:gap-1">
+        <ul className="ticket-frame flex items-center gap-0.5 rounded-[4px] px-2 sm:gap-1">
           {LINKS.map(({ label, href, soon }) =>
             soon ? (
               <li key={label}>
                 <span
                   aria-disabled="true"
                   title="Coming soon"
-                  className={cn(itemClass, 'cursor-not-allowed text-text-primary/30')}
+                  className={cn(itemClass, 'cursor-not-allowed text-ink-soft/50')}
                 >
                   {label}
                 </span>
@@ -60,7 +60,7 @@ export function SiteNav() {
               <li key={label}>
                 <a
                   href={href}
-                  className={cn(itemClass, 'text-accent transition-colors hover:text-accent/70')}
+                  className={cn(itemClass, 'text-ink transition-colors hover:text-oxblood')}
                 >
                   {label}
                 </a>
