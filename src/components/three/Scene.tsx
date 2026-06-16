@@ -10,6 +10,7 @@ import { BulbGlow } from './synty/BulbGlow';
 import { IsoControls } from './synty/IsoControls';
 import { Indicators } from './synty/Indicators';
 import { DynamicLights } from './synty/DynamicLights';
+import { BallTossGame } from './game/BallTossGame';
 import { type QualityTier } from './hooks/useQualityTier';
 
 interface SceneProps {
@@ -60,6 +61,7 @@ export default function Scene({ tier }: SceneProps) {
         <SyntyScene />
         <AnimatedRides />
         <BulbGlow />
+        <BallTossGame />
       </Suspense>
 
       <Indicators />

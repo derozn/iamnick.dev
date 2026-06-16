@@ -118,22 +118,6 @@ function Work() {
   );
 }
 
-/** Optional carnival game stepped into from its stall (built in a later phase). */
-function Game({ title }: { title: string }) {
-  return (
-    <>
-      <Kicker>Step right up</Kicker>
-      <h2 className="font-expressive text-[28px] font-semibold text-text-primary md:text-[34px]">
-        {title}
-      </h2>
-      <p className="mt-5 max-w-prose text-[15px] leading-relaxed text-text-primary/85">
-        A playable carnival game is coming to this stall — knock the bottles down for a prize. Check
-        back soon.
-      </p>
-    </>
-  );
-}
-
 function Projects() {
   return (
     <>
@@ -218,7 +202,8 @@ export function SectionContent({ section }: { section: string }) {
   if (section === 'work') return <Work />;
   if (section === 'projects') return <Projects />;
   if (section === 'contact') return <Contact />;
-  if (section === 'game:ball-toss') return <Game title="Ball Toss" />;
+  // `game:` sections (e.g. ball-toss) step into the in-canvas game instead of
+  // raising a content panel, so they never reach SectionContent.
   if (section.startsWith('role:')) {
     const role = roles.find((r) => r.id === section.slice(5));
     if (role) return <RolePanel role={role} />;

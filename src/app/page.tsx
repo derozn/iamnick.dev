@@ -1,5 +1,6 @@
 import { MidwayCanvas } from '@/components/three/MidwayCanvas';
 import { ContentOverlay } from '@/components/content/ContentOverlay';
+import { BallTossHud } from '@/components/three/game/BallTossHud';
 
 export const dynamic = 'auto';
 
@@ -21,6 +22,9 @@ export default function Homepage() {
 
       {/* Content panel that rises over the scene when a structure is focused */}
       <ContentOverlay />
+
+      {/* DOM overlay for the ball-toss game (score / balls / exit / win-lose) */}
+      <BallTossHud />
     </>
   );
 }

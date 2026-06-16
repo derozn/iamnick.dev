@@ -20,6 +20,21 @@ import { create } from 'zustand';
 
 export type SceneMode = 'travelling' | 'viewing' | 'playing';
 
+/**
+ * Ball-toss game phase — drives the DOM HUD. The per-frame physics lives in refs
+ * inside `<BallTossGame>`; only this summary state reaches the store so the HUD can
+ * react without coupling to the sim.
+ *   - `intro`  — just stepped in; show the how-to-play card, bottles at rest.
+ *   - `aiming` — armed, a ball is ready; pointer aims, charge-and-release throws.
+ *   - `thrown` — a ball is in flight / bottles settling; input is parked.
+ *   - `won`    — all bottles down; show the prize card.
+ *   - `lost`   — out of balls with bottles standing; show the final-score card.
+ */
+export type BallTossPhase = 'intro' | 'aiming' | 'thrown' | 'won' | 'lost';
+
+/** Balls the visitor gets per ball-toss round. */
+export const BALL_TOSS_BALLS = 3;
+
 /** Normalised [0, 1] scroll-progress band occupied by one Midway attraction. */
 export interface SectionRange {
   start: number;
@@ -51,7 +66,22 @@ export interface SceneState {
   stepIn: (stall: string) => void;
   /** Exit the active stall back to travelling at the same scroll position. */
   exit: () => void;
+
+  /* --- Ball-toss game slice (summary only; the sim runs in refs) --- */
+  /** Running score for the current ball-toss round. */
+  ballTossScore: number;
+  /** Balls left to throw this round. */
+  ballTossBallsLeft: number;
+  /** Current phase of the ball-toss round (drives the HUD). */
+  ballTossPhase: BallTossPhase;
+  /** Reset the round to a fresh start (full balls, zero score, intro card). */
+  resetBallToss: () => void;
+  /** Merge a partial summary update from the sim (score / balls / phase). */
+  setBallToss: (patch: Partial<BallTossSlice>) => void;
 }
+
+/** The mutable summary fields the sim writes back to the store. */
+type BallTossSlice = Pick<SceneState, 'ballTossScore' | 'ballTossBallsLeft' | 'ballTossPhase'>;
 
 export const useSceneStore = create<SceneState>()((set) => ({
   mode: 'travelling',
@@ -66,5 +96,14 @@ export const useSceneStore = create<SceneState>()((set) => ({
   open: (attraction) => set({ mode: 'viewing', activeAttraction: attraction }),
   close: () => set({ mode: 'travelling', activeAttraction: null, focusedAttraction: null }),
   stepIn: (stall) => set({ mode: 'playing', activeStall: stall }),
-  exit: () => set({ mode: 'travelling', activeStall: null }),
+  // Also clear focusedAttraction so IsoControls releases the booth and the iso
+  // camera eases back to the overview (otherwise it stays parked at the stall).
+  exit: () => set({ mode: 'travelling', activeStall: null, focusedAttraction: null }),
+
+  ballTossScore: 0,
+  ballTossBallsLeft: BALL_TOSS_BALLS,
+  ballTossPhase: 'intro',
+  resetBallToss: () =>
+    set({ ballTossScore: 0, ballTossBallsLeft: BALL_TOSS_BALLS, ballTossPhase: 'intro' }),
+  setBallToss: (patch) => set(patch),
 }));

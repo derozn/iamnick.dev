@@ -47,9 +47,11 @@ export function IsoControls() {
   const drag = useRef<{ x: number; y: number } | null>(null);
   const focusedRef = useRef<string | null>(null);
   const open = useSceneStore((s) => s.open);
+  const stepIn = useSceneStore((s) => s.stepIn);
 
   // React to focus changes: fly to a head-on view of the structure's opening (or
-  // back to the iso overview), and raise its content once the fly-in has settled.
+  // back to the iso overview), and on arrival either raise its content panel or —
+  // for a `game:` section — step into the playable game instead.
   useEffect(() => {
     focusedRef.current = focused;
     if (focused) {
@@ -57,14 +59,17 @@ export function IsoControls() {
       if (a) {
         // re-centre the overview on this structure for the return trip
         panTarget.current.set(a.position[0], 1.5, a.position[2]);
-        const t = setTimeout(() => open(focused), 1400);
+        // Keep the 1.4 s fly-in so the camera has arrived at the counter before the
+        // game arms (or the content panel rises).
+        const isGame = a.section.startsWith('game:');
+        const t = setTimeout(() => (isGame ? stepIn(a.id) : open(a.id)), 1400);
         invalidate();
         return () => clearTimeout(t);
       }
     }
     wantDist.current = DEFAULT_D;
     invalidate();
-  }, [focused, invalidate, open]);
+  }, [focused, invalidate, open, stepIn]);
 
   // Drag to pan, wheel to zoom (disabled while focused on a structure).
   useEffect(() => {
