@@ -41,6 +41,35 @@ export const CM = 0.01;
 /** The 3-2-1 pyramid, front row first. Row index rises with height. */
 export const PYRAMID_ROWS = [3, 2, 1] as const;
 
+/* --- Throw physics (custom lightweight sim; all tunable for feel) --- */
+
+/** Downward acceleration (m/s²). Softer than real gravity for a floaty arc. */
+export const GRAVITY = -8;
+/** Launch speed at zero / full charge (m/s). The charge meter lerps between. */
+export const MIN_SPEED = 8;
+export const MAX_SPEED = 14;
+/**
+ * Upward lift added to the (normalised) launch direction before re-normalising.
+ * The play camera looks slightly down at the counter, so a raw point-and-throw
+ * would fire low; this lobs the ball so aiming at the stack roughly lands on it.
+ * Tuned offline against the play camera — see the build notes.
+ */
+export const LAUNCH_LIFT = 0.25;
+/** Seconds of held charge to reach full power. */
+export const CHARGE_TIME = 0.85;
+/** Ball despawns below this world height (fell off / past the booth). */
+export const FLOOR_Y = -0.5;
+/** Ball is dead once it gets this far from the booth focus (missed long). */
+export const MAX_RANGE = 14;
+/** Velocity retained after clipping a bottle, so one ball can cascade a stack. */
+export const HIT_DAMPING = 0.72;
+/** Points awarded per bottle knocked down. */
+export const POINTS_PER_BOTTLE = 100;
+/** Bonus for clearing the whole stack with a single ball. */
+export const CLEAR_COMBO_BONUS = 250;
+/** Trajectory-preview sample count (in-scene aim arc). */
+export const ARC_SAMPLES = 22;
+
 /**
  * Resting base positions for the pyramid, given a bottle spacing and per-row rise.
  * Each Vector3 is where that bottle's base should sit (world space, upright),
