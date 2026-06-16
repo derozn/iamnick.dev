@@ -6,6 +6,7 @@ import { useGLTF } from '@react-three/drei';
 import {
   type BufferGeometry,
   Color,
+  DoubleSide,
   InstancedMesh,
   type Material,
   Matrix4,
@@ -81,6 +82,8 @@ interface InstancedPrefabProps {
   cullDist?: number;
   /** Push these surfaces toward camera in depth — decals/posters sit coplanar on walls and z-fight. */
   polygonOffset?: boolean;
+  /** Self-illuminate with the base map — for Maya-merged props whose broken normals render black. */
+  unlit?: boolean;
 }
 
 export function InstancedPrefab({
@@ -92,6 +95,7 @@ export function InstancedPrefab({
   shareAtlas = false,
   cullDist,
   polygonOffset = false,
+  unlit = false,
 }: InstancedPrefabProps) {
   const { scene } = useGLTF(url, true);
 
@@ -103,6 +107,25 @@ export function InstancedPrefab({
       if (m.isMesh && m.geometry) {
         if (baseAtlas) applyBase(m.material, baseAtlas, shareAtlas);
         if (emissive) applyEmissive(m.material, emissive, emissiveIntensity);
+        // A few props (the candyfloss cart, the carnival train + carriages) are
+        // Maya-merged meshes ("pasted__"/"lambert" materials) whose normals survive
+        // the FBX→glTF conversion broken in a way computeVertexNormals can't recover:
+        // they receive no diffuse light and render pure black, even though their
+        // texture/UVs are fine. Self-illuminate them with their own base map so they
+        // read their albedo (flat, but textured) instead of going black.
+        if (unlit) {
+          for (const mm of Array.isArray(m.material) ? m.material : [m.material]) {
+            const sm = mm as MeshStandardMaterial;
+            sm.emissiveMap = sm.map;
+            sm.emissive = WHITE;
+            sm.emissiveIntensity = 0.9;
+          }
+        }
+        // DoubleSide lights camera-facing fragments on any prop the conversion left
+        // with reversed winding (without it, those faces also render black).
+        for (const mm of Array.isArray(m.material) ? m.material : [m.material]) {
+          mm.side = DoubleSide;
+        }
         if (polygonOffset) {
           for (const mm of Array.isArray(m.material) ? m.material : [m.material]) {
             mm.polygonOffset = true;
@@ -119,7 +142,7 @@ export function InstancedPrefab({
       }
     });
     return out;
-  }, [scene, emissive, emissiveIntensity, baseAtlas, shareAtlas, polygonOffset]);
+  }, [scene, emissive, emissiveIntensity, baseAtlas, shareAtlas, polygonOffset, unlit]);
 
   // Per-instance world matrices (one row per sub) + a shared prop-origin position
   // (the transform's translation — submesh offsets are negligible at cull range).
