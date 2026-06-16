@@ -18,13 +18,27 @@ const available = new Set(manifest as string[]);
 const EXCLUDE =
   /Background_Card|Sky_Dome|CloudRing|Tree_Background|SM_Env_Ground_Hill|BearTrap|Cable_01|Cobwebs|Decal|Net_01|Photo_Stand|Plushie_03|Sign_Closed|Spirit_Board|Dynamite|Needle/;
 
+/**
+ * A translation artefact piled ~454 stall accessories (ring-toss rings, cans,
+ * plushies, bottles, signs, weapons…) at the scene origin — they came through with
+ * local-to-parent transforms instead of world. Drop everything in that tight blob
+ * (it's pure overdraw + clutter) except the central flag/light pole.
+ */
+const PILE_X = -0.3;
+const PILE_Z = -0.7;
+const PILE_R2 = 3 * 3;
+const PILE_KEEP = /Bunting_Pole|Light_Pole|Lamp_Post|Flag/;
+const inPile = (name: string, t: number[]) =>
+  !PILE_KEEP.test(name) && (t[0] - PILE_X) ** 2 + (-t[2] - PILE_Z) ** 2 < PILE_R2;
+
 /** [prefabName, transforms[]] for every demo prefab we have a GLB for, plus our additions. */
 const entries = Object.entries(demoInstances as Record<string, number[][]>)
   .filter(([name]) => available.has(name) && !EXCLUDE.test(name) && !SPINNER_NAMES.has(name))
-  .map(([name, tfs]) => [
-    name,
-    EXTRA_INSTANCES[name] ? [...tfs, ...EXTRA_INSTANCES[name]] : tfs,
-  ]) as [string, number[][]][];
+  .map(([name, tfs]) => {
+    const kept = tfs.filter((t) => !inPile(name, t));
+    return [name, EXTRA_INSTANCES[name] ? [...kept, ...EXTRA_INSTANCES[name]] : kept];
+  })
+  .filter(([, tfs]) => (tfs as number[][]).length > 0) as [string, number[][]][];
 
 entries.forEach(([name]) => useGLTF.preload(`${SYNTY}${name}.glb`, true));
 

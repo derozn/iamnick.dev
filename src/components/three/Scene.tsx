@@ -37,7 +37,10 @@ export default function Scene({ tier }: SceneProps) {
       // demand loop while the camera moves, so render continuously where bloom is
       // on (high tier). Low tier has no bloom — keep demand to save power.
       frameloop={high ? 'always' : 'demand'}
-      dpr={high ? [1, 1.5] : [1, 1.25]}
+      // Cap the render resolution — fragment cost (scene + Bloom) scales with the
+      // pixel count, so on a retina display this is the biggest lever against the
+      // move/scroll lag + context-loss flicker.
+      dpr={high ? [1, 1.25] : 1}
       gl={{
         antialias: false,
         powerPreference: 'high-performance',
