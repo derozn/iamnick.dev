@@ -12,6 +12,7 @@ import {
   Matrix4,
   type Mesh,
   type MeshStandardMaterial,
+  Quaternion,
   Vector3,
 } from 'three';
 
@@ -19,17 +20,26 @@ import { BALL_TOSS_BALLS, useSceneStore } from '@/store/scene';
 import {
   ARC_SAMPLES,
   BOOTH_FOCUS,
+  CASCADE_PUSH_FACTOR,
+  CASCADE_RADIUS_FACTOR,
   CHARGE_TIME,
+  CLEAR_COMBO_BONUS,
   CM,
+  COMBO_MIN_HITS,
   FLOOR_Y,
   GRAVITY,
   HIT_DAMPING,
+  HIT_FUDGE,
+  KNOCK_PUSH,
+  KNOCK_SPIN,
+  KNOCK_UP,
   LAUNCH_LIFT,
   MAX_RANGE,
   MAX_SPEED,
   MIN_SPEED,
   POINTS_PER_BOTTLE,
   pyramidPositions,
+  SETTLE_Y,
   SYNTY,
 } from './ballTossConfig';
 
@@ -111,8 +121,37 @@ export function BallTossGame() {
 const _v = new Vector3();
 const _p = new Vector3();
 const _vel = new Vector3();
+const _kd = new Vector3();
+const _cd = new Vector3();
 const _m = new Matrix4();
+const _dq = new Quaternion();
 const _hidden = new Matrix4().makeScale(0, 0, 0);
+
+/** Per-bottle rigid state. Standing bottles sit at `base`; a knock turns them into
+ *  a tumbling body integrated under gravity until they fall out of play. */
+interface BottleSim {
+  base: Vector3;
+  pos: Vector3;
+  vel: Vector3;
+  quat: Quaternion;
+  axis: Vector3; // tumble axis (unit)
+  spin: number; // tumble rate (rad/s)
+  up: boolean; // still standing
+  resting: boolean; // fallen and spent
+}
+
+function makeSims(positions: Vector3[]): BottleSim[] {
+  return positions.map((base) => ({
+    base,
+    pos: base.clone(),
+    vel: new Vector3(),
+    quat: new Quaternion(),
+    axis: new Vector3(1, 0, 0),
+    spin: 0,
+    up: true,
+    resting: false,
+  }));
+}
 
 /** Unit launch direction for a pointer NDC: the camera ray, lobbed up by LAUNCH_LIFT. */
 function liftedDir(camera: Camera, px: number, py: number, out: Vector3) {
@@ -134,20 +173,24 @@ function Sim() {
     [bottleR, bottleH],
   );
 
+  const spacing = bottleR * 2 + 0.012;
+  const cascadeRadius = spacing * CASCADE_RADIUS_FACTOR;
+
   // --- Sim state (refs only; mutated in handlers / useFrame) ---
   const bottleGroups = useRef<(Group | null)[]>([]);
-  const upRef = useRef<boolean[]>(positions.map(() => true));
+  const sims = useRef<BottleSim[]>(makeSims(positions));
   const ball = useRef({ pos: new Vector3(), vel: new Vector3(), live: false });
   const ballGroup = useRef<Group>(null);
   const pointer = useRef({ x: 0, y: 0 });
   const charging = useRef(false);
   const power = useRef(0);
+  const knockedThisThrow = useRef(0);
   const arc = useRef<InstancedMesh>(null);
   const reticle = useRef<Mesh>(null);
 
   // Fresh round each time the booth is entered (Sim remounts on enter).
   useEffect(() => {
-    upRef.current = positions.map(() => true);
+    sims.current = makeSims(positions);
     setBallToss({ ballTossScore: 0, ballTossBallsLeft: BALL_TOSS_BALLS, ballTossPhase: 'aiming' });
   }, [positions, setBallToss]);
 
@@ -183,6 +226,7 @@ function Sim() {
       ball.current.pos.copy(camera.position);
       ball.current.vel.copy(_v).multiplyScalar(speed);
       ball.current.live = true;
+      knockedThisThrow.current = 0;
       power.current = 0;
       if (ballGroup.current) ballGroup.current.visible = true;
       const s = useSceneStore.getState();
@@ -235,15 +279,17 @@ function Sim() {
       b.vel.y += GRAVITY * h;
       b.pos.addScaledVector(b.vel, h);
 
-      const rr = bottleR + ballR;
-      for (let i = 0; i < positions.length; i++) {
-        if (!upRef.current[i]) continue;
-        const base = positions[i];
-        const dx = b.pos.x - base.x;
-        const dz = b.pos.z - base.z;
-        const withinY = b.pos.y > base.y - ballR && b.pos.y < base.y + bottleH + ballR;
+      const rr = bottleR + ballR + HIT_FUDGE;
+      for (let i = 0; i < sims.current.length; i++) {
+        const s = sims.current[i];
+        if (!s.up) continue;
+        const dx = b.pos.x - s.base.x;
+        const dz = b.pos.z - s.base.z;
+        const lo = s.base.y - ballR - HIT_FUDGE;
+        const hi = s.base.y + bottleH + ballR + HIT_FUDGE;
+        const withinY = b.pos.y > lo && b.pos.y < hi;
         if (withinY && dx * dx + dz * dz < rr * rr) {
-          knock(i);
+          knock(i, _kd.copy(b.vel), false);
           b.vel.multiplyScalar(HIT_DAMPING);
         }
       }
@@ -256,25 +302,80 @@ function Sim() {
     if (ballGroup.current) ballGroup.current.position.copy(b.pos);
   }
 
-  /** Knock a bottle down (Step 3: hide it) and tally the score. */
-  function knock(i: number) {
-    upRef.current[i] = false;
-    const g = bottleGroups.current[i];
-    if (g) g.visible = false;
-    const s = useSceneStore.getState();
-    s.setBallToss({ ballTossScore: s.ballTossScore + POINTS_PER_BOTTLE });
+  /** Topple a bottle along `dir`: impulse + tumble, score it, and cascade into any
+   *  standing neighbours it would fall onto. */
+  function knock(i: number, dir: Vector3, cascade: boolean) {
+    const s = sims.current[i];
+    if (!s.up) return;
+    s.up = false;
+    knockedThisThrow.current++;
+
+    // Horizontal shove along the incoming direction (default forward if degenerate).
+    _kd.copy(dir).setY(0);
+    if (_kd.lengthSq() < 1e-6) _kd.set(0, 0, -1);
+    _kd.normalize();
+    const push = (cascade ? CASCADE_PUSH_FACTOR : 1) * KNOCK_PUSH;
+    s.vel.copy(_kd).multiplyScalar(push).setY(KNOCK_UP);
+    // Tumble about the horizontal axis perpendicular to the shove (falls forward).
+    s.axis.set(_kd.z, 0, -_kd.x).normalize();
+    // Deterministic per-bottle variation (no Math.random — keeps the sim pure/repeatable).
+    s.spin = KNOCK_SPIN * (0.85 + 0.3 * ((i % 4) / 3));
+    // Capture the fall direction before recursion clobbers the shared scratch.
+    const fallX = _kd.x;
+    const fallZ = _kd.z;
+
+    const st = useSceneStore.getState();
+    st.setBallToss({ ballTossScore: st.ballTossScore + POINTS_PER_BOTTLE });
+
+    // Cascade: only nudge near neighbours the bottle actually falls *onto* (ahead in
+    // the fall direction), so a hit topples a fan — not the whole connected stack.
+    for (let j = 0; j < sims.current.length; j++) {
+      const n = sims.current[j];
+      if (j === i || !n.up) continue;
+      const dx = n.base.x - s.base.x;
+      const dz = n.base.z - s.base.z;
+      if (dx * dx + dz * dz < cascadeRadius * cascadeRadius && dx * fallX + dz * fallZ > 0) {
+        knock(j, _cd.set(dx, 0, dz), true);
+      }
+    }
   }
 
-  /** Ball is spent — hide it and advance the round (next ball / win / lose). */
+  /** Ball is spent — hide it, award any combo, advance the round (next / won / lost). */
   function retireBall() {
     ball.current.live = false;
     if (ballGroup.current) ballGroup.current.visible = false;
     const s = useSceneStore.getState();
-    const standing = upRef.current.filter(Boolean).length;
+    if (knockedThisThrow.current >= COMBO_MIN_HITS) {
+      s.setBallToss({ ballTossScore: s.ballTossScore + CLEAR_COMBO_BONUS });
+    }
+    const standing = sims.current.filter((b) => b.up).length;
     if (standing === 0) s.setBallToss({ ballTossPhase: 'won' });
     else if (s.ballTossBallsLeft <= 0) s.setBallToss({ ballTossPhase: 'lost' });
     else s.setBallToss({ ballTossPhase: 'aiming' });
     invalidate();
+  }
+
+  /** Integrate any toppling bottles; returns true while some are still moving. */
+  function stepBottles(dt: number) {
+    let moving = false;
+    for (let i = 0; i < sims.current.length; i++) {
+      const s = sims.current[i];
+      if (s.up || s.resting) continue;
+      moving = true;
+      s.vel.y += GRAVITY * dt;
+      s.pos.addScaledVector(s.vel, dt);
+      _dq.setFromAxisAngle(s.axis, s.spin * dt);
+      s.quat.premultiply(_dq);
+      const g = bottleGroups.current[i];
+      if (s.pos.y < SETTLE_Y) {
+        s.resting = true;
+        if (g) g.visible = false;
+      } else if (g) {
+        g.position.copy(s.pos);
+        g.quaternion.copy(s.quat);
+      }
+    }
+    return moving;
   }
 
   useFrame((_s, delta) => {
@@ -296,6 +397,8 @@ function Sim() {
       stepBall(dt);
       invalidate();
     }
+
+    if (stepBottles(dt)) invalidate();
   });
 
   return (

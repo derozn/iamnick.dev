@@ -63,12 +63,35 @@ export const FLOOR_Y = -0.5;
 export const MAX_RANGE = 14;
 /** Velocity retained after clipping a bottle, so one ball can cascade a stack. */
 export const HIT_DAMPING = 0.72;
+/**
+ * Extra hit slack (m) added to the ball-vs-bottle radius and height test. The
+ * bottles are tiny (≈10cm), so a tight test makes near-misses frustrating; this
+ * widens the effective target for a forgiving, arcade carnival feel.
+ */
+export const HIT_FUDGE = 0.08;
 /** Points awarded per bottle knocked down. */
 export const POINTS_PER_BOTTLE = 100;
-/** Bonus for clearing the whole stack with a single ball. */
+/** Bonus for knocking 3+ bottles with a single ball (a stack-clearing strike). */
 export const CLEAR_COMBO_BONUS = 250;
+/** A single ball must topple at least this many bottles to earn the combo. */
+export const COMBO_MIN_HITS = 3;
 /** Trajectory-preview sample count (in-scene aim arc). */
 export const ARC_SAMPLES = 22;
+
+/* --- Topple physics (knocked bottles tumble off the shelf) --- */
+
+/** Horizontal shove (m/s) a directly-hit bottle takes along the ball's path. */
+export const KNOCK_PUSH = 1.8;
+/** Upward pop (m/s) on a knock, so bottles lift off before falling. */
+export const KNOCK_UP = 0.7;
+/** Tumble rate (rad/s) imparted on a knock. */
+export const KNOCK_SPIN = 12;
+/** A toppling bottle nudges standing neighbours within this × bottle-spacing. */
+export const CASCADE_RADIUS_FACTOR = 1.7;
+/** Cascade nudges are gentler than a direct hit (fraction of KNOCK_PUSH). */
+export const CASCADE_PUSH_FACTOR = 0.7;
+/** A toppling bottle that falls below this world height is spent (hidden). */
+export const SETTLE_Y = -0.4;
 
 /**
  * Resting base positions for the pyramid, given a bottle spacing and per-row rise.
