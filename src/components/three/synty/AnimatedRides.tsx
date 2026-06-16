@@ -6,6 +6,7 @@ import { useGLTF, useTexture } from '@react-three/drei';
 import {
   Color,
   type Group,
+  LinearFilter,
   type Material,
   Matrix4,
   type Mesh,
@@ -50,7 +51,7 @@ function applyEmissive(mat: Material | Material[], tex: Texture) {
     if (!sm.emissiveMap) {
       sm.emissive = WHITE;
       sm.emissiveMap = tex;
-      sm.emissiveIntensity = 2;
+      sm.emissiveIntensity = 3;
       sm.needsUpdate = true;
     }
   }
@@ -108,6 +109,10 @@ export function AnimatedRides() {
     const tex = t as Texture;
     tex.flipY = false;
     tex.colorSpace = SRGBColorSpace;
+    // Keep the tiny bulb swatches sharp at distance — see SyntyScene for why.
+    tex.generateMipmaps = false;
+    tex.minFilter = LinearFilter;
+    tex.magFilter = LinearFilter;
     tex.needsUpdate = true;
   }) as Texture;
 

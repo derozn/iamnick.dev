@@ -28,7 +28,7 @@ export default function Scene({ tier }: SceneProps) {
   const high = tier === 'high';
   // Light atmospheric fog only — the iso overview needs to read the whole scene
   // (no per-instance distance culling here; the camera sees everything).
-  const fogDensity = high ? 0.01 : 0.016;
+  const fogDensity = high ? 0.013 : 0.018;
 
   return (
     <Canvas

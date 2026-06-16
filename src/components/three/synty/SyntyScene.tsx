@@ -1,5 +1,5 @@
 import { useGLTF, useTexture } from '@react-three/drei';
-import { SRGBColorSpace, type Texture } from 'three';
+import { LinearFilter, SRGBColorSpace, type Texture } from 'three';
 
 import demoInstances from './demo-instances.json';
 import manifest from './manifest.json';
@@ -58,6 +58,13 @@ export function SyntyScene({ cullDist }: { cullDist?: number }) {
     const tex = t as Texture;
     tex.flipY = false;
     tex.colorSpace = SRGBColorSpace;
+    // The Synty emissive atlas is 99% black with the bulb/light swatches packed
+    // into a tiny lit corner. With mipmaps on, those few-texel swatches average to
+    // black as the rides recede, so the bulbs go dark — disable mipmaps so every
+    // bulb samples the sharp lit texel at any distance (light twinkle is a bonus).
+    tex.generateMipmaps = false;
+    tex.minFilter = LinearFilter;
+    tex.magFilter = LinearFilter;
     tex.needsUpdate = true;
   }) as Texture;
 
