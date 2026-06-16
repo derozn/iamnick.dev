@@ -8,6 +8,17 @@
 > The thing left to do is **feel-tuning** (throw arc + hit forgiveness) on a real machine — see §4 —
 > plus the optional follow-ups in §7.
 
+> **Update — throw is now a slingshot (supersedes the charge-and-release scheme below).**
+> The original "point-to-aim + hold-to-charge" was replaced with an Angry-Birds-style
+> **slingshot**: a ready ball sits in the pouch; press and **drag back** to set power (pull
+> distance) and aim (pull direction — the ball fires _opposite_ the pull); release to throw; a
+> live arc + reticle preview the shot; a tap under `PULL_DEADZONE` cancels. `CHARGE_TIME` is gone;
+> new knobs `PULL_FULL` / `AIM_YAW` / `AIM_LOFT` / `POUCH_NDC` / `LAUNCH_DIST` / `PULL_WORLD` are in
+> `ballTossConfig.ts`. Crucially the launch sits **above + ~4 m from** the stack, so the throw is
+> near-flat: **`LAUNCH_LIFT 0.25→0.05`, `AIM_LOFT → 0`** (loft made shots sail over). The HUD also
+> moved to the letterpress theme — see `hud-letterpress-overhaul.md`. Where the §2/§4 text below
+> still says "charge", read "pull".
+
 ---
 
 ## 0. TL;DR
