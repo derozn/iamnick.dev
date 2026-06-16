@@ -80,8 +80,10 @@ export const ATTRACTIONS: Attraction[] = [
     section: 'game:ball-toss',
     prefab: 'SM_Prop_Stall_02',
     transform: [13, 0.1, 12, 0, 0.38268, 0, 0.92388, 1, 1, 1],
-    position: [13, 1.7, -12],
+    // Aim the play camera at the bottle stack on the counter (a touch above it),
+    // closer than a content-tent so the small bottles read for the throw.
+    position: [13.35, 1.12, -11.0],
     facing: [-0.707, 0, 0.707],
-    focusDist: 8,
+    focusDist: 5.2,
   },
 ];
