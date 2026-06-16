@@ -81,7 +81,7 @@ export const ATTRACTIONS: Attraction[] = [
     prefab: 'SM_Prop_Stall_02',
     transform: [13, 0.1, 12, 0, 0.38268, 0, 0.92388, 1, 1, 1],
     position: [13, 1.7, -12],
-    facing: [-0.707, 0, -0.707],
+    facing: [0.707, 0, -0.707],
     focusDist: 8,
   },
 ];
