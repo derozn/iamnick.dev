@@ -28,6 +28,9 @@ const PILE_X = -0.3;
 const PILE_Z = -0.7;
 const PILE_R2 = 3 * 3;
 const PILE_KEEP = /Bunting_Pole|Light_Pole|Lamp_Post|Flag/;
+
+/** Prefabs that carry their own distinct (non-01_A) base texture — keep their map. */
+const SHARE_SKIP = /Sign_|Poster|Board|Photo|Spirit/;
 const inPile = (name: string, t: number[]) =>
   !PILE_KEEP.test(name) && (t[0] - PILE_X) ** 2 + (-t[2] - PILE_Z) ** 2 < PILE_R2;
 
@@ -75,6 +78,9 @@ export function SyntyScene({ cullDist }: { cullDist?: number }) {
           transforms={transforms}
           emissive={emissive}
           baseAtlas={baseAtlas}
+          // dedup the per-GLB atlas copies onto the one shared atlas (big VRAM win),
+          // except signs/posters which carry their own distinct text texture.
+          shareAtlas={!SHARE_SKIP.test(name)}
           cullDist={cullDist}
         />
       ))}

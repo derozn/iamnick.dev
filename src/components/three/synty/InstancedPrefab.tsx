@@ -33,11 +33,16 @@ function applyEmissive(mat: Material | Material[], tex: Texture, intensity: numb
   }
 }
 
-/** Texture any material the conversion left blank with the shared base atlas (most props use it). */
-function applyBase(mat: Material | Material[], tex: Texture) {
+/**
+ * Point a material's base map at the shared atlas. With `force`, this also replaces
+ * an already-present map — almost every prop uses the same 01_A atlas but each GLB
+ * embedded its OWN copy (~512² each → hundreds of MB of VRAM across 255 prefabs).
+ * Sharing one texture dedupes that, the big lever against context-loss flicker.
+ */
+function applyBase(mat: Material | Material[], tex: Texture, force: boolean) {
   for (const m of Array.isArray(mat) ? mat : [mat]) {
     const sm = m as MeshStandardMaterial;
-    if (!sm.map) {
+    if (force || !sm.map) {
       sm.map = tex;
       sm.color = WHITE;
       sm.needsUpdate = true;
@@ -71,6 +76,8 @@ interface InstancedPrefabProps {
   emissiveIntensity?: number;
   /** Shared base atlas, applied to any material the conversion left untextured. */
   baseAtlas?: Texture;
+  /** Replace this prefab's own atlas copy with the shared one (dedup VRAM). */
+  shareAtlas?: boolean;
   cullDist?: number;
   /** Push these surfaces toward camera in depth — decals/posters sit coplanar on walls and z-fight. */
   polygonOffset?: boolean;
@@ -80,8 +87,9 @@ export function InstancedPrefab({
   url,
   transforms,
   emissive,
-  emissiveIntensity = 1.8,
+  emissiveIntensity = 3.2,
   baseAtlas,
+  shareAtlas = false,
   cullDist,
   polygonOffset = false,
 }: InstancedPrefabProps) {
@@ -93,7 +101,7 @@ export function InstancedPrefab({
     scene.traverse((o) => {
       const m = o as Mesh;
       if (m.isMesh && m.geometry) {
-        if (baseAtlas) applyBase(m.material, baseAtlas);
+        if (baseAtlas) applyBase(m.material, baseAtlas, shareAtlas);
         if (emissive) applyEmissive(m.material, emissive, emissiveIntensity);
         if (polygonOffset) {
           for (const mm of Array.isArray(m.material) ? m.material : [m.material]) {
@@ -111,7 +119,7 @@ export function InstancedPrefab({
       }
     });
     return out;
-  }, [scene, emissive, emissiveIntensity, baseAtlas, polygonOffset]);
+  }, [scene, emissive, emissiveIntensity, baseAtlas, shareAtlas, polygonOffset]);
 
   // Per-instance world matrices (one row per sub) + a shared prop-origin position
   // (the transform's translation — submesh offsets are negligible at cull range).
