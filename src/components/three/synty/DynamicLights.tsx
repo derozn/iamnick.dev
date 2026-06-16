@@ -127,11 +127,12 @@ export function DynamicLights({ pool = 8 }: { pool?: number }) {
 
   return (
     <>
-      {/* cheap, constant base rig — carries the whole scene */}
-      <hemisphereLight args={['#3a4a74', '#100e16', 1.1]} />
-      <ambientLight intensity={0.4} color="#222046" />
-      <directionalLight position={[40, 90, 50]} intensity={1.0} color="#9aa6de" />
-      <directionalLight position={[-50, 45, -40]} intensity={0.45} color="#9a6cff" />
+      {/* cheap, constant base rig — carries the whole scene. Lifted so props away
+          from the point-lights still read (otherwise they fall to near-black). */}
+      <hemisphereLight args={['#5a6a9a', '#1a1726', 1.7]} />
+      <ambientLight intensity={0.85} color="#3a3656" />
+      <directionalLight position={[40, 90, 50]} intensity={1.3} color="#9aa6de" />
+      <directionalLight position={[-50, 45, -40]} intensity={0.6} color="#9a6cff" />
 
       {/* fixed pool — the shader only ever compiles `pool` point lights */}
       {Array.from({ length: pool }).map((_, i) => (
