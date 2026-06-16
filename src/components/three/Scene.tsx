@@ -9,7 +9,6 @@ import { AnimatedRides } from './synty/AnimatedRides';
 import { IsoControls } from './synty/IsoControls';
 import { Indicators } from './synty/Indicators';
 import { DynamicLights } from './synty/DynamicLights';
-import { PostFX } from './effects/PostFX';
 import { type QualityTier } from './hooks/useQualityTier';
 
 interface SceneProps {
@@ -33,9 +32,9 @@ export default function Scene({ tier }: SceneProps) {
 
   return (
     <Canvas
-      // Bloom's EffectComposer flickers to black between invalidations under the
-      // demand loop while the camera moves, so render continuously where bloom is
-      // on (high tier). Low tier has no bloom — keep demand to save power.
+      // Render continuously on high tier (smooth drag + ride spin); low tier renders
+      // on demand to save power. (No post-processing — the EffectComposer was the
+      // source of the black-flicker/context-loss, so the bulbs glow from emissive.)
       frameloop={high ? 'always' : 'demand'}
       // Cap the render resolution — fragment cost (scene + Bloom) scales with the
       // pixel count, so on a retina display this is the biggest lever against the
@@ -62,8 +61,6 @@ export default function Scene({ tier }: SceneProps) {
       </Suspense>
 
       <Indicators />
-
-      {high && <PostFX />}
     </Canvas>
   );
 }

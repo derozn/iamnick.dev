@@ -50,7 +50,7 @@ function applyEmissive(mat: Material | Material[], tex: Texture) {
     if (!sm.emissiveMap) {
       sm.emissive = WHITE;
       sm.emissiveMap = tex;
-      sm.emissiveIntensity = 3.2;
+      sm.emissiveIntensity = 2;
       sm.needsUpdate = true;
     }
   }

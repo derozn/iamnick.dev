@@ -87,7 +87,7 @@ export function InstancedPrefab({
   url,
   transforms,
   emissive,
-  emissiveIntensity = 3.2,
+  emissiveIntensity = 2,
   baseAtlas,
   shareAtlas = false,
   cullDist,
