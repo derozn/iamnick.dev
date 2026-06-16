@@ -33,6 +33,18 @@ function applyEmissive(mat: Material | Material[], tex: Texture, intensity: numb
   }
 }
 
+/** Texture any material the conversion left blank with the shared base atlas (most props use it). */
+function applyBase(mat: Material | Material[], tex: Texture) {
+  for (const m of Array.isArray(mat) ? mat : [mat]) {
+    const sm = m as MeshStandardMaterial;
+    if (!sm.map) {
+      sm.map = tex;
+      sm.color = WHITE;
+      sm.needsUpdate = true;
+    }
+  }
+}
+
 const cmScale = new Matrix4().makeScale(CM, CM, CM);
 
 interface SubMesh {
@@ -57,6 +69,8 @@ interface InstancedPrefabProps {
   transforms: number[][];
   emissive?: Texture;
   emissiveIntensity?: number;
+  /** Shared base atlas, applied to any material the conversion left untextured. */
+  baseAtlas?: Texture;
   cullDist?: number;
   /** Push these surfaces toward camera in depth — decals/posters sit coplanar on walls and z-fight. */
   polygonOffset?: boolean;
@@ -67,6 +81,7 @@ export function InstancedPrefab({
   transforms,
   emissive,
   emissiveIntensity = 1.8,
+  baseAtlas,
   cullDist,
   polygonOffset = false,
 }: InstancedPrefabProps) {
@@ -78,6 +93,7 @@ export function InstancedPrefab({
     scene.traverse((o) => {
       const m = o as Mesh;
       if (m.isMesh && m.geometry) {
+        if (baseAtlas) applyBase(m.material, baseAtlas);
         if (emissive) applyEmissive(m.material, emissive, emissiveIntensity);
         if (polygonOffset) {
           for (const mm of Array.isArray(m.material) ? m.material : [m.material]) {
@@ -94,7 +110,7 @@ export function InstancedPrefab({
       }
     });
     return out;
-  }, [scene, emissive, emissiveIntensity, polygonOffset]);
+  }, [scene, emissive, emissiveIntensity, baseAtlas, polygonOffset]);
 
   // Per-instance world matrices (one row per sub) + a shared prop-origin position
   // (the transform's translation — submesh offsets are negligible at cull range).

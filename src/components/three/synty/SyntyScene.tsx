@@ -16,7 +16,7 @@ const available = new Set(manifest as string[]);
  * planes (beartrap, cobwebs, decals, the blank recycle bin, signs, etc.).
  */
 const EXCLUDE =
-  /Background_Card|Sky_Dome|CloudRing|Tree_Background|SM_Env_Ground_Hill|BearTrap|Cable_01|Cobwebs|Decal|Hoops_Hoola|Milk_Bottle_Toss|Net_01|Photo_Stand|Plushie_03|Rubbish_Bin_03|Sign_Closed|Spirit_Board|Table_01|Dynamite|Needle/;
+  /Background_Card|Sky_Dome|CloudRing|Tree_Background|SM_Env_Ground_Hill|BearTrap|Cable_01|Cobwebs|Decal|Net_01|Photo_Stand|Plushie_03|Sign_Closed|Spirit_Board|Dynamite|Needle/;
 
 /** [prefabName, transforms[]] for every demo prefab we have a GLB for, plus our additions. */
 const entries = Object.entries(demoInstances as Record<string, number[][]>)
@@ -44,6 +44,14 @@ export function SyntyScene({ cullDist }: { cullDist?: number }) {
     tex.needsUpdate = true;
   }) as Texture;
 
+  // Shared base atlas — re-textures props the conversion left blank (most use it).
+  const baseAtlas = useTexture(`${SYNTY}base-atlas.png`, (t) => {
+    const tex = t as Texture;
+    tex.flipY = false;
+    tex.colorSpace = SRGBColorSpace;
+    tex.needsUpdate = true;
+  }) as Texture;
+
   return (
     <>
       {entries.map(([name, transforms]) => (
@@ -52,6 +60,7 @@ export function SyntyScene({ cullDist }: { cullDist?: number }) {
           url={`${SYNTY}${name}.glb`}
           transforms={transforms}
           emissive={emissive}
+          baseAtlas={baseAtlas}
           cullDist={cullDist}
         />
       ))}
