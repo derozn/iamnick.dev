@@ -166,6 +166,7 @@ function Sim() {
   const { clone: ballClone, radius: ballR } = useBallAsset();
 
   const setBallToss = useSceneStore((s) => s.setBallToss);
+  const round = useSceneStore((s) => s.ballTossRound);
 
   // Resting upright base positions for the pyramid (world space).
   const positions = useMemo(
@@ -188,11 +189,30 @@ function Sim() {
   const arc = useRef<InstancedMesh>(null);
   const reticle = useRef<Mesh>(null);
 
-  // Fresh round each time the booth is entered (Sim remounts on enter).
+  // Entering the booth (Sim mounts) opens the how-to card before play.
+  useEffect(() => {
+    setBallToss({ ballTossScore: 0, ballTossBallsLeft: BALL_TOSS_BALLS, ballTossPhase: 'intro' });
+  }, [setBallToss]);
+
+  // Rebuild the stack on mount and on every "Play again" (round bump): fresh sims
+  // plus restored bottle visuals (upright, visible) since the sim mutates groups.
   useEffect(() => {
     sims.current = makeSims(positions);
-    setBallToss({ ballTossScore: 0, ballTossBallsLeft: BALL_TOSS_BALLS, ballTossPhase: 'aiming' });
-  }, [positions, setBallToss]);
+    sims.current.forEach((s, i) => {
+      const g = bottleGroups.current[i];
+      if (g) {
+        g.position.copy(s.base);
+        g.quaternion.identity();
+        g.visible = true;
+      }
+    });
+    ball.current.live = false;
+    if (ballGroup.current) ballGroup.current.visible = false;
+    charging.current = false;
+    power.current = 0;
+    knockedThisThrow.current = 0;
+    invalidate();
+  }, [round, positions, invalidate]);
 
   // Aim from the pointer ray, charge on hold, throw on release.
   useEffect(() => {

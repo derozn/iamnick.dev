@@ -74,8 +74,12 @@ export interface SceneState {
   ballTossBallsLeft: number;
   /** Current phase of the ball-toss round (drives the HUD). */
   ballTossPhase: BallTossPhase;
+  /** Bumped on each "Play again"; the in-canvas sim watches it to reset the stack. */
+  ballTossRound: number;
   /** Reset the round to a fresh start (full balls, zero score, intro card). */
   resetBallToss: () => void;
+  /** Play again in place: zero score, full balls, straight to aiming, bump round. */
+  replayBallToss: () => void;
   /** Merge a partial summary update from the sim (score / balls / phase). */
   setBallToss: (patch: Partial<BallTossSlice>) => void;
 }
@@ -103,7 +107,15 @@ export const useSceneStore = create<SceneState>()((set) => ({
   ballTossScore: 0,
   ballTossBallsLeft: BALL_TOSS_BALLS,
   ballTossPhase: 'intro',
+  ballTossRound: 0,
   resetBallToss: () =>
     set({ ballTossScore: 0, ballTossBallsLeft: BALL_TOSS_BALLS, ballTossPhase: 'intro' }),
+  replayBallToss: () =>
+    set((s) => ({
+      ballTossScore: 0,
+      ballTossBallsLeft: BALL_TOSS_BALLS,
+      ballTossPhase: 'aiming',
+      ballTossRound: s.ballTossRound + 1,
+    })),
   setBallToss: (patch) => set(patch),
 }));
