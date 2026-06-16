@@ -102,6 +102,7 @@ export function InstancedPrefab({
             mm.polygonOffsetUnits = -2;
           }
         }
+        m.geometry.computeVertexNormals(); // conversion flipped some normals -> black
         out.push({
           geometry: m.geometry,
           material: m.material,
