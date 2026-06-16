@@ -55,13 +55,13 @@ const CANDIDATES: Candidate[] = [
       'SM_Prop_Lamp_Post_02',
     ],
     2,
-  ).map((pos) => ({ pos, color: WARM, intensity: 8, distance: 8, decay: 2 })),
+  ).map((pos) => ({ pos, color: WARM, intensity: 13, distance: 11, decay: 2 })),
   // our extra street lamps (bulb sits ~4.3m up the post)
   ...EXTRA_LAMPS.map(([x, z]) => ({
     pos: new Vector3(x, 4.3, z),
     color: WARM,
-    intensity: 8,
-    distance: 8,
+    intensity: 13,
+    distance: 11,
     decay: 2,
   })),
   // vivid neon accents at the actual rides
@@ -97,8 +97,8 @@ const CANDIDATES: Candidate[] = [
   ...ATTRACTIONS.map((a) => ({
     pos: new Vector3(a.position[0], a.position[1] + 2.6, a.position[2]),
     color: WARM,
-    intensity: 10,
-    distance: 12,
+    intensity: 15,
+    distance: 14,
     decay: 2,
   })),
 ];
@@ -127,15 +127,17 @@ export function DynamicLights({ pool = 8 }: { pool?: number }) {
 
   return (
     <>
-      {/* cheap, constant base rig — neon-night levels. Lifted now that the Bloom
-          pass is gone: the old low fill was there to stop bloom overloading the GPU,
-          but without it that ceiling no longer applies, so we can raise the fill
-          enough that props sitting in the gaps between lit stalls still read (they
-          were reading as "black" purely from being under-lit, not untextured). */}
-      <hemisphereLight args={['#4a5c8c', '#16131f', 1.55]} />
-      <ambientLight intensity={0.72} color="#2b2752" />
-      <directionalLight position={[40, 90, 50]} intensity={1.25} color="#9aa6de" />
-      <directionalLight position={[-50, 45, -40]} intensity={0.6} color="#9a6cff" />
+      {/* cheap, constant base rig — deep neon-night levels tuned for the promo mood:
+          a low, cool fill so the scene falls into shadow and the warm pools (lamps,
+          pumpkins, per-booth) carry the light. The fill is warm-violet on the ground
+          and cool on top so shadows stay coloured, not dead-black, and unlit props in
+          the gaps still separate from the fog without washing out the contrast. */}
+      <hemisphereLight args={['#46588f', '#2a1f2c', 0.6]} />
+      <ambientLight intensity={0.28} color="#2c2440" />
+      {/* moon key — cool, high, kept modest so the firelight pools dominate */}
+      <directionalLight position={[40, 90, 50]} intensity={0.85} color="#aab6f0" />
+      {/* violet rim from behind the ride plaza for depth + carnival colour */}
+      <directionalLight position={[-50, 45, -40]} intensity={0.8} color="#a86cff" />
 
       {/* fixed pool — the shader only ever compiles `pool` point lights */}
       {Array.from({ length: pool }).map((_, i) => (

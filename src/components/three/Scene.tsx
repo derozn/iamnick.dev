@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { AgXToneMapping } from 'three';
+import { ACESFilmicToneMapping } from 'three';
 
 import { SyntyScene } from './synty/SyntyScene';
 import { AnimatedRides } from './synty/AnimatedRides';
@@ -45,8 +45,10 @@ export default function Scene({ tier }: SceneProps) {
       gl={{
         antialias: false,
         powerPreference: 'high-performance',
-        toneMapping: AgXToneMapping,
-        toneMappingExposure: 1.45,
+        // ACES Filmic for the promo's punchy, saturated firelight (AgX read too
+        // flat/desaturated for the warm-pool look). Exposure trimmed to suit.
+        toneMapping: ACESFilmicToneMapping,
+        toneMappingExposure: 1.15,
       }}
       // Low fov flattens perspective for the isometric read; IsoControls drives it.
       camera={{ fov: 34, near: 0.5, far: 400, position: [40, 44, 40] }}
