@@ -29,17 +29,8 @@ const PILE_Z = -0.7;
 const PILE_R2 = 3 * 3;
 const PILE_KEEP = /Bunting_Pole|Light_Pole|Lamp_Post|Flag/;
 
-/**
- * Prefabs that must keep their OWN embedded atlas instead of the shared one — either
- * a distinct (non-01_A) texture (signs/posters), or a prop whose UVs were authored
- * against a slightly different 01_A export than our shared `base-atlas.png`, so the
- * forced share lands their faces on the wrong (black) pixels (the candyfloss cart,
- * the carnival train + carriages).
- */
-const SHARE_SKIP = /Sign_|Poster|Board|Photo|Spirit|Cart_Candyfloss|Carnival_Train/;
-
-/** Maya-merged props with broken normals that won't receive light — self-illuminate them. */
-const UNLIT = /Cart_Candyfloss|Carnival_Train|Wagon_Cage|Pie_Throwing_Wall|Dunk_Tank/;
+/** Prefabs that carry their own distinct (non-01_A) base texture — keep their map. */
+const SHARE_SKIP = /Sign_|Poster|Board|Photo|Spirit/;
 const inPile = (name: string, t: number[]) =>
   !PILE_KEEP.test(name) && (t[0] - PILE_X) ** 2 + (-t[2] - PILE_Z) ** 2 < PILE_R2;
 
@@ -97,7 +88,6 @@ export function SyntyScene({ cullDist }: { cullDist?: number }) {
           // dedup the per-GLB atlas copies onto the one shared atlas (big VRAM win),
           // except signs/posters which carry their own distinct text texture.
           shareAtlas={!SHARE_SKIP.test(name)}
-          unlit={UNLIT.test(name)}
           cullDist={cullDist}
         />
       ))}
