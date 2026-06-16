@@ -18,28 +18,36 @@ import {
 
 import { BALL_TOSS_BALLS, useSceneStore } from '@/store/scene';
 import {
+  AIM_LOFT,
+  AIM_YAW,
   ARC_SAMPLES,
   BOOTH_FOCUS,
   CASCADE_PUSH_FACTOR,
   CASCADE_RADIUS_FACTOR,
-  CHARGE_TIME,
   CLEAR_COMBO_BONUS,
   CM,
   COMBO_MIN_HITS,
   FLOOR_Y,
+  FORWARD,
   GRAVITY,
   HIT_DAMPING,
   HIT_FUDGE,
   KNOCK_PUSH,
   KNOCK_SPIN,
   KNOCK_UP,
+  LAUNCH_DIST,
   LAUNCH_LIFT,
   MAX_RANGE,
   MAX_SPEED,
   MIN_SPEED,
   POINTS_PER_BOTTLE,
+  POUCH_NDC,
+  PULL_DEADZONE,
+  PULL_FULL,
+  PULL_WORLD,
   pyramidPositions,
   SETTLE_Y,
+  SIDE,
   SYNTY,
 } from './ballTossConfig';
 
@@ -54,12 +62,11 @@ import {
  * in refs (R3F lint forbids mutating hook returns / reading ref.current in render);
  * only summary state (score / balls / phase) is mirrored to the store for the HUD.
  *
- * Controls — **aim + charge-and-release** (one scheme, works on mouse + touch):
- *   point where you want the ball to go (an in-scene arc previews the throw),
- *   press-and-hold to charge power (the arc lengthens), release to throw.
- *
- * (Step 3: throw + projectile + ball-vs-bottle hit — a knocked bottle hides.
- * Proper toppling, cascade and combo scoring land in Step 4.)
+ * Controls — **slingshot** (one scheme, works on mouse + touch): a ready ball
+ *   sits in the pouch; press and drag it *back* against where you want it to go,
+ *   then release. Pull distance is power, pull direction is aim, and the ball
+ *   fires opposite the pull. A live trajectory arc + reticle preview the shot as
+ *   you drag; a tap (pull under PULL_DEADZONE) cancels without spending a ball.
  */
 
 useGLTF.preload(`${SYNTY}SM_Prop_Milk_Bottle_01.glb`, true);
@@ -153,10 +160,44 @@ function makeSims(positions: Vector3[]): BottleSim[] {
   }));
 }
 
-/** Unit launch direction for a pointer NDC: the camera ray, lobbed up by LAUNCH_LIFT. */
-function liftedDir(camera: Camera, px: number, py: number, out: Vector3) {
-  out.set(px, py, 0.5).unproject(camera).sub(camera.position).normalize();
-  out.y += LAUNCH_LIFT;
+const _up = new Vector3(0, 1, 0);
+
+const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
+
+/** World point of the slingshot pouch — the ready-ball rest, LAUNCH_DIST in front
+ *  of the camera at the POUCH_NDC screen anchor. */
+function pouchPoint(camera: Camera, out: Vector3) {
+  out
+    .set(POUCH_NDC[0], POUCH_NDC[1], 0.5)
+    .unproject(camera)
+    .sub(camera.position)
+    .normalize()
+    .multiplyScalar(LAUNCH_DIST)
+    .add(camera.position);
+  return out;
+}
+
+/** Loaded-ball world position: the pouch drawn toward the finger by the pull
+ *  (drag in screen NDC, y-up), so the ball visibly follows the drag. */
+function loadedPoint(camera: Camera, dx: number, dy: number, out: Vector3) {
+  pouchPoint(camera, out);
+  out.addScaledVector(SIDE, dx * PULL_WORLD);
+  out.addScaledVector(_up, dy * PULL_WORLD);
+  return out;
+}
+
+/** Power [0..1] for a pull (drag in NDC): distance past the deadzone, up to PULL_FULL. */
+function pullPower(dx: number, dy: number) {
+  const len = Math.hypot(dx, dy);
+  return clamp((len - PULL_DEADZONE) / (PULL_FULL - PULL_DEADZONE), 0, 1);
+}
+
+/** Launch direction for a pull (drag in NDC, y-up): forward into the booth, swung
+ *  laterally *opposite* the pull and lofted up — a slingshot fires away from the draw. */
+function launchDir(dx: number, dy: number, out: Vector3) {
+  const yaw = clamp(-dx / PULL_FULL, -1, 1) * AIM_YAW;
+  out.copy(FORWARD).setY(0).normalize().applyAxisAngle(_up, yaw);
+  out.y += LAUNCH_LIFT + clamp(-dy / PULL_FULL, 0, 1) * AIM_LOFT;
   return out.normalize();
 }
 
@@ -167,6 +208,7 @@ function Sim() {
 
   const setBallToss = useSceneStore((s) => s.setBallToss);
   const round = useSceneStore((s) => s.ballTossRound);
+  const phase = useSceneStore((s) => s.ballTossPhase);
 
   // Resting upright base positions for the pyramid (world space).
   const positions = useMemo(
@@ -182,9 +224,11 @@ function Sim() {
   const sims = useRef<BottleSim[]>(makeSims(positions));
   const ball = useRef({ pos: new Vector3(), vel: new Vector3(), live: false });
   const ballGroup = useRef<Group>(null);
-  const pointer = useRef({ x: 0, y: 0 });
-  const charging = useRef(false);
-  const power = useRef(0);
+  // Slingshot pull, in screen NDC (y-up): anchor = where the drag began, drag =
+  // current offset from it. Power and aim are both derived from `drag`.
+  const pulling = useRef(false);
+  const anchor = useRef({ x: 0, y: 0 });
+  const drag = useRef({ x: 0, y: 0 });
   const knockedThisThrow = useRef(0);
   const arc = useRef<InstancedMesh>(null);
   const reticle = useRef<Mesh>(null);
@@ -193,6 +237,12 @@ function Sim() {
   useEffect(() => {
     setBallToss({ ballTossScore: 0, ballTossBallsLeft: BALL_TOSS_BALLS, ballTossPhase: 'intro' });
   }, [setBallToss]);
+
+  // Demand frameloop only ticks on invalidate; nudge it on phase change so the
+  // ready ball / aim preview appears the moment we enter (or re-enter) `aiming`.
+  useEffect(() => {
+    invalidate();
+  }, [phase, invalidate]);
 
   // Rebuild the stack on mount and on every "Play again" (round bump): fresh sims
   // plus restored bottle visuals (upright, visible) since the sim mutates groups.
@@ -208,19 +258,22 @@ function Sim() {
     });
     ball.current.live = false;
     if (ballGroup.current) ballGroup.current.visible = false;
-    charging.current = false;
-    power.current = 0;
+    pulling.current = false;
+    drag.current.x = 0;
+    drag.current.y = 0;
     knockedThisThrow.current = 0;
     invalidate();
   }, [round, positions, invalidate]);
 
-  // Aim from the pointer ray, charge on hold, throw on release.
+  // Slingshot: press to grab, drag back to aim + load power, release to throw.
   useEffect(() => {
     const el = gl.domElement;
     const toNdc = (e: PointerEvent) => {
       const r = el.getBoundingClientRect();
-      pointer.current.x = ((e.clientX - r.left) / r.width) * 2 - 1;
-      pointer.current.y = -(((e.clientY - r.top) / r.height) * 2 - 1);
+      return {
+        x: ((e.clientX - r.left) / r.width) * 2 - 1,
+        y: -(((e.clientY - r.top) / r.height) * 2 - 1),
+      };
     };
     const canThrow = () => {
       const s = useSceneStore.getState();
@@ -228,26 +281,36 @@ function Sim() {
     };
     const onDown = (e: PointerEvent) => {
       if (!canThrow()) return;
-      toNdc(e);
-      charging.current = true;
-      power.current = 0;
+      anchor.current = toNdc(e);
+      drag.current.x = 0;
+      drag.current.y = 0;
+      pulling.current = true;
       invalidate();
     };
     const onMove = (e: PointerEvent) => {
-      toNdc(e);
+      if (!pulling.current) return;
+      const n = toNdc(e);
+      drag.current.x = n.x - anchor.current.x;
+      drag.current.y = n.y - anchor.current.y;
       invalidate();
     };
     const onUp = () => {
-      if (!charging.current) return;
-      charging.current = false;
-      if (!canThrow()) return;
-      const speed = MIN_SPEED + (MAX_SPEED - MIN_SPEED) * power.current;
-      liftedDir(camera, pointer.current.x, pointer.current.y, _v);
-      ball.current.pos.copy(camera.position);
-      ball.current.vel.copy(_v).multiplyScalar(speed);
+      if (!pulling.current) return;
+      pulling.current = false;
+      const dx = drag.current.x;
+      const dy = drag.current.y;
+      drag.current.x = 0;
+      drag.current.y = 0;
+      // A tap (no real pull) cancels — no ball spent.
+      if (!canThrow() || Math.hypot(dx, dy) < PULL_DEADZONE) {
+        invalidate();
+        return;
+      }
+      const speed = MIN_SPEED + (MAX_SPEED - MIN_SPEED) * pullPower(dx, dy);
+      loadedPoint(camera, dx, dy, ball.current.pos); // fires from the drawn-back ball
+      ball.current.vel.copy(launchDir(dx, dy, _v)).multiplyScalar(speed);
       ball.current.live = true;
       knockedThisThrow.current = 0;
-      power.current = 0;
       if (ballGroup.current) ballGroup.current.visible = true;
       const s = useSceneStore.getState();
       s.setBallToss({ ballTossPhase: 'thrown', ballTossBallsLeft: s.ballTossBallsLeft - 1 });
@@ -263,11 +326,14 @@ function Sim() {
     };
   }, [camera, gl, invalidate]);
 
-  /** Trace the projectile from the camera and lay the preview arc + reticle on it. */
+  /** Trace the projectile from the drawn-back ball and lay the preview arc + reticle
+   *  on it — the live picture of the current pull's power and aim. */
   function updateAim() {
-    const speed = MIN_SPEED + (MAX_SPEED - MIN_SPEED) * power.current;
-    _p.copy(camera.position);
-    _vel.copy(liftedDir(camera, pointer.current.x, pointer.current.y, _v)).multiplyScalar(speed);
+    const dx = drag.current.x;
+    const dy = drag.current.y;
+    const speed = MIN_SPEED + (MAX_SPEED - MIN_SPEED) * pullPower(dx, dy);
+    loadedPoint(camera, dx, dy, _p);
+    _vel.copy(launchDir(dx, dy, _v)).multiplyScalar(speed);
     const step = 0.045;
     let landed = false;
     for (let i = 0; i < ARC_SAMPLES; i++) {
@@ -400,18 +466,21 @@ function Sim() {
 
   useFrame((_s, delta) => {
     const dt = Math.min(delta, 0.033);
-    const phase = useSceneStore.getState().ballTossPhase;
+    const aiming = useSceneStore.getState().ballTossPhase === 'aiming';
+    const isPulling = pulling.current;
 
-    if (charging.current) {
-      power.current = Math.min(1, power.current + dt / CHARGE_TIME);
-      invalidate();
+    // Aim preview (arc + reticle) shows only while actively drawing the slingshot.
+    if (arc.current) arc.current.visible = aiming && isPulling;
+    if (reticle.current) reticle.current.visible = aiming && isPulling;
+
+    // Ready ball: rests in the pouch while aiming, follows the finger while pulling.
+    if (aiming && !ball.current.live && ballGroup.current) {
+      ballGroup.current.visible = true;
+      if (isPulling) loadedPoint(camera, drag.current.x, drag.current.y, _p);
+      else pouchPoint(camera, _p);
+      ballGroup.current.position.copy(_p);
+      if (isPulling) updateAim();
     }
-
-    // Aim preview — visible only while aiming.
-    const aiming = phase === 'aiming';
-    if (reticle.current) reticle.current.visible = aiming;
-    if (arc.current) arc.current.visible = aiming;
-    if (aiming) updateAim();
 
     if (ball.current.live) {
       stepBall(dt);

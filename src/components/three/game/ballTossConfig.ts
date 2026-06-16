@@ -49,14 +49,12 @@ export const GRAVITY = -8;
 export const MIN_SPEED = 8;
 export const MAX_SPEED = 14;
 /**
- * Upward lift added to the (normalised) launch direction before re-normalising.
- * The play camera looks slightly down at the counter, so a raw point-and-throw
- * would fire low; this lobs the ball so aiming at the stack roughly lands on it.
- * Tuned offline against the play camera — see the build notes.
+ * Base upward loft added to the (normalised) launch direction before re-normalising.
+ * The slingshot pouch sits *above* the stack and only ~4 m away, so the throw is
+ * almost flat — gravity drops it into the bottles. Just a hair of lift keeps the
+ * preview arc readable; more than this and shots sail over (tuned offline, §6).
  */
-export const LAUNCH_LIFT = 0.25;
-/** Seconds of held charge to reach full power. */
-export const CHARGE_TIME = 0.85;
+export const LAUNCH_LIFT = 0.05;
 /** Ball despawns below this world height (fell off / past the booth). */
 export const FLOOR_Y = -0.5;
 /** Ball is dead once it gets this far from the booth focus (missed long). */
@@ -77,6 +75,33 @@ export const CLEAR_COMBO_BONUS = 250;
 export const COMBO_MIN_HITS = 3;
 /** Trajectory-preview sample count (in-scene aim arc). */
 export const ARC_SAMPLES = 22;
+
+/* --- Slingshot aim (pull-back-and-release; replaces the old timed charge) --- */
+
+/**
+ * The throw is a slingshot: press, drag the ball *back* against where you want it
+ * to go, release. Pull distance is power; pull direction is aim; the ball fires
+ * opposite the pull. These knobs map a screen drag (in NDC, y-up) to the shot.
+ */
+/** Pull distance (screen NDC) at which power reaches MAX_SPEED. */
+export const PULL_FULL = 0.5;
+/** A release with less pull than this (NDC) is a cancel, not a throw — so a tap is safe. */
+export const PULL_DEADZONE = 0.05;
+/** Max lateral aim swing (radians) at a full sideways pull (fires opposite the pull). */
+export const AIM_YAW = 0.5;
+/**
+ * Extra upward loft at a full *downward* pull, on top of LAUNCH_LIFT. Kept at 0:
+ * because the pouch sits above the close target, any loft makes a hard pull sail
+ * over the stack — a deep pull should add power, not arc. Raise only if the launch
+ * geometry changes (see the offline sweep in §6).
+ */
+export const AIM_LOFT = 0;
+/** Screen anchor (NDC, y-up) for the ready ball / slingshot pouch — lower centre. */
+export const POUCH_NDC: readonly [number, number] = [0, -0.5];
+/** How far (m) in front of the camera the pouch / launch origin sits. */
+export const LAUNCH_DIST = 1.1;
+/** World metres the loaded ball is drawn back per unit of NDC pull (visual feedback). */
+export const PULL_WORLD = 0.5;
 
 /* --- Topple physics (knocked bottles tumble off the shelf) --- */
 
