@@ -73,9 +73,8 @@ flies the camera to the booth and, because the section starts with `game:`, call
 **Controls — one scheme, mouse + touch:** _point to aim · hold to charge · release to throw._
 The launch direction is the **camera ray** through the pointer, lobbed upward by `LAUNCH_LIFT`
 (the play camera looks slightly down, so a raw point-and-throw fires low). Power charges while held
-(`CHARGE_TIME` to full) and maps to launch speed `MIN_SPEED…MAX_SPEED`. An in-scene \*\*trajectory arc
-
-- landing reticle\*\* previews the shot while aiming.
+(`CHARGE_TIME` to full) and maps to launch speed `MIN_SPEED…MAX_SPEED`. An in-scene **trajectory arc
+and landing reticle** preview the shot while aiming.
 
 **Phases** (`ballTossPhase`, drives the HUD):
 
