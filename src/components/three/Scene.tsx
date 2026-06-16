@@ -6,6 +6,7 @@ import { AgXToneMapping } from 'three';
 
 import { SyntyScene } from './synty/SyntyScene';
 import { AnimatedRides } from './synty/AnimatedRides';
+import { BulbGlow } from './synty/BulbGlow';
 import { IsoControls } from './synty/IsoControls';
 import { Indicators } from './synty/Indicators';
 import { DynamicLights } from './synty/DynamicLights';
@@ -58,6 +59,7 @@ export default function Scene({ tier }: SceneProps) {
       <Suspense fallback={null}>
         <SyntyScene />
         <AnimatedRides />
+        <BulbGlow />
       </Suspense>
 
       <Indicators />

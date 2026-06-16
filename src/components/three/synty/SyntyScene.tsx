@@ -35,7 +35,7 @@ const inPile = (name: string, t: number[]) =>
   !PILE_KEEP.test(name) && (t[0] - PILE_X) ** 2 + (-t[2] - PILE_Z) ** 2 < PILE_R2;
 
 /** [prefabName, transforms[]] for every demo prefab we have a GLB for, plus our additions. */
-const entries = Object.entries(demoInstances as Record<string, number[][]>)
+export const entries = Object.entries(demoInstances as Record<string, number[][]>)
   .filter(([name]) => available.has(name) && !EXCLUDE.test(name) && !SPINNER_NAMES.has(name))
   .map(([name, tfs]) => {
     const kept = tfs.filter((t) => !inPile(name, t));
