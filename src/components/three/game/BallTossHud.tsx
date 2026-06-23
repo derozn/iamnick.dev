@@ -54,8 +54,9 @@ export function BallTossHud() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {/* Top bar: score + balls, and Exit */}
-          <div className="flex items-start justify-between gap-4 p-4 md:p-6">
+          {/* Top bar: score + balls CENTRED (the iamnick.dev logo owns top-left, so
+              centring it avoids the clash), with Exit pinned top-right. */}
+          <div className="relative flex items-start justify-center p-4 md:p-6">
             <div className="ticket-frame pointer-events-auto flex items-center gap-4 rounded-[3px] px-4 py-2 font-fell-sc text-[14px] tracking-[0.08em] text-ink">
               <span>
                 Score <span className="font-rye text-oxblood">{score}</span>
@@ -71,7 +72,7 @@ export function BallTossHud() {
             <button
               onClick={exit}
               aria-label="Exit game"
-              className="paper-button pointer-events-auto flex h-9 w-9 items-center justify-center rounded-[3px] font-rye text-[15px]"
+              className="paper-button pointer-events-auto absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-[3px] font-rye text-[15px] md:right-6 md:top-6"
             >
               ✕
             </button>

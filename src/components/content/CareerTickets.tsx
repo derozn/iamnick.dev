@@ -87,12 +87,13 @@ export function CareerTickets() {
 
   return (
     <div className="flex w-full max-w-md flex-col items-center">
-      {/* Section header */}
-      <header className="mb-6 text-center">
-        <p className="font-fell-sc letterpress text-[15px] tracking-[0.3em] text-brass-text">
+      {/* Section header — a bone placard so the ink reads over the dark midway
+          (a bare header floated dark-on-dark against the dimmed backdrop). */}
+      <header className="ticket-frame halftone mb-7 rounded-[4px] px-9 py-3.5 text-center">
+        <p className="font-fell-sc letterpress text-[14px] tracking-[0.32em] text-brass-text">
           the bill
         </p>
-        <h2 className="font-rye letterpress mt-2 text-[46px] leading-none text-ink">Career</h2>
+        <h2 className="font-rye letterpress mt-1.5 text-[42px] leading-none text-ink">Career</h2>
       </header>
 
       {/* The deck */}

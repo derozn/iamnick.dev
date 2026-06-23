@@ -26,7 +26,7 @@ export function MidwayCanvas() {
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 z-0 bg-gradient-to-b from-[#14141f] to-[#070810]"
+      className="midway-canvas fixed inset-0 z-0 bg-gradient-to-b from-[#14141f] to-[#070810]"
     >
       {tier !== 'none' && <Scene tier={tier} />}
     </div>

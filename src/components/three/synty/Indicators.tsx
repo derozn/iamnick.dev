@@ -13,6 +13,9 @@ import { ATTRACTIONS } from './attractions';
 export function Indicators() {
   const focus = useSceneStore((s) => s.focus);
   const focused = useSceneStore((s) => s.focusedAttraction);
+  const started = useSceneStore((s) => s.started);
+  // Hidden during the intro vignette; they appear once the camera has expanded.
+  const hidden = !!focused || !started;
 
   return (
     <>
@@ -24,8 +27,8 @@ export function Indicators() {
           zIndexRange={[30, 0]}
           style={{
             transition: 'opacity 240ms ease',
-            opacity: focused ? 0 : 1,
-            pointerEvents: focused ? 'none' : 'auto',
+            opacity: hidden ? 0 : 1,
+            pointerEvents: hidden ? 'none' : 'auto',
           }}
         >
           <button

@@ -1,5 +1,7 @@
 import { MidwayCanvas } from '@/components/three/MidwayCanvas';
 import { ContentOverlay } from '@/components/content/ContentOverlay';
+import { StaticResume } from '@/components/content/StaticResume';
+import { IntroOverlay } from '@/components/content/IntroOverlay';
 import { BallTossHud } from '@/components/three/game/BallTossHud';
 
 export const dynamic = 'auto';
@@ -11,14 +13,20 @@ export const dynamic = 'auto';
  * mark each point of interest, and clicking one flies the camera in and opens that
  * CV section in the neon HUD overlay (ContentOverlay).
  *
- * TODO(content/SEO): render all sections as always-present DOM (visually hidden)
- * so they're crawlable/keyboard-navigable, with the HUD as the enhanced view.
+ * The full CV is also mirrored in <StaticResume> as visually-hidden, always-present
+ * DOM, so the page is crawlable and screen-reader-navigable without the canvas.
  */
 export default function Homepage() {
   return (
     <>
+      {/* Crawlable / accessible CV — the page's real content (sr-only) */}
+      <StaticResume />
+
       {/* Isometric Dark Carnival — fixed, fills the viewport */}
       <MidwayCanvas />
+
+      {/* Bruno-Simon-style entry: loading screen → framed vignette → "click to start" */}
+      <IntroOverlay />
 
       {/* Content panel that rises over the scene when a structure is focused */}
       <ContentOverlay />

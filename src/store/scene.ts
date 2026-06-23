@@ -42,6 +42,14 @@ export interface SectionRange {
 }
 
 export interface SceneState {
+  /** Intro: the scene's GLBs/textures have finished loading (Suspense resolved). */
+  sceneReady: boolean;
+  setSceneReady: (ready: boolean) => void;
+  /** Intro: the visitor has clicked "start" — the camera expands from the framed
+   *  vignette to the full overview and controls become live. */
+  started: boolean;
+  start: () => void;
+
   /** Current interaction mode — `travelling` on-rails, `viewing` a content tent, or `playing` a game. */
   mode: SceneMode;
   /** Attraction id whose content panel is open (viewing), or null. */
@@ -88,6 +96,11 @@ export interface SceneState {
 type BallTossSlice = Pick<SceneState, 'ballTossScore' | 'ballTossBallsLeft' | 'ballTossPhase'>;
 
 export const useSceneStore = create<SceneState>()((set) => ({
+  sceneReady: false,
+  setSceneReady: (sceneReady) => set({ sceneReady }),
+  started: false,
+  start: () => set({ started: true }),
+
   mode: 'travelling',
   activeAttraction: null,
   focusedAttraction: null,

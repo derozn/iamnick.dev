@@ -24,6 +24,7 @@ export const metadata: Metadata = {
     template: '%s · iamnick.dev',
   },
   description: metaDescription,
+  alternates: { canonical: '/' },
   manifest: '/site.webmanifest',
   icons: {
     apple: {

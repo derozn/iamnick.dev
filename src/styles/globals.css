@@ -173,6 +173,32 @@
   }
 }
 
+/* Bruno-Simon-style intro reveal: a lit disc of the scene floats in a dark void.
+ * This element IS the transparent circular hole; its box-shadow paints the dark
+ * surround + a warm rim glow on the disc edge. Motion scales it open ("iris") on
+ * start to reveal the whole carnival. */
+.intro-spotlight {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46vmin;
+  height: 46vmin;
+  margin: -23vmin 0 0 -23vmin;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 60px 14px rgb(255 186 120 / 0.18),
+    0 0 26px 3px rgb(255 200 150 / 0.32),
+    0 0 0 100vmax rgb(6 7 16 / 0.97);
+  will-change: transform;
+}
+
+/* The scene canvas owns every touch gesture (drag-pan, pinch-zoom, slingshot) —
+ * without this the browser scrolls/zooms the page instead and cancels the drag,
+ * which is what broke pan + the ball-toss on mobile. */
+.midway-canvas canvas {
+  touch-action: none;
+}
+
 /* POI indicator — a letterpress brass tag whose label unfurls on hover. */
 .iso-indicator {
   display: inline-flex;
