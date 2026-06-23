@@ -8,13 +8,16 @@ import { formatYearMonth } from '@/lib/formatDate';
  * CV section only surfaces behind a click. That leaves nothing for search-engine
  * crawlers or assistive tech to read, so the entire résumé is mirrored here as
  * real markup (one `<h1>`, sectioned content, real links). It's visually hidden
- * (`sr-only`) — sighted visitors get the interactive scene; crawlers and screen
- * readers get the complete, accessible document. This is the page's primary
- * content, not keyword padding: it matches the visual experience one-to-one.
+ * (the `.static-resume` clip technique in globals.css) — sighted visitors get the
+ * interactive scene; crawlers and screen readers get the complete, accessible
+ * document. Under `prefers-reduced-motion` (where the 3-D scene never mounts) the
+ * same markup is REVEALED as a styled letterpress document, so those visitors read
+ * the CV instead of a bare backdrop. This is the page's primary content, not
+ * keyword padding: it matches the visual experience one-to-one.
  */
 export function StaticResume() {
   return (
-    <main className="sr-only" aria-label={`${profile.name} — résumé`}>
+    <main className="static-resume" aria-label={`${profile.name} — résumé`}>
       <h1>
         {profile.name} — {profile.headline}
       </h1>

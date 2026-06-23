@@ -199,6 +199,78 @@
   touch-action: none;
 }
 
+/* The crawlable / assistive-tech résumé (StaticResume). Visually hidden for canvas
+ * users via the clip "sr-only" technique (screen readers still read it). But under
+ * prefers-reduced-motion — where the 3-D scene never mounts — we REVEAL it as a
+ * styled letterpress document so those visitors get the full CV instead of a bare
+ * backdrop. Pure CSS: no flash, no hydration cost, works even without JS. */
+.static-resume {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .static-resume {
+    position: relative;
+    z-index: 1; /* above the fixed canvas-gradient backdrop (z-0) */
+    width: min(720px, 92vw);
+    height: auto;
+    margin: 64px auto;
+    padding: 56px clamp(24px, 6vw, 64px) 72px;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    border: 1.5px solid var(--color-keyline);
+    border-radius: 5px;
+    box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
+    font-family: var(--font-fell), serif;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+  .static-resume h1 {
+    margin: 0 0 10px;
+    font-family: var(--font-rye), serif;
+    font-size: 34px;
+    line-height: 1.12;
+  }
+  .static-resume h2 {
+    margin: 40px 0 14px;
+    padding-top: 22px;
+    border-top: 1px solid color-mix(in srgb, var(--color-ink-soft) 40%, transparent);
+    font-family: var(--font-rye), serif;
+    font-size: 24px;
+    color: var(--color-oxblood);
+  }
+  .static-resume h3 {
+    margin: 20px 0 4px;
+    font-family: var(--font-fell-sc), serif;
+    font-size: 18px;
+  }
+  .static-resume article {
+    margin: 10px 0 22px;
+  }
+  .static-resume ul {
+    margin: 8px 0 8px 1.15em;
+    list-style: square;
+  }
+  .static-resume li {
+    margin: 4px 0;
+  }
+  .static-resume a {
+    color: var(--color-oxblood);
+    text-decoration: underline;
+  }
+}
+
 /* POI indicator — a letterpress brass tag whose label unfurls on hover. */
 .iso-indicator {
   display: inline-flex;

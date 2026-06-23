@@ -3,4 +3,5 @@ node_modules
 public
 coverage
 pnpm-lock.yaml
+pnpm-workspace.yaml
 **/*.d.ts
