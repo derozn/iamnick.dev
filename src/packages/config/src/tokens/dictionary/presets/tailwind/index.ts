@@ -1,1 +1,0 @@
-export { makeTailwindConfig } from './tailwind';

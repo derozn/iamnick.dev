@@ -1,1 +1,0 @@
-export { twMergeConfig } from './mergeConfig';

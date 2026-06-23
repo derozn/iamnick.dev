@@ -1,0 +1,611 @@
+@import 'tailwindcss';
+
+@theme {
+  /* ── Colors ──────────────────────────────────────────── */
+  --color-background-primary: #070810;
+  --color-text-primary: #d6d6d6;
+  --color-text-secondary: #000000;
+  --color-text-error: #c00408;
+  --color-snow-white: #ffffff;
+  --color-black: #000000;
+  --color-rich-black: #070810;
+
+  /* Semantic feedback / border colors used by components */
+  --color-background-feedback-negative: #c00408;
+  --color-border-primary: #d6d6d6;
+
+  /* Accent slots — brand red */
+  --color-accent-primary: #d6d6d6;
+  --color-accent: #c50201;
+  --color-accent-dim: #7a0f0f;
+
+  /* ── Carnival letterpress inks (HUD overhaul) ───────────
+   * Aged sideshow-poster palette — bone stock + two spot inks.
+   * See horror-carnival-hud-spec §2.1. */
+  --color-paper: #e6dabd;
+  --color-ink: #2a2017;
+  --color-ink-soft: #5c4a36;
+  --color-oxblood: #6f2722;
+  --color-oxblood-bright: #8a322a;
+  --color-brass: #a3823f;
+  --color-brass-text: #7d5f2b;
+  --color-keyline: #241a12;
+
+  /* ── Fonts ───────────────────────────────────────────── */
+  --font-expressive: var(--font-montserrat), sans-serif;
+  --font-functional: var(--font-open-sans), sans-serif;
+  --font-fallback: sans-serif;
+  /* Period faces for the letterpress HUD */
+  --font-rye: var(--font-rye-src), 'Rye', serif;
+  --font-fell: var(--font-fell-src), 'IM Fell English', serif;
+  --font-fell-sc: var(--font-fell-sc-src), 'IM Fell English SC', serif;
+
+  /* ── Spacing scale (0-20) ───────────────────────────── */
+  --spacing-0: 0px;
+  --spacing-1: 2px;
+  --spacing-2: 4px;
+  --spacing-3: 8px;
+  --spacing-4: 12px;
+  --spacing-5: 16px;
+  --spacing-6: 20px;
+  --spacing-7: 24px;
+  --spacing-8: 32px;
+  --spacing-9: 40px;
+  --spacing-10: 48px;
+  --spacing-11: 56px;
+  --spacing-12: 64px;
+  --spacing-13: 72px;
+  --spacing-14: 80px;
+  --spacing-15: 88px;
+  --spacing-16: 96px;
+  --spacing-17: 104px;
+  --spacing-18: 112px;
+  --spacing-19: 128px;
+  --spacing-20: 144px;
+
+  /* ── Border radius ──────────────────────────────────── */
+  --radius-0: 0px;
+  --radius-1: 2px;
+  --radius-2: 4px;
+  --radius-3: 8px;
+  --radius-4: 12px;
+  --radius-5: 16px;
+  --radius-6: 20px;
+  --radius-7: 24px;
+  --radius-8: 32px;
+  --radius-9: 40px;
+  --radius-10: 48px;
+  --radius-11: 56px;
+  --radius-12: 64px;
+
+  /* ── Border width ───────────────────────────────────── */
+  --border-width-0: 0px;
+  --border-width-1: 1px;
+  --border-width-2: 2px;
+  --border-width-3: 4px;
+
+  /* ── Breakpoints ────────────────────────────────────── */
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 960px;
+  --breakpoint-lg: 1280px;
+  --breakpoint-xl: 1920px;
+
+  /* ── Type scale ─────────────────────────────────────── */
+  --font-size-12: 12px;
+  --font-size-14: 14px;
+  --font-size-16: 16px;
+  --font-size-18: 18px;
+  --font-size-20: 20px;
+  --font-size-24: 24px;
+  --font-size-28: 28px;
+  --font-size-32: 32px;
+  --font-size-36: 36px;
+  --font-size-40: 40px;
+  --font-size-44: 44px;
+  --font-size-48: 48px;
+  --font-size-56: 56px;
+  --font-size-64: 64px;
+  --font-size-80: 80px;
+
+  /* ── Custom aspect ratios ───────────────────────────── */
+  --aspect-standard: 4 / 3;
+  --aspect-portrait: 2 / 3;
+  --aspect-classic: 3 / 2;
+  --aspect-tall: 9 / 16;
+  --aspect-print: 3 / 4;
+  --aspect-photo: 4 / 5;
+  --aspect-large-portrait: 3 / 5;
+  --aspect-tv: 16 / 9;
+}
+
+/* ── Base styles ──────────────────────────────────────── */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background-color: var(--color-background-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-functional);
+  }
+}
+
+/* ── Focus-visible ring ───────────────────────────────── */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+/* ── Animated border beam ─────────────────────────────── */
+@property --beam-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes beam-rotate {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+/* Pulsing dot on the isometric point-of-interest indicators. */
+@keyframes isoPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.55);
+    opacity: 0.55;
+  }
+}
+
+/* Bruno-Simon-style intro reveal: a lit disc of the scene floats in a dark void.
+ * This element IS the transparent circular hole; its box-shadow paints the dark
+ * surround + a warm rim glow on the disc edge. Motion scales it open ("iris") on
+ * start to reveal the whole carnival. */
+.intro-spotlight {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46vmin;
+  height: 46vmin;
+  margin: -23vmin 0 0 -23vmin;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 60px 14px rgb(255 186 120 / 0.18),
+    0 0 26px 3px rgb(255 200 150 / 0.32),
+    0 0 0 100vmax rgb(6 7 16 / 0.97);
+  will-change: transform;
+}
+
+/* The scene canvas owns every touch gesture (drag-pan, pinch-zoom, slingshot) —
+ * without this the browser scrolls/zooms the page instead and cancels the drag,
+ * which is what broke pan + the ball-toss on mobile. */
+.midway-canvas canvas {
+  touch-action: none;
+}
+
+/* The crawlable / assistive-tech résumé (StaticResume). Visually hidden for canvas
+ * users via the clip "sr-only" technique (screen readers still read it). But under
+ * prefers-reduced-motion — where the 3-D scene never mounts — we REVEAL it as a
+ * styled letterpress document so those visitors get the full CV instead of a bare
+ * backdrop. Pure CSS: no flash, no hydration cost, works even without JS. */
+.static-resume {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .static-resume {
+    position: relative;
+    z-index: 1; /* above the fixed canvas-gradient backdrop (z-0) */
+    width: min(720px, 92vw);
+    height: auto;
+    margin: 64px auto;
+    padding: 56px clamp(24px, 6vw, 64px) 72px;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    border: 1.5px solid var(--color-keyline);
+    border-radius: 5px;
+    box-shadow: 0 30px 80px rgb(0 0 0 / 0.5);
+    font-family: var(--font-fell), serif;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+  .static-resume h1 {
+    margin: 0 0 10px;
+    font-family: var(--font-rye), serif;
+    font-size: 34px;
+    line-height: 1.12;
+  }
+  .static-resume h2 {
+    margin: 40px 0 14px;
+    padding-top: 22px;
+    border-top: 1px solid color-mix(in srgb, var(--color-ink-soft) 40%, transparent);
+    font-family: var(--font-rye), serif;
+    font-size: 24px;
+    color: var(--color-oxblood);
+  }
+  .static-resume h3 {
+    margin: 20px 0 4px;
+    font-family: var(--font-fell-sc), serif;
+    font-size: 18px;
+  }
+  .static-resume article {
+    margin: 10px 0 22px;
+  }
+  .static-resume ul {
+    margin: 8px 0 8px 1.15em;
+    list-style: square;
+  }
+  .static-resume li {
+    margin: 4px 0;
+  }
+  .static-resume a {
+    color: var(--color-oxblood);
+    text-decoration: underline;
+  }
+}
+
+/* POI indicator — a letterpress brass tag whose label unfurls on hover. */
+.iso-indicator {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0;
+  border-radius: 3px;
+  border: 1.5px solid var(--color-keyline);
+  background: color-mix(in srgb, var(--color-paper) 88%, transparent);
+  backdrop-filter: blur(4px);
+  color: var(--color-ink);
+  font: 400 12px/1 var(--font-fell-sc, 'IM Fell English SC', serif);
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow:
+    inset 0 0 0 1.4px rgb(36 26 18 / 0.35),
+    inset 0 1px 0 rgb(255 250 235 / 0.4),
+    0 2px 6px rgb(0 0 0 / 0.35);
+  transition: box-shadow 240ms ease;
+}
+.iso-indicator__dot {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+}
+.iso-indicator__dot::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--color-oxblood);
+  box-shadow: 0 0 7px 1px color-mix(in srgb, var(--color-brass) 70%, transparent);
+  animation: isoPulse 1.6s ease-in-out infinite;
+}
+.iso-indicator__label {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  color: var(--color-brass-text);
+  transition:
+    max-width 300ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 180ms ease,
+    padding 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.iso-indicator:hover {
+  box-shadow:
+    inset 0 0 0 1.4px rgb(36 26 18 / 0.45),
+    inset 0 1px 0 rgb(255 250 235 / 0.5),
+    0 3px 10px rgb(0 0 0 / 0.45);
+}
+.iso-indicator:hover .iso-indicator__label {
+  max-width: 220px;
+  opacity: 1;
+  padding-right: 13px;
+}
+
+/* ── Custom utilities ─────────────────────────────────── */
+@utility no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@utility img-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-background-primary);
+  opacity: 0.5;
+}
+
+/*
+ * HUD glass card — cyberpunk corner-cut panel that sits over the 3-D scene.
+ *
+ * Three layers:
+ *   root     — clip-path hex shape (two 45° corner cuts) + faint backdrop blur
+ *   ::before — beam layer: static accent edge + rotating conic beam. Fully visible
+ *              only at the 1px rim left exposed by ::after; the remainder bleeds
+ *              through the translucent scrim as a subtle light sweep.
+ *   ::after  — scrim fill, inset 1px, same clip shape. Directional gradient:
+ *              ≥0.85 alpha behind the text column, falling away at the open edge
+ *              so the scene glows through the card fringe.
+ */
+@utility hud-card {
+  --hud-cut: 20px;
+  --hud-clip: polygon(
+    0 0,
+    calc(100% - var(--hud-cut)) 0,
+    100% var(--hud-cut),
+    100% 100%,
+    var(--hud-cut) 100%,
+    0 calc(100% - var(--hud-cut))
+  );
+  position: relative;
+  isolation: isolate;
+  clip-path: var(--hud-clip);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+      conic-gradient(
+        from var(--beam-angle),
+        transparent 0%,
+        transparent 76%,
+        rgb(76 201 240 / 0.95) 89%,
+        rgb(177 108 234 / 0.95) 95%,
+        transparent 100%
+      ),
+      linear-gradient(rgb(76 201 240 / 0.28), rgb(76 201 240 / 0.28));
+    animation: beam-rotate 7s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    clip-path: var(--hud-clip);
+    background:
+      radial-gradient(120% 90% at 0% 0%, rgb(76 201 240 / 0.07), transparent 55%),
+      linear-gradient(
+        115deg,
+        rgb(7 8 16 / 0.93) 0%,
+        rgb(7 8 16 / 0.87) 55%,
+        rgb(7 8 16 / 0.78) 82%,
+        rgb(7 8 16 / 0.45) 100%
+      );
+  }
+}
+
+/* Mirrors the corner cuts (top-left + bottom-right) for right-aligned cards. */
+@utility hud-flip {
+  --hud-clip: polygon(
+    var(--hud-cut, 20px) 0,
+    100% 0,
+    100% calc(100% - var(--hud-cut, 20px)),
+    calc(100% - var(--hud-cut, 20px)) 100%,
+    0 100%,
+    0 var(--hud-cut, 20px)
+  );
+}
+
+/* Outline-only tech chip with a single corner cut — outer bg acts as the 1px stroke. */
+@utility hud-chip {
+  --chip-cut: 8px;
+  --chip-clip: polygon(
+    0 0,
+    calc(100% - var(--chip-cut)) 0,
+    100% var(--chip-cut),
+    100% 100%,
+    0 100%
+  );
+  position: relative;
+  isolation: isolate;
+  clip-path: var(--chip-clip);
+  background: rgb(76 201 240 / 0.4);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    clip-path: var(--chip-clip);
+    background: rgb(7 8 16 / 0.72);
+  }
+}
+
+/* HUD button — corner-cut outline, neon beam ignites on hover/focus. */
+@utility hud-button {
+  --hud-cut: 12px;
+  --hud-clip: polygon(
+    0 0,
+    calc(100% - var(--hud-cut)) 0,
+    100% var(--hud-cut),
+    100% 100%,
+    var(--hud-cut) 100%,
+    0 calc(100% - var(--hud-cut))
+  );
+  position: relative;
+  isolation: isolate;
+  clip-path: var(--hud-clip);
+  background: rgb(214 214 214 / 0.18);
+  transition: background-color 0.25s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background: conic-gradient(
+      from var(--beam-angle),
+      transparent 0%,
+      transparent 62%,
+      rgb(76 201 240 / 0.95) 84%,
+      rgb(177 108 234 / 0.95) 94%,
+      transparent 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: beam-rotate 3.5s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    clip-path: var(--hud-clip);
+    background: rgb(7 8 16 / 0.72);
+    transition: background-color 0.25s ease;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: rgb(76 201 240 / 0.45);
+
+    &::before {
+      opacity: 1;
+    }
+
+    &::after {
+      background: rgb(13 18 32 / 0.78);
+    }
+  }
+
+  /* clip-path swallows an outside outline — draw the focus ring inside the shape */
+  &:focus-visible {
+    outline-offset: -4px;
+  }
+}
+
+/* Lifts body copy off low-opacity scrim regions over bright 3-D backdrops. */
+@utility text-shadow-scrim {
+  text-shadow: 0 1px 8px rgb(7 8 16 / 0.8);
+}
+
+/* ── Letterpress carnival surfaces (HUD overhaul) ─────────
+ * Aged-poster card treatment ported from horror-carnival-hud-reference.html.
+ * Bone stock with the spec's "double-rule" emboss; ink sits *in* the paper. */
+@utility ticket-frame {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 22% 12%, rgb(120 88 46 / 0.07), transparent 26%),
+    radial-gradient(circle at 82% 78%, rgb(120 88 46 / 0.06), transparent 24%), var(--color-paper);
+  border: 1.5px solid var(--color-keyline);
+  box-shadow:
+    inset 0 0 0 3px var(--color-paper),
+    inset 0 0 0 3.7px rgb(36 26 18 / 0.4),
+    inset 0 2px 8px rgb(70 48 22 / 0.14),
+    inset 0 0 0 1px rgb(255 250 235 / 0.22);
+}
+
+/* Tear-off perforation: a dotted vertical rule near the left edge (pair with pl). */
+@utility ticket-perf {
+  &::before {
+    content: '';
+    position: absolute;
+    top: 9px;
+    bottom: 9px;
+    left: 26px;
+    width: 2px;
+    background-image: radial-gradient(circle, var(--color-keyline) 0 1.1px, transparent 1.4px);
+    background-size: 2px 9px;
+    background-repeat: repeat-y;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+/* 1px light text-shadow → the letterpress "deboss" illusion on ink/brass text. */
+@utility letterpress {
+  text-shadow: 0 1px 0 rgb(255 250 235 / 0.32);
+}
+
+/* Subtle ben-day dot screen multiplied over a fill so ink reads printed, not flat. */
+@utility halftone {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgb(0 0 0 / 0.5) 0.5px, transparent 0.7px);
+    background-size: 3px 3px;
+    mix-blend-mode: multiply;
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* Beveled bone keycap — the letterpress button (prompt keycaps, HUD actions). */
+@utility paper-button {
+  position: relative;
+  isolation: isolate;
+  background: var(--color-paper);
+  border: 1.5px solid var(--color-keyline);
+  color: var(--color-oxblood);
+  box-shadow:
+    inset 0 1px 0 rgb(255 250 235 / 0.5),
+    inset 0 -2px 3px rgb(80 55 25 / 0.18),
+    inset 0 0 0 1px rgb(255 250 235 / 0.18);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-oxblood-bright);
+    background: #efe6cf;
+  }
+}
+
+/* Outline ticket-stub chip for tech tags etc. — brass ink on bone, hairline keyline. */
+@utility paper-chip {
+  border: 1px solid color-mix(in srgb, var(--color-ink-soft) 45%, transparent);
+  color: var(--color-brass-text);
+  background: color-mix(in srgb, var(--color-paper) 30%, transparent);
+}

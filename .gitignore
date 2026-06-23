@@ -5,7 +5,6 @@ node_modules/
 
 # testing
 coverage/
-testCoverage/
 
 # lint
 .eslintcache
@@ -13,6 +12,7 @@ testCoverage/
 # next.js
 .next/
 out/
+next-env.d.ts
 
 # production
 build/
@@ -22,31 +22,19 @@ build/
 
 # debug
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+pnpm-debug.log*
 
 # local env files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*.local
 
-### yarn ###
-.yarn/*
-!.yarn/patches
-!.yarn/releases
-!.yarn/plugins
-!.yarn/sdks
-!.yarn/versions
-.pnp.*
+# TS
+*.tsbuildinfo
 
-## Turbo Repo
-.turbo
+# Claude Code agent worktrees / local
+.claude/worktrees/
 
-## TS
-tsconfig.tsbuildinfo
-
-# Storybook build outputs
-.out
-.storybook-out
-storybook-static
+# pnpm 10/11 auto-generates this for its build-script approval prompt, but this
+# isn't a workspace — and a packages-less workspace file breaks Vercel's pnpm 9.x
+# install ("packages field missing or empty"). Build approvals live in
+# package.json -> pnpm.onlyBuiltDependencies (read by pnpm 9.x). Keep it untracked.
+pnpm-workspace.yaml
