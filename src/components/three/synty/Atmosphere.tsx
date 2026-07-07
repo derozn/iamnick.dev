@@ -3,24 +3,17 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
-import {
-  AdditiveBlending,
-  BackSide,
-  Color,
-  DoubleSide,
-  type Group,
-  type Mesh,
-  ShaderMaterial,
-} from 'three';
+import { AdditiveBlending, BackSide, Color, type Group, type Mesh, ShaderMaterial } from 'three';
 
 import { getGlowTexture } from './bulbGlowExtract';
 
 /**
  * Atmosphere — the cheap set dressing that sells the night: a gradient sky dome
  * whose horizon *is* the fog colour (so the fogged ground meets the sky with no
- * seam), a starfield, a hazy moon along the moon-key light's direction, slow
- * searchlight beams sweeping over the big rides, and drifting ground-fog sheets
- * at the map edges.
+ * seam), a starfield, a hazy moon along the moon-key light's direction, and
+ * drifting ground-fog sheets at the map edges. (Sweeping searchlight cones were
+ * tried and cut — from the fixed iso angle they always read as clipping through
+ * the ride geometry.)
  *
  * Perf contract (the fragile-GPU rule): zero lights, zero render targets, a
  * handful of draw calls, and every animated piece is high-tier-only (where the
@@ -30,17 +23,6 @@ import { getGlowTexture } from './bulbGlowExtract';
 /** Sky colours — horizon MUST match Scene's FOG for an invisible seam. */
 const HORIZON = '#2b2f57';
 const ZENITH = '#12142e';
-
-/**
- * Searchlight anchors (three-space): big top, carousel, ferris wheel.
- * `apexY` sits ABOVE each structure's roof so the beam lives in the sky only —
- * a ground-level apex made the cone slice visibly through the ride geometry.
- */
-const BEAMS: { pos: [number, number, number]; apexY: number; speed: number; phase: number }[] = [
-  { pos: [-1.6, 0, 21], apexY: 10.5, speed: 0.12, phase: 0.4 },
-  { pos: [23.7, 0, 25.4], apexY: 8.5, speed: 0.17, phase: 2.4 },
-  { pos: [-22.2, 0, 28.6], apexY: 15.5, speed: 0.09, phase: 4.2 },
-];
 
 /** Ground-fog sheets: centre + size, hugging the field's dark edges. */
 const FOG_SHEETS: { pos: [number, number, number]; size: [number, number] }[] = [
@@ -68,7 +50,7 @@ const SKY_FRAG = /* glsl */ `
   }
 `;
 
-const BEAM_VERT = /* glsl */ `
+const UV_VERT = /* glsl */ `
   varying vec2 vUv;
   void main() {
     vUv = uv;
@@ -109,17 +91,6 @@ const FOG_FRAG = /* glsl */ `
   }
 `;
 
-const BEAM_FRAG = /* glsl */ `
-  varying vec2 vUv;
-  void main() {
-    // brightest at the source (apex sits at v=1 after the flip), fading up,
-    // with soft side edges so the cone reads volumetric not CG-hard
-    float a = pow(vUv.y, 2.2) * 0.16;
-    a *= smoothstep(0.0, 0.12, vUv.x) * smoothstep(1.0, 0.88, vUv.x);
-    gl_FragColor = vec4(vec3(1.0, 0.86, 0.62), a);
-  }
-`;
-
 function makeSky() {
   return new ShaderMaterial({
     vertexShader: SKY_VERT,
@@ -133,20 +104,9 @@ function makeSky() {
   });
 }
 
-function makeBeam() {
-  return new ShaderMaterial({
-    vertexShader: BEAM_VERT,
-    fragmentShader: BEAM_FRAG,
-    transparent: true,
-    blending: AdditiveBlending,
-    depthWrite: false,
-    side: DoubleSide,
-  });
-}
-
 function makeGroundFog() {
   return new ShaderMaterial({
-    vertexShader: BEAM_VERT, // plain uv-passthrough works for the flat sheets too
+    vertexShader: UV_VERT,
     fragmentShader: FOG_FRAG,
     uniforms: { uTime: { value: 0 } },
     transparent: true,
@@ -168,10 +128,8 @@ const MOON_POS: [number, number, number] = [
 
 export function Atmosphere({ high }: { high: boolean }) {
   const skyMaterial = useMemo(() => makeSky(), []);
-  const beamMaterial = useMemo(() => makeBeam(), []);
   const fogMaterial = useMemo(() => makeGroundFog(), []);
   const moonRef = useRef<Group>(null);
-  const beamRefs = useRef<(Group | null)[]>([]);
   // uniforms are mutated through this element ref in useFrame (never through the
   // useMemo return — the codebase's react-hooks/immutability rule)
   const fogMeshRef = useRef<Mesh>(null);
@@ -179,14 +137,9 @@ export function Atmosphere({ high }: { high: boolean }) {
   useFrame(({ camera, clock }) => {
     // moon always faces the camera (cheap billboard — one quaternion copy)
     moonRef.current?.quaternion.copy(camera.quaternion);
-    if (!high) return; // sweeps + fog drift are high-tier-only (frameloop=always)
-    const t = clock.elapsedTime;
+    if (!high) return; // fog drift is high-tier-only (frameloop=always)
     const fogMat = fogMeshRef.current?.material as ShaderMaterial | undefined;
-    if (fogMat) fogMat.uniforms.uTime.value = t;
-    BEAMS.forEach((b, i) => {
-      const g = beamRefs.current[i];
-      if (g) g.rotation.y = t * b.speed * Math.PI * 2 * 0.16 + b.phase;
-    });
+    if (fogMat) fogMat.uniforms.uTime.value = clock.elapsedTime;
   });
 
   return (
@@ -216,27 +169,6 @@ export function Atmosphere({ high }: { high: boolean }) {
           />
         </sprite>
       </group>
-
-      {/* searchlights sweeping the sky above the big rides (high tier only) */}
-      {high &&
-        BEAMS.map((b, i) => (
-          <group
-            key={i}
-            position={b.pos}
-            ref={(el) => {
-              beamRefs.current[i] = el;
-            }}
-          >
-            {/* tilt the beam off vertical; the parent group spins about Y */}
-            <group position={[0, b.apexY, 0]} rotation={[0.32, 0, 0]}>
-              {/* rotateX(PI) puts the cone's apex at the group origin (v=1 there),
-                  i.e. hovering just above the structure's roof */}
-              <mesh material={beamMaterial} position={[0, 21, 0]} rotation={[Math.PI, 0, 0]}>
-                <coneGeometry args={[5.5, 42, 16, 1, true]} />
-              </mesh>
-            </group>
-          </group>
-        ))}
 
       {/* drifting ground-fog sheets at the field edges — procedural noise with
           faded edges (a tiled sprite texture read as a grid of squares) */}
