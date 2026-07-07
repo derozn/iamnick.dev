@@ -14,6 +14,7 @@ import { DynamicLights } from './synty/DynamicLights';
 import { BallTossGame } from './game/BallTossGame';
 import { SafePostFX } from './effects/SafePostFX';
 import { LoaderVeil } from './intro/LoaderVeil';
+import { Atmosphere } from './synty/Atmosphere';
 import { type QualityTier } from './hooks/useQualityTier';
 
 interface SceneProps {
@@ -91,6 +92,7 @@ export default function Scene({ tier }: SceneProps) {
       <LoaderVeil />
 
       <Suspense fallback={null}>
+        {!dbg.off.has('atmo') && <Atmosphere high={high} />}
         {!dbg.off.has('synty') && <SyntyScene bloomOn={bloomOn} exclude={dbg.offp} />}
         {!dbg.off.has('rides') && <AnimatedRides bloomOn={bloomOn} />}
         {!dbg.off.has('glow') && <BulbGlow bloomOn={bloomOn} />}
