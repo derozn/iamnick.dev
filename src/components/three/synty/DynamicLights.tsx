@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Color, Matrix4, type PointLight, Vector3 } from 'three';
+import { Color, type DirectionalLight, Matrix4, type PointLight, Vector3 } from 'three';
 
 import demoInstances from './demo-instances.json';
 import { unityTRS } from './conversion';
@@ -22,6 +22,7 @@ import { EXTRA_LAMPS } from './sceneAdditions';
 const data = demoInstances as Record<string, number[][]>;
 const _m = new Matrix4();
 const _v = new Vector3();
+const _fwd = new Vector3();
 const posOf = (names: string[], yLift: number): Vector3[] =>
   names
     .flatMap((n) => data[n] ?? [])
@@ -116,6 +117,8 @@ const CANDIDATES: Candidate[] = [
 
 export function DynamicLights({ pool = 8 }: { pool?: number }) {
   const lights = useRef<(PointLight | null)[]>([]);
+  const keyRef = useRef<DirectionalLight>(null);
+  const rimRef = useRef<DirectionalLight>(null);
   const order = useMemo(() => CANDIDATES.map((_, i) => i), []);
   // which candidate each slot currently plays (-1 = none yet); slots are STABLE:
   // a slot keeps its candidate while that candidate stays in the nearest set, so
@@ -125,6 +128,21 @@ export function DynamicLights({ pool = 8 }: { pool?: number }) {
   useFrame(({ camera }, delta) => {
     const cp = camera.position;
     const dt = Math.min(delta, 0.1);
+
+    // CAMERA-RELATIVE studio rig: the key rides above-and-behind the viewer, the
+    // rim opposes it. A static key can't work here — the overview looks from a
+    // fixed 225° azimuth but every focus fly-in faces its own direction (the
+    // striker looks north, the entrance south…), so whichever quadrant a fixed
+    // key sits in, SOME view renders back-lit ("inverted"-looking lighting).
+    // Both lights aim at their default (0,0,0) target; with parallel rays only
+    // the direction matters, and panning never changes direction — only the
+    // damped fly-ins swing it, so it inherits their smoothness.
+    camera.getWorldDirection(_fwd);
+    _fwd.y = 0;
+    if (_fwd.lengthSq() < 1e-4) _fwd.set(0, 0, -1);
+    _fwd.normalize();
+    keyRef.current?.position.set(-_fwd.x * 45, 90, -_fwd.z * 45);
+    rimRef.current?.position.set(_fwd.x * 50, 45, _fwd.z * 50);
     // nearest-`pool` candidates win the fixed light slots this frame
     order.sort(
       (a, b) => CANDIDATES[a].pos.distanceToSquared(cp) - CANDIDATES[b].pos.distanceToSquared(cp),
@@ -176,14 +194,12 @@ export function DynamicLights({ pool = 8 }: { pool?: number }) {
       <hemisphereLight args={['#46588f', '#2a1f2c', 0.6]} />
       <ambientLight intensity={0.28} color="#2c2440" />
       {/* moon key — cool, high, kept modest so the firelight pools dominate.
-          CRITICAL: it must sit in the CAMERA's quadrant. The iso camera is fixed
-          at azimuth 225° (looking from −x/−z toward +x/+z); with the key on the
-          far side the whole scene rendered back-lit — every camera-facing facade
-          in shadow, lit surfaces only on faces pointing away ("inverted"). */}
-      <directionalLight position={[-40, 90, -50]} intensity={0.85} color="#aab6f0" />
-      {/* violet rim from BEHIND the scene (far quadrant) for silhouette depth +
+          Positioned per-frame in useFrame: it FOLLOWS the camera (above-behind)
+          so the faces the visitor is looking at are always the lit ones. */}
+      <directionalLight ref={keyRef} position={[-40, 90, -50]} intensity={0.85} color="#aab6f0" />
+      {/* violet rim — per-frame at the opposite side, for silhouette depth +
           carnival colour on the edges the key doesn't reach */}
-      <directionalLight position={[50, 45, 40]} intensity={0.8} color="#a86cff" />
+      <directionalLight ref={rimRef} position={[50, 45, 40]} intensity={0.8} color="#a86cff" />
 
       {/* fixed pool — the shader only ever compiles `pool` point lights */}
       {Array.from({ length: pool }).map((_, i) => (
