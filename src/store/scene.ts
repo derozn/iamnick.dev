@@ -37,13 +37,23 @@ export const BALL_TOSS_BALLS = 3;
 
 /** localStorage key: this device dropped the GL context with the composer on. */
 const POSTFX_BLOCKED_KEY = 'iamnick:postfx-blocked';
+/** localStorage key: visitor muted the carnival audio. */
+const MUTED_KEY = 'iamnick:muted';
 
-/** SSR-safe localStorage read (the store module is evaluated on the server too). */
-const readPostFxBlocked = () => {
+/** SSR-safe localStorage flag read (the store module is evaluated on the server too). */
+const readFlag = (key: string) => {
   try {
-    return typeof window !== 'undefined' && window.localStorage.getItem(POSTFX_BLOCKED_KEY) === '1';
+    return typeof window !== 'undefined' && window.localStorage.getItem(key) === '1';
   } catch {
     return false;
+  }
+};
+const writeFlag = (key: string, on: boolean) => {
+  try {
+    if (on) window.localStorage.setItem(key, '1');
+    else window.localStorage.removeItem(key);
+  } catch {
+    // private mode etc. — the in-session state still applies
   }
 };
 
@@ -67,6 +77,10 @@ export interface SceneState {
    *  the glow. The permanent safety net behind re-enabling post-processing. */
   postFxBlocked: boolean;
   blockPostFx: () => void;
+
+  /** Carnival audio muted (persisted). AudioDirector mirrors this into the mixer. */
+  muted: boolean;
+  toggleMuted: () => void;
 
   /** Intro: real asset-load progress [0,1] (drei useProgress → LoaderVeil bridge). */
   loadProgress: number;
@@ -133,15 +147,18 @@ export const useSceneStore = create<SceneState>()((set) => ({
   veilLive: false,
   setVeilLive: (veilLive) => set({ veilLive }),
 
-  postFxBlocked: readPostFxBlocked(),
+  postFxBlocked: readFlag(POSTFX_BLOCKED_KEY),
   blockPostFx: () => {
-    try {
-      window.localStorage.setItem(POSTFX_BLOCKED_KEY, '1');
-    } catch {
-      // private mode etc. — the in-session flag still protects this visit
-    }
+    writeFlag(POSTFX_BLOCKED_KEY, true);
     set({ postFxBlocked: true });
   },
+
+  muted: readFlag(MUTED_KEY),
+  toggleMuted: () =>
+    set((s) => {
+      writeFlag(MUTED_KEY, !s.muted);
+      return { muted: !s.muted };
+    }),
 
   mode: 'travelling',
   activeAttraction: null,

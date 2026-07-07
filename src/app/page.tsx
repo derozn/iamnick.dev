@@ -3,6 +3,7 @@ import { ContentOverlay } from '@/components/content/ContentOverlay';
 import { StaticResume } from '@/components/content/StaticResume';
 import { IntroOverlay } from '@/components/content/IntroOverlay';
 import { DebugBridge } from '@/components/content/DebugBridge';
+import { AudioDirector } from '@/components/content/AudioDirector';
 import { BallTossHud } from '@/components/three/game/BallTossHud';
 
 export const dynamic = 'auto';
@@ -34,6 +35,9 @@ export default function Homepage() {
 
       {/* DOM overlay for the ball-toss game (score / balls / exit / win-lose) */}
       <BallTossHud />
+
+      {/* Scene state → audio mixer (ambience on enter, duck under panels, mute) */}
+      <AudioDirector />
 
       {/* Headless-verification hook — inert unless the URL carries ?debug=1 */}
       <DebugBridge />

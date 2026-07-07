@@ -17,6 +17,7 @@ import {
 } from 'three';
 
 import { BALL_TOSS_BALLS, useSceneStore } from '@/store/scene';
+import { playSfx } from '@/lib/audio';
 import {
   AIM_LOFT,
   AIM_YAW,
@@ -312,6 +313,7 @@ function Sim() {
       ball.current.live = true;
       knockedThisThrow.current = 0;
       if (ballGroup.current) ballGroup.current.visible = true;
+      playSfx('throw');
       const s = useSceneStore.getState();
       s.setBallToss({ ballTossPhase: 'thrown', ballTossBallsLeft: s.ballTossBallsLeft - 1 });
       invalidate();
@@ -395,6 +397,7 @@ function Sim() {
     if (!s.up) return;
     s.up = false;
     knockedThisThrow.current++;
+    playSfx('bottle'); // throttled in the mixer, so a cascade doesn't machine-gun
 
     // Horizontal shove along the incoming direction (default forward if degenerate).
     _kd.copy(dir).setY(0);

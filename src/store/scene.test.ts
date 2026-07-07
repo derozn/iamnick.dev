@@ -56,6 +56,16 @@ describe('store/scene', () => {
     useSceneStore.setState({ loadProgress: 0, veilLive: false });
   });
 
+  it('toggleMuted flips and persists', () => {
+    expect(useSceneStore.getState().muted).toBe(false);
+    useSceneStore.getState().toggleMuted();
+    expect(useSceneStore.getState().muted).toBe(true);
+    expect(window.localStorage.getItem('iamnick:muted')).toBe('1');
+    useSceneStore.getState().toggleMuted();
+    expect(useSceneStore.getState().muted).toBe(false);
+    expect(window.localStorage.getItem('iamnick:muted')).toBeNull();
+  });
+
   it('starts with post-fx allowed; blockPostFx trips and persists the flag', () => {
     expect(useSceneStore.getState().postFxBlocked).toBe(false);
     useSceneStore.getState().blockPostFx();

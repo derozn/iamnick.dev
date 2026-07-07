@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 
 import { useSceneStore } from '@/store/scene';
 import { useQualityTier } from '@/components/three/hooks/useQualityTier';
+import { initAudio } from '@/lib/audio';
 
 // NB: deliberately NO @react-three/* import here — this overlay is in the static
 // (non-dynamic) bundle, and importing drei/three would pull the whole 3-D chunk
@@ -103,7 +104,11 @@ export function IntroOverlay() {
           <motion.button
             type="button"
             disabled={!sceneReady}
-            onClick={start}
+            onClick={() => {
+              // the guaranteed user gesture — the only place the mixer may be born
+              initAudio(useSceneStore.getState().muted);
+              start();
+            }}
             aria-label="Enter the carnival"
             className="absolute inset-0 z-20"
             style={{ pointerEvents: sceneReady ? 'auto' : 'none' }}

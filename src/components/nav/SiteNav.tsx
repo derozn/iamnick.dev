@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'motion/react';
 
 import { useSceneStore } from '@/store/scene';
 import { ATTRACTIONS, type Attraction } from '@/components/three/synty/attractions';
+import { MuteButton } from './MuteButton';
 
 const EASE = [0.22, 0.61, 0.27, 1] as const;
 
@@ -56,6 +57,10 @@ export function SiteNav() {
       >
         iamnick<span className="text-accent">.dev</span>
       </a>
+
+      {/* stays visible even while a panel/game owns the top-right ✕ (right-4);
+          the mute lives one slot left at right-16 */}
+      <MuteButton />
 
       {!hidden && (
         <button
