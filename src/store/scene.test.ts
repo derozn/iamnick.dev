@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { useSceneStore } from './scene';
+import { STRIKER_SWINGS, useSceneStore } from './scene';
+import { meterValue, resultLabel } from '@/components/three/game/highStrikerConfig';
 
 const reset = () =>
   useSceneStore.setState({
@@ -54,6 +55,38 @@ describe('store/scene', () => {
     useSceneStore.getState().setVeilLive(true);
     expect(useSceneStore.getState().veilLive).toBe(true);
     useSceneStore.setState({ loadProgress: 0, veilLive: false });
+  });
+
+  it('striker: arm → strike → replay round-trips', () => {
+    const s = () => useSceneStore.getState();
+    expect(s().strikerPhase).toBe('intro');
+    s().setStriker({ strikerPhase: 'armed', strikerArmedAt: 1000 });
+    s().setStriker({
+      strikerPhase: 'struck',
+      strikerPower: 0.97,
+      strikerAttemptsLeft: s().strikerAttemptsLeft - 1,
+      strikerBest: 0.97,
+    });
+    expect(s().strikerAttemptsLeft).toBe(STRIKER_SWINGS - 1);
+    expect(s().strikerBest).toBe(0.97);
+    s().replayStriker();
+    expect(s().strikerPhase).toBe('armed');
+    expect(s().strikerAttemptsLeft).toBe(STRIKER_SWINGS);
+    expect(s().strikerBest).toBe(0);
+    expect(s().strikerRound).toBe(1);
+    s().resetStriker();
+    expect(s().strikerPhase).toBe('intro');
+  });
+
+  it('striker meter is a deterministic triangle wave with sensible labels', () => {
+    expect(meterValue(0)).toBe(0);
+    expect(meterValue(625)).toBeCloseTo(1); // half of METER_PERIOD (1.25s) = peak
+    expect(meterValue(1250)).toBeCloseTo(0); // full period = back home
+    expect(meterValue(312.5)).toBeCloseTo(0.5);
+    expect(resultLabel(0.2)).toBe('Wet noodle');
+    expect(resultLabel(0.5)).toBe('Fairly fair');
+    expect(resultLabel(0.8)).toBe('Big-top strong');
+    expect(resultLabel(0.97)).toBe('RING THAT BELL!');
   });
 
   it('collectTicket appends once, persists, and fireBurst bumps the trigger', () => {

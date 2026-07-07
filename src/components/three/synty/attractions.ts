@@ -82,6 +82,19 @@ export const ATTRACTIONS: Attraction[] = [
     focusDist: 20,
   },
   {
+    // The strength-test pole mid-map. Its authored yaw is ~-10°; the camera sits
+    // on the +z (front) side so the puck rail + bell read in profile.
+    id: 'high-striker',
+    title: 'High Striker',
+    section: 'game:high-striker',
+    prefab: 'SM_Prop_High_Striker_01',
+    transform: [-6.689, 0.108, -5.366, 0, -0.089, 0, 0.996, 1, 1, 1],
+    // focus target sits mid-pole so the fly-in frames base-to-bell
+    position: [-6.69, 2.6, 5.37],
+    facing: [-0.18, 0, 0.98],
+    focusDist: 8.5,
+  },
+  {
     id: 'ball-toss',
     title: 'Ball Toss',
     section: 'game:ball-toss',

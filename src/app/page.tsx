@@ -6,6 +6,7 @@ import { DebugBridge } from '@/components/content/DebugBridge';
 import { AudioDirector } from '@/components/content/AudioDirector';
 import { TicketHud } from '@/components/three/tickets/TicketHud';
 import { BallTossHud } from '@/components/three/game/BallTossHud';
+import { HighStrikerHud } from '@/components/three/game/HighStrikerHud';
 
 export const dynamic = 'auto';
 
@@ -36,6 +37,9 @@ export default function Homepage() {
 
       {/* DOM overlay for the ball-toss game (score / balls / exit / win-lose) */}
       <BallTossHud />
+
+      {/* DOM overlay for the high-striker game (gauge / swings / verdict) */}
+      <HighStrikerHud />
 
       {/* Golden-ticket hunt tally + full-house modal */}
       <TicketHud />

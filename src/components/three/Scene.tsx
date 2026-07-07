@@ -12,6 +12,7 @@ import { IsoControls } from './synty/IsoControls';
 import { Indicators } from './synty/Indicators';
 import { DynamicLights } from './synty/DynamicLights';
 import { BallTossGame } from './game/BallTossGame';
+import { HighStrikerGame } from './game/HighStrikerGame';
 import { SafePostFX } from './effects/SafePostFX';
 import { LoaderVeil } from './intro/LoaderVeil';
 import { Atmosphere } from './synty/Atmosphere';
@@ -99,6 +100,7 @@ export default function Scene({ tier }: SceneProps) {
         {!dbg.off.has('rides') && <AnimatedRides bloomOn={bloomOn} />}
         {!dbg.off.has('glow') && <BulbGlow bloomOn={bloomOn} />}
         {!dbg.off.has('game') && <BallTossGame />}
+        {!dbg.off.has('game') && <HighStrikerGame />}
         {!dbg.off.has('tickets') && <GoldenTickets bloomOn={bloomOn} />}
         <ConfettiBurst />
         {/* A child of Suspense: it only mounts once all the GLBs/textures above

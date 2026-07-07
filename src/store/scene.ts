@@ -35,6 +35,20 @@ export type BallTossPhase = 'intro' | 'aiming' | 'thrown' | 'won' | 'lost';
 /** Balls the visitor gets per ball-toss round. */
 export const BALL_TOSS_BALLS = 3;
 
+/**
+ * High-striker phase — drives the DOM HUD + in-canvas puck.
+ *   - `intro`  — how-to card; the meter is idle.
+ *   - `armed`  — needle sweeping; a tap captures power (deterministic from
+ *                `strikerArmedAt`, see highStrikerConfig.meterValue).
+ *   - `struck` — puck in flight; input parked.
+ *   - `result` — swing resolved, brief beat before re-arm / done.
+ *   - `done`   — attempts spent; show the verdict card.
+ */
+export type StrikerPhase = 'intro' | 'armed' | 'struck' | 'result' | 'done';
+
+/** Swings the visitor gets per high-striker round. */
+export const STRIKER_SWINGS = 3;
+
 /** localStorage key: this device dropped the GL context with the composer on. */
 const POSTFX_BLOCKED_KEY = 'iamnick:postfx-blocked';
 /** localStorage key: visitor muted the carnival audio. */
@@ -158,10 +172,30 @@ export interface SceneState {
   replayBallToss: () => void;
   /** Merge a partial summary update from the sim (score / balls / phase). */
   setBallToss: (patch: Partial<BallTossSlice>) => void;
+
+  /* --- High-striker game slice (summary only; the puck sim runs in refs) --- */
+  strikerPhase: StrikerPhase;
+  /** performance.now() when the meter armed — the needle is derived from this. */
+  strikerArmedAt: number;
+  /** Power [0,1] captured at the last tap. */
+  strikerPower: number;
+  strikerAttemptsLeft: number;
+  /** Best power this round (drives the verdict label). */
+  strikerBest: number;
+  /** Bumped on "Play again"; the in-canvas sim watches it to reset the puck. */
+  strikerRound: number;
+  setStriker: (patch: Partial<StrikerSlice>) => void;
+  resetStriker: () => void;
+  replayStriker: () => void;
 }
 
 /** The mutable summary fields the sim writes back to the store. */
 type BallTossSlice = Pick<SceneState, 'ballTossScore' | 'ballTossBallsLeft' | 'ballTossPhase'>;
+
+type StrikerSlice = Pick<
+  SceneState,
+  'strikerPhase' | 'strikerArmedAt' | 'strikerPower' | 'strikerAttemptsLeft' | 'strikerBest'
+>;
 
 export const useSceneStore = create<SceneState>()((set) => ({
   sceneReady: false,
@@ -239,6 +273,31 @@ export const useSceneStore = create<SceneState>()((set) => ({
   ballTossRound: 0,
   resetBallToss: () =>
     set({ ballTossScore: 0, ballTossBallsLeft: BALL_TOSS_BALLS, ballTossPhase: 'intro' }),
+
+  strikerPhase: 'intro',
+  strikerArmedAt: 0,
+  strikerPower: 0,
+  strikerAttemptsLeft: STRIKER_SWINGS,
+  strikerBest: 0,
+  strikerRound: 0,
+  setStriker: (patch) => set(patch),
+  resetStriker: () =>
+    set({
+      strikerPhase: 'intro',
+      strikerArmedAt: 0,
+      strikerPower: 0,
+      strikerAttemptsLeft: STRIKER_SWINGS,
+      strikerBest: 0,
+    }),
+  replayStriker: () =>
+    set((s) => ({
+      strikerPhase: 'armed',
+      strikerArmedAt: performance.now(),
+      strikerPower: 0,
+      strikerAttemptsLeft: STRIKER_SWINGS,
+      strikerBest: 0,
+      strikerRound: s.strikerRound + 1,
+    })),
   replayBallToss: () =>
     set((s) => ({
       ballTossScore: 0,
