@@ -53,12 +53,20 @@ export default function Scene({ tier }: SceneProps) {
     const offp = q.get('offp') ? new RegExp(q.get('offp')!) : undefined;
     return { off, offp };
   }, []);
+  // DEPLOY SAFETY: the bloom composer stays OFF by default until the zero-normal
+  // NaN fix is verified (Phase 1 circle-back) — a NaN black-frame does NOT drop
+  // the GL context, so SafePostFX's tripwire can't catch it. Opt in for testing
+  // with ?bloom=1. Flip the default to `high && !postFxBlocked` once verified.
+  //
   // Bloom is a MOUNT-TIME decision: emissive intensities are baked into materials
   // once (applyEmissive guards re-application), so they can't follow a mid-session
   // composer dropout. If the context is lost, SafePostFX unmounts the composer and
   // the scene runs a touch dim until reload — the persisted flag makes the next
   // visit tune emissives for the no-composer look from the start.
-  const bloomOn = useMemo(() => high && !useSceneStore.getState().postFxBlocked, [high]);
+  const bloomOn = useMemo(() => {
+    const optIn = typeof window !== 'undefined' && window.location.search.includes('bloom=1');
+    return high && optIn && !useSceneStore.getState().postFxBlocked;
+  }, [high]);
   // Atmospheric fog for depth — paired with the luminous FOG colour above and the
   // capped zoom-out, the far edge of the carnival fades into haze (not darkness),
   // while near props stay crisp because exp² fog is light up close.

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useProgress } from '@react-three/drei';
 import { PlaneGeometry, ShaderMaterial } from 'three';
@@ -95,15 +95,10 @@ const FRAG = /* glsl */ `
   }
 `;
 
-/** Mirrors drei's global loading progress into the scene store (HTML % readout). */
-function ProgressBridge() {
-  const { progress } = useProgress();
-  const setLoadProgress = useSceneStore((s) => s.setLoadProgress);
-  useEffect(() => {
-    setLoadProgress(progress / 100);
-  }, [progress, setLoadProgress]);
-  return null;
-}
+// NB: loading progress is SAMPLED from drei's store inside useFrame below, not
+// subscribed to with the useProgress() hook — loaders register synchronously
+// while other components (e.g. Ride's useGLTF) are still rendering, and a
+// hook subscription turns that into a setState-during-render warning.
 
 export function LoaderVeil() {
   const [done, setDone] = useState(false);
@@ -146,6 +141,10 @@ export function LoaderVeil() {
       st.setVeilLive(true);
     }
 
+    // mirror drei's load progress into the scene store (drives the DOM bulb
+    // rail + %); sampled here so the write happens outside React render
+    st.setLoadProgress(useProgress.getState().progress / 100);
+
     u.uTime.value += dt;
     u.uAspect.value = size.width / size.height;
     // ease the spotlight open on ready, the full iris on start
@@ -164,18 +163,15 @@ export function LoaderVeil() {
 
   if (done) return null;
   return (
-    <>
-      <ProgressBridge />
-      <mesh
-        geometry={geometry}
-        material={material}
-        ref={(el) => {
-          // material ref for useFrame without touching the hook return in render
-          matRef.current = el ? (el.material as ShaderMaterial) : null;
-        }}
-        renderOrder={9999}
-        frustumCulled={false}
-      />
-    </>
+    <mesh
+      geometry={geometry}
+      material={material}
+      ref={(el) => {
+        // material ref for useFrame without touching the hook return in render
+        matRef.current = el ? (el.material as ShaderMaterial) : null;
+      }}
+      renderOrder={9999}
+      frustumCulled={false}
+    />
   );
 }
