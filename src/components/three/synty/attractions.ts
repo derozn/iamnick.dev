@@ -89,10 +89,12 @@ export const ATTRACTIONS: Attraction[] = [
     section: 'game:high-striker',
     prefab: 'SM_Prop_High_Striker_01',
     transform: [-6.689, 0.108, -5.366, 0, -0.089, 0, 0.996, 1, 1, 1],
-    // focus target sits mid-pole so the fly-in frames base-to-bell
-    position: [-6.69, 2.6, 5.37],
+    // focus target sits mid-pole and the camera stands well back: the prop is
+    // ~6.5 m tall and the play fov is 34°, so seeing base-to-bell (+margin)
+    // needs ≈0.61·d ≥ 7.5 m → d ≈ 12.5.
+    position: [-6.69, 3.1, 5.37],
     facing: [-0.18, 0, 0.98],
-    focusDist: 8.5,
+    focusDist: 12.5,
   },
   {
     id: 'ball-toss',

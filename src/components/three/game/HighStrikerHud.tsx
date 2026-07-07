@@ -79,8 +79,28 @@ export function HighStrikerHud() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {/* Top bar: swings + best, centred; Exit pinned top-right. */}
-          <div className="relative flex items-start justify-center p-4 md:p-6">
+          {/* The pole + bell own the screen centre/top, so ALL chrome hugs the
+              bottom edge (stats live down there too) — only Exit sits up top. */}
+          <button
+            onClick={exit}
+            aria-label="Exit game"
+            className="paper-button pointer-events-auto absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-[3px] font-rye text-[15px] md:right-6 md:top-6"
+          >
+            ✕
+          </button>
+
+          {/* Bottom stack: hint / last-swing verdict, then the stats chip. */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-5 flex flex-col items-center gap-2">
+            {phase === 'armed' && (
+              <p className="ticket-frame rounded-[3px] px-4 py-1.5 font-fell text-[13px] italic text-ink">
+                Tap when the needle peaks — ring the bell!
+              </p>
+            )}
+            {phase === 'struck' && (
+              <p className="ticket-frame rounded-[3px] px-4 py-1.5 font-fell text-[13px] italic text-ink">
+                {pct(power)}% — {resultLabel(power)}
+              </p>
+            )}
             <div className="ticket-frame pointer-events-auto flex items-center gap-4 rounded-[3px] px-4 py-2 font-fell-sc text-[14px] tracking-[0.08em] text-ink">
               <span aria-label={`${attemptsLeft} swings left`}>
                 Swings{' '}
@@ -96,14 +116,6 @@ export function HighStrikerHud() {
                 Best <span className="font-rye text-oxblood">{pct(best)}%</span>
               </span>
             </div>
-
-            <button
-              onClick={exit}
-              aria-label="Exit game"
-              className="paper-button pointer-events-auto absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-[3px] font-rye text-[15px] md:right-6 md:top-6"
-            >
-              ✕
-            </button>
           </div>
 
           {/* Power gauge — right edge, letterpress track with a brass needle. */}
@@ -135,22 +147,6 @@ export function HighStrikerHud() {
                   />
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Tap hint */}
-          {phase === 'armed' && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
-              <p className="ticket-frame rounded-[3px] px-4 py-1.5 font-fell text-[13px] italic text-ink">
-                Tap when the needle peaks — ring the bell!
-              </p>
-            </div>
-          )}
-          {phase === 'struck' && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
-              <p className="ticket-frame rounded-[3px] px-4 py-1.5 font-fell text-[13px] italic text-ink">
-                {pct(power)}% — {resultLabel(power)}
-              </p>
             </div>
           )}
 

@@ -81,22 +81,37 @@ export function IntroOverlay() {
               iamnick<span className="text-accent">.dev</span>
             </p>
             <p className="font-fell mt-3 text-[15px] italic text-paper/70">Raising the big top…</p>
-            {/* Before the 3-D chunk lands: an indeterminate brass sweep. Once the
-            shader veil is live, its in-canvas bulb marquee is the progress bar —
-            this swaps to a live percentage above it. */}
-            {veilLive ? (
-              <p className="font-fell-sc mt-6 text-[15px] tracking-[0.3em] text-brass tabular-nums">
-                {pct}%
-              </p>
-            ) : (
-              <div className="relative mt-7 h-[3px] w-56 overflow-hidden rounded-full bg-paper/15">
-                <motion.div
-                  className="absolute inset-y-0 w-1/3 rounded-full bg-brass"
-                  animate={{ x: ['-110%', '320%'] }}
-                  transition={{ duration: 1.3, repeat: Infinity, ease: 'easeInOut' }}
-                />
-              </div>
-            )}
+            {/* Bulb-marquee progress rail — ONE design from first paint to reveal.
+            Before the 3-D chunk lands (no progress data yet) the bulbs run a
+            carnival chase; once the canvas is live they light up with real load
+            progress. DOM (not shader) precisely so it exists before the chunk. */}
+            <div className="mt-7 flex items-center gap-[1.15vmin]">
+              {Array.from({ length: 16 }).map((_, i) => {
+                const lit = veilLive && i < Math.round((pct / 100) * 16);
+                return (
+                  <span
+                    key={i}
+                    className={
+                      'block h-[1.5vmin] min-h-[7px] w-[1.5vmin] min-w-[7px] rounded-full ' +
+                      (lit
+                        ? 'bg-[#ffd34d] shadow-[0_0_9px_2px_rgba(255,211,77,0.65)]'
+                        : 'border border-paper/25 bg-paper/10')
+                    }
+                    style={
+                      !veilLive
+                        ? { animation: 'bulb-chase 1.9s infinite', animationDelay: `${i * 0.1}s` }
+                        : undefined
+                    }
+                  />
+                );
+              })}
+            </div>
+            <p
+              className="font-fell-sc mt-4 text-[13px] tracking-[0.3em] text-brass tabular-nums"
+              style={{ opacity: veilLive ? 1 : 0 }}
+            >
+              {pct}%
+            </p>
           </motion.div>
 
           {/* Enter prompt — full-screen click target (click anywhere / the iris), with a

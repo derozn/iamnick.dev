@@ -101,6 +101,17 @@ const CANDIDATES: Candidate[] = [
     distance: 14,
     decay: 2,
   })),
+  // front-fill for the entrance sign: the moon key sits at +z (BEHIND the sign
+  // from the intro camera), so its welcome face read back-lit/dark. This pool
+  // floats in front of the face (-z side, where the visitor stands) and washes
+  // it warm — it's the first thing anyone sees.
+  {
+    pos: new Vector3(-1.77, 3.6, -35),
+    color: WARM,
+    intensity: 16,
+    distance: 14,
+    decay: 1.8,
+  },
 ];
 
 export function DynamicLights({ pool = 8 }: { pool?: number }) {

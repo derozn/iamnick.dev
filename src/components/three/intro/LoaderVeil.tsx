@@ -41,12 +41,9 @@ const FRAG = /* glsl */ `
 
   varying vec2 vUv;
   uniform float uTime;
-  uniform float uProgress; // damped real load progress [0,1]
   uniform float uSpot;     // 0 covered -> 1 spotlight open (sceneReady)
   uniform float uReveal;   // 0 holding -> 1 fully irised open (started)
   uniform float uAspect;   // canvas width / height
-
-  const float BULBS = 16.0;
 
   float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
@@ -76,31 +73,9 @@ const FRAG = /* glsl */ `
     col += (hash(vUv * 913.7 + fract(uTime) * 7.3) - 0.5) * 0.045; // film grain
     col *= 1.0 - 0.45 * dot(p, p);                                  // vignette
 
-    // --- marquee bulb rail (fades out as the spotlight opens) ---
-    float railFade = 1.0 - uSpot;
-    if (railFade > 0.001) {
-      // rail sits under the HTML title block, spanning ~56% of the min dimension
-      float railW = 0.56 * vmin;
-      float spacing = railW / (BULBS - 1.0);
-      float railY = -0.16 * vmin;
-      float bulbR = spacing * 0.22;
-      float lit = uProgress * BULBS;
-      vec3 brass = vec3(0.85, 0.65, 0.30);
-      vec3 gold = vec3(1.0, 0.83, 0.45);
-      for (float i = 0.0; i < BULBS; i += 1.0) {
-        vec2 c = vec2(-railW * 0.5 + i * spacing, railY);
-        float d = length(p - c);
-        float on = clamp(lit - i, 0.0, 1.0);
-        // per-bulb flicker while lit (marquee shimmer)
-        float fl = 0.82 + 0.18 * hash(vec2(i, floor(uTime * 9.0)));
-        // lit: warm radial glow; unlit: faint dark ring
-        float core = smoothstep(bulbR, bulbR * 0.25, d);
-        float halo = smoothstep(bulbR * 3.2, 0.0, d);
-        vec3 bulb = on * fl * (gold * core * 1.6 + brass * halo * 0.5);
-        float ring = (1.0 - on) * smoothstep(bulbR * 0.55, bulbR * 0.45, abs(d - bulbR * 0.7)) * 0.10;
-        col += (bulb + vec3(ring)) * railFade;
-      }
-    }
+    // (the bulb-marquee progress rail is DOM, in IntroOverlay — it must exist
+    // from the very first HTML paint, before this shader's chunk has even
+    // downloaded, and swapping designs mid-load looked like two loaders)
 
     // --- spotlight iris: hole in the veil, warm rim ---
     // disc radius matches the retired CSS disc (23vmin) at uSpot=1, then blows
@@ -145,7 +120,6 @@ export function LoaderVeil() {
         fragmentShader: FRAG,
         uniforms: {
           uTime: { value: 0 },
-          uProgress: { value: 0 },
           uSpot: { value: 0 },
           uReveal: { value: 0 },
           uAspect: { value: 1 },
@@ -174,8 +148,6 @@ export function LoaderVeil() {
 
     u.uTime.value += dt;
     u.uAspect.value = size.width / size.height;
-    // damp toward the real progress so the rail sweeps instead of stepping
-    u.uProgress.value += (st.loadProgress - u.uProgress.value) * Math.min(1, dt * 4);
     // ease the spotlight open on ready, the full iris on start
     const wantSpot = st.sceneReady ? 1 : 0;
     u.uSpot.value += (wantSpot - u.uSpot.value) * Math.min(1, dt * 2.2);

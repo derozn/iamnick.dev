@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Stars, useTexture } from '@react-three/drei';
+import { Stars } from '@react-three/drei';
 import {
   AdditiveBlending,
   BackSide,
@@ -10,9 +10,7 @@ import {
   DoubleSide,
   type Group,
   type Mesh,
-  RepeatWrapping,
   ShaderMaterial,
-  type Texture,
 } from 'three';
 
 import { getGlowTexture } from './bulbGlowExtract';
@@ -33,11 +31,15 @@ import { getGlowTexture } from './bulbGlowExtract';
 const HORIZON = '#2b2f57';
 const ZENITH = '#12142e';
 
-/** Searchlight anchors (three-space): big top, carousel, ferris wheel. */
-const BEAMS: { pos: [number, number, number]; speed: number; phase: number }[] = [
-  { pos: [-1.6, 0, 21], speed: 0.12, phase: 0.4 },
-  { pos: [23.7, 0, 25.4], speed: 0.17, phase: 2.4 },
-  { pos: [-22.2, 0, 28.6], speed: 0.09, phase: 4.2 },
+/**
+ * Searchlight anchors (three-space): big top, carousel, ferris wheel.
+ * `apexY` sits ABOVE each structure's roof so the beam lives in the sky only —
+ * a ground-level apex made the cone slice visibly through the ride geometry.
+ */
+const BEAMS: { pos: [number, number, number]; apexY: number; speed: number; phase: number }[] = [
+  { pos: [-1.6, 0, 21], apexY: 10.5, speed: 0.12, phase: 0.4 },
+  { pos: [23.7, 0, 25.4], apexY: 8.5, speed: 0.17, phase: 2.4 },
+  { pos: [-22.2, 0, 28.6], apexY: 15.5, speed: 0.09, phase: 4.2 },
 ];
 
 /** Ground-fog sheets: centre + size, hugging the field's dark edges. */
@@ -71,6 +73,39 @@ const BEAM_VERT = /* glsl */ `
   void main() {
     vUv = uv;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const FOG_FRAG = /* glsl */ `
+  varying vec2 vUv;
+  uniform float uTime;
+
+  float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+  }
+  float vnoise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(
+      mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+      mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+      u.y
+    );
+  }
+
+  void main() {
+    // two octaves of drifting value noise — seamless by construction (the old
+    // tiled fog.png was a single puff sprite, so repeating it read as squares)
+    vec2 p = vUv * vec2(5.0, 2.6);
+    float n = vnoise(p + vec2(uTime * 0.045, uTime * 0.02));
+    n += 0.5 * vnoise(p * 2.3 - vec2(uTime * 0.03, uTime * 0.055));
+    n /= 1.5;
+    n = smoothstep(0.35, 0.85, n);
+    // soft falloff on every side so the sheet has no visible rectangle edge
+    float fade = smoothstep(0.0, 0.28, vUv.x) * smoothstep(1.0, 0.72, vUv.x)
+               * smoothstep(0.0, 0.3, vUv.y) * smoothstep(1.0, 0.7, vUv.y);
+    gl_FragColor = vec4(vec3(0.62, 0.65, 0.85), n * fade * 0.16);
   }
 `;
 
@@ -109,6 +144,16 @@ function makeBeam() {
   });
 }
 
+function makeGroundFog() {
+  return new ShaderMaterial({
+    vertexShader: BEAM_VERT, // plain uv-passthrough works for the flat sheets too
+    fragmentShader: FOG_FRAG,
+    uniforms: { uTime: { value: 0 } },
+    transparent: true,
+    depthWrite: false,
+  });
+}
+
 /** Moon disc + halo, billboarded along the moon-key light direction [40,90,50]. */
 const MOON_DIR = (() => {
   const l = Math.hypot(40, 90, 50);
@@ -124,33 +169,23 @@ const MOON_POS: [number, number, number] = [
 export function Atmosphere({ high }: { high: boolean }) {
   const skyMaterial = useMemo(() => makeSky(), []);
   const beamMaterial = useMemo(() => makeBeam(), []);
+  const fogMaterial = useMemo(() => makeGroundFog(), []);
   const moonRef = useRef<Group>(null);
   const beamRefs = useRef<(Group | null)[]>([]);
-  const fogRefs = useRef<(Mesh | null)[]>([]);
-
-  const fogTex = useTexture('/textures/fog.png', (t) => {
-    const tex = t as Texture;
-    tex.wrapS = RepeatWrapping;
-    tex.wrapT = RepeatWrapping;
-    tex.needsUpdate = true;
-  }) as Texture;
-  // each sheet scrolls independently, so each needs its OWN texture (clones
-  // share the underlying image — no extra VRAM)
-  const sheetTextures = useMemo(() => FOG_SHEETS.map(() => fogTex.clone()), [fogTex]);
+  // uniforms are mutated through this element ref in useFrame (never through the
+  // useMemo return — the codebase's react-hooks/immutability rule)
+  const fogMeshRef = useRef<Mesh>(null);
 
   useFrame(({ camera, clock }) => {
     // moon always faces the camera (cheap billboard — one quaternion copy)
     moonRef.current?.quaternion.copy(camera.quaternion);
     if (!high) return; // sweeps + fog drift are high-tier-only (frameloop=always)
     const t = clock.elapsedTime;
+    const fogMat = fogMeshRef.current?.material as ShaderMaterial | undefined;
+    if (fogMat) fogMat.uniforms.uTime.value = t;
     BEAMS.forEach((b, i) => {
       const g = beamRefs.current[i];
       if (g) g.rotation.y = t * b.speed * Math.PI * 2 * 0.16 + b.phase;
-    });
-    fogRefs.current.forEach((m, i) => {
-      if (!m) return;
-      const mat = m.material as { map?: Texture | null };
-      mat.map?.offset.set((t * 0.006 + i * 0.37) % 1, (t * 0.0042 * (i % 2 ? -1 : 1)) % 1);
     });
   });
 
@@ -193,8 +228,9 @@ export function Atmosphere({ high }: { high: boolean }) {
             }}
           >
             {/* tilt the beam off vertical; the parent group spins about Y */}
-            <group rotation={[0.32, 0, 0]}>
-              {/* rotateX(PI) puts the cone's apex at the ground (v=1 there) */}
+            <group position={[0, b.apexY, 0]} rotation={[0.32, 0, 0]}>
+              {/* rotateX(PI) puts the cone's apex at the group origin (v=1 there),
+                  i.e. hovering just above the structure's roof */}
               <mesh material={beamMaterial} position={[0, 21, 0]} rotation={[Math.PI, 0, 0]}>
                 <coneGeometry args={[5.5, 42, 16, 1, true]} />
               </mesh>
@@ -202,24 +238,18 @@ export function Atmosphere({ high }: { high: boolean }) {
           </group>
         ))}
 
-      {/* drifting ground-fog sheets at the field edges */}
+      {/* drifting ground-fog sheets at the field edges — procedural noise with
+          faded edges (a tiled sprite texture read as a grid of squares) */}
       {FOG_SHEETS.map((f, i) => (
         <mesh
           key={i}
           position={f.pos}
           rotation={[-Math.PI / 2, 0, i * 1.2]}
-          ref={(el) => {
-            fogRefs.current[i] = el;
-          }}
+          material={fogMaterial}
+          // one ref is enough — the material (and its uTime) is shared
+          ref={i === 0 ? fogMeshRef : undefined}
         >
           <planeGeometry args={f.size} />
-          <meshBasicMaterial
-            map={sheetTextures[i]}
-            transparent
-            opacity={0.14}
-            depthWrite={false}
-            toneMapped={false}
-          />
         </mesh>
       ))}
     </>

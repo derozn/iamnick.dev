@@ -173,10 +173,19 @@
   }
 }
 
-/* Bruno-Simon-style intro reveal: a lit disc of the scene floats in a dark void.
- * This element IS the transparent circular hole; its box-shadow paints the dark
- * surround + a warm rim glow on the disc edge. Motion scales it open ("iris") on
- * start to reveal the whole carnival. */
+/* Loading-screen bulb marquee (IntroOverlay): before the 3-D chunk arrives the
+ * bulbs run this carnival chase; once real progress exists they light solid. */
+@keyframes bulb-chase {
+  0%,
+  22%,
+  100% {
+    opacity: 0.22;
+  }
+  8% {
+    opacity: 1;
+  }
+}
+
 /* The scene canvas owns every touch gesture (drag-pan, pinch-zoom, slingshot) —
  * without this the browser scrolls/zooms the page instead and cancels the drag,
  * which is what broke pan + the ball-toss on mobile. */
