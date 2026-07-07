@@ -17,6 +17,7 @@ import { SafePostFX } from './effects/SafePostFX';
 import { LoaderVeil } from './intro/LoaderVeil';
 import { Atmosphere } from './synty/Atmosphere';
 import { GoldenTickets } from './tickets/GoldenTickets';
+import { Npcs } from './synty/Npcs';
 import { ConfettiBurst } from './effects/ConfettiBurst';
 import { type QualityTier } from './hooks/useQualityTier';
 
@@ -107,6 +108,11 @@ export default function Scene({ tier }: SceneProps) {
             have loaded, so it's a reliable "scene is ready" signal for the intro. */}
         <SceneReady />
       </Suspense>
+
+      {/* NPCs stream in AFTER the intro is ready (separate Suspense — they must
+          not delay sceneReady/the loading screen). Renders nothing until the
+          Mixamo conversion pass fills npcManifest.json. */}
+      <Suspense fallback={null}>{!dbg.off.has('npcs') && <Npcs high={high} />}</Suspense>
 
       {!dbg.off.has('indicators') && <Indicators />}
     </Canvas>
