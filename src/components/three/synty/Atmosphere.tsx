@@ -114,7 +114,12 @@ function makeGroundFog() {
   });
 }
 
-/** Moon disc + halo, billboarded along the moon-key light direction [40,90,50]. */
+/**
+ * Moon disc + halo, billboarded, hung in the FAR (+x/+z) quadrant where the
+ * fixed iso camera can actually see it. NB deliberately decoupled from the key
+ * directional, which lives in the CAMERA's quadrant so facades light correctly
+ * (a key under the visible moon back-lit the whole scene — see DynamicLights).
+ */
 const MOON_DIR = (() => {
   const l = Math.hypot(40, 90, 50);
   return [40 / l, 90 / l, 50 / l] as const;

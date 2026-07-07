@@ -175,10 +175,15 @@ export function DynamicLights({ pool = 8 }: { pool?: number }) {
           the gaps still separate from the fog without washing out the contrast. */}
       <hemisphereLight args={['#46588f', '#2a1f2c', 0.6]} />
       <ambientLight intensity={0.28} color="#2c2440" />
-      {/* moon key — cool, high, kept modest so the firelight pools dominate */}
-      <directionalLight position={[40, 90, 50]} intensity={0.85} color="#aab6f0" />
-      {/* violet rim from behind the ride plaza for depth + carnival colour */}
-      <directionalLight position={[-50, 45, -40]} intensity={0.8} color="#a86cff" />
+      {/* moon key — cool, high, kept modest so the firelight pools dominate.
+          CRITICAL: it must sit in the CAMERA's quadrant. The iso camera is fixed
+          at azimuth 225° (looking from −x/−z toward +x/+z); with the key on the
+          far side the whole scene rendered back-lit — every camera-facing facade
+          in shadow, lit surfaces only on faces pointing away ("inverted"). */}
+      <directionalLight position={[-40, 90, -50]} intensity={0.85} color="#aab6f0" />
+      {/* violet rim from BEHIND the scene (far quadrant) for silhouette depth +
+          carnival colour on the edges the key doesn't reach */}
+      <directionalLight position={[50, 45, 40]} intensity={0.8} color="#a86cff" />
 
       {/* fixed pool — the shader only ever compiles `pool` point lights */}
       {Array.from({ length: pool }).map((_, i) => (
