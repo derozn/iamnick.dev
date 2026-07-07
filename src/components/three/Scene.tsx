@@ -96,7 +96,10 @@ export default function Scene({ tier }: SceneProps) {
       <color attach="background" args={[FOG]} />
       <fogExp2 attach="fog" args={[FOG, fogDensity]} />
 
-      {!dbg.off.has('lights') && <DynamicLights pool={high ? 8 : 4} />}
+      {/* Pool size is the SAME on both tiers: 8 forward point lights are cheap
+          (the historical crash was ~37), and halving the pool on small viewports
+          made whole areas drop their light when the tier flipped on resize. */}
+      {!dbg.off.has('lights') && <DynamicLights pool={8} />}
       <IsoControls />
       {bloomOn && !dbg.off.has('postfx') && <SafePostFX />}
       {/* In-canvas shader loading screen — outside Suspense so it renders (and

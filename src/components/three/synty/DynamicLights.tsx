@@ -117,22 +117,52 @@ const CANDIDATES: Candidate[] = [
 export function DynamicLights({ pool = 8 }: { pool?: number }) {
   const lights = useRef<(PointLight | null)[]>([]);
   const order = useMemo(() => CANDIDATES.map((_, i) => i), []);
+  // which candidate each slot currently plays (-1 = none yet); slots are STABLE:
+  // a slot keeps its candidate while that candidate stays in the nearest set, so
+  // a small camera move can't shuffle every light between slots.
+  const assigned = useRef<number[]>([]);
 
-  useFrame(({ camera }) => {
+  useFrame(({ camera }, delta) => {
     const cp = camera.position;
+    const dt = Math.min(delta, 0.1);
     // nearest-`pool` candidates win the fixed light slots this frame
     order.sort(
       (a, b) => CANDIDATES[a].pos.distanceToSquared(cp) - CANDIDATES[b].pos.distanceToSquared(cp),
     );
+    if (assigned.current.length !== pool) assigned.current = Array(pool).fill(-1);
+    const want = new Set(order.slice(0, pool));
+    const slots = assigned.current;
+    // free slots whose candidate fell out of the nearest set
+    for (let k = 0; k < pool; k++) if (slots[k] !== -1 && !want.has(slots[k])) slots[k] = -1;
+    // hand incoming candidates to the freed slots
+    const held = new Set(slots);
+    for (const idx of want) {
+      if (held.has(idx)) continue;
+      const free = slots.indexOf(-1);
+      if (free === -1) break;
+      slots[free] = idx;
+    }
     for (let k = 0; k < pool; k++) {
       const l = lights.current[k];
       if (!l) continue;
-      const c = CANDIDATES[order[k]];
-      l.position.copy(c.pos);
-      l.color.copy(c.color);
-      l.intensity = c.intensity;
-      l.distance = c.distance;
-      l.decay = c.decay;
+      const idx = slots[k];
+      if (idx === -1) {
+        l.intensity = 0;
+        continue;
+      }
+      const c = CANDIDATES[idx];
+      // FADE, don't snap: a light popping to full strength at a new position read
+      // as objects flicking between lit and unlit (worst during focus fly-ins and
+      // after the pool re-seeds on a tier change/resize).
+      if (l.userData.candidate !== idx) {
+        l.userData.candidate = idx;
+        l.position.copy(c.pos);
+        l.color.copy(c.color);
+        l.distance = c.distance;
+        l.decay = c.decay;
+        l.intensity = 0;
+      }
+      l.intensity += (c.intensity - l.intensity) * (1 - Math.exp(-dt / 0.16));
     }
   });
 
