@@ -44,4 +44,13 @@ describe('store/scene', () => {
     expect(useSceneStore.getState().mode).toBe('travelling');
     expect(useSceneStore.getState().activeStall).toBeNull();
   });
+
+  it('starts with post-fx allowed; blockPostFx trips and persists the flag', () => {
+    expect(useSceneStore.getState().postFxBlocked).toBe(false);
+    useSceneStore.getState().blockPostFx();
+    expect(useSceneStore.getState().postFxBlocked).toBe(true);
+    expect(window.localStorage.getItem('iamnick:postfx-blocked')).toBe('1');
+    window.localStorage.removeItem('iamnick:postfx-blocked');
+    useSceneStore.setState({ postFxBlocked: false });
+  });
 });

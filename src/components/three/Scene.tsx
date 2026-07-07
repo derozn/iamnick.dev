@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { ACESFilmicToneMapping } from 'three';
 
@@ -12,6 +12,7 @@ import { IsoControls } from './synty/IsoControls';
 import { Indicators } from './synty/Indicators';
 import { DynamicLights } from './synty/DynamicLights';
 import { BallTossGame } from './game/BallTossGame';
+import { SafePostFX } from './effects/SafePostFX';
 import { type QualityTier } from './hooks/useQualityTier';
 
 interface SceneProps {
@@ -34,6 +35,24 @@ const FOG = '#2b2f57';
  */
 export default function Scene({ tier }: SceneProps) {
   const high = tier === 'high';
+  // Debug-only bisection gates (headless verification): ?off=synty,rides,glow,
+  // lights,game,indicators unmounts pieces; ?offp=<regex> drops matching Synty
+  // prefabs. Inert in normal visits; SSR-safe (Scene is dynamic ssr:false).
+  const dbg = useMemo(() => {
+    if (typeof window === 'undefined' || !window.location.search.includes('debug=1')) {
+      return { off: new Set<string>(), offp: undefined as RegExp | undefined };
+    }
+    const q = new URLSearchParams(window.location.search);
+    const off = new Set((q.get('off') ?? '').split(',').filter(Boolean));
+    const offp = q.get('offp') ? new RegExp(q.get('offp')!) : undefined;
+    return { off, offp };
+  }, []);
+  // Bloom is a MOUNT-TIME decision: emissive intensities are baked into materials
+  // once (applyEmissive guards re-application), so they can't follow a mid-session
+  // composer dropout. If the context is lost, SafePostFX unmounts the composer and
+  // the scene runs a touch dim until reload — the persisted flag makes the next
+  // visit tune emissives for the no-composer look from the start.
+  const bloomOn = useMemo(() => high && !useSceneStore.getState().postFxBlocked, [high]);
   // Atmospheric fog for depth — paired with the luminous FOG colour above and the
   // capped zoom-out, the far edge of the carnival fades into haze (not darkness),
   // while near props stay crisp because exp² fog is light up close.
@@ -42,8 +61,8 @@ export default function Scene({ tier }: SceneProps) {
   return (
     <Canvas
       // Render continuously on high tier (smooth drag + ride spin); low tier renders
-      // on demand to save power. (No post-processing — the EffectComposer was the
-      // source of the black-flicker/context-loss, so the bulbs glow from emissive.)
+      // on demand to save power. (Post-processing is back, but only on high tier and
+      // behind SafePostFX's context-loss tripwire — see that component.)
       frameloop={high ? 'always' : 'demand'}
       // Cap the render resolution — fragment cost (scene + Bloom) scales with the
       // pixel count, so on a retina display this is the biggest lever against the
@@ -63,20 +82,21 @@ export default function Scene({ tier }: SceneProps) {
       <color attach="background" args={[FOG]} />
       <fogExp2 attach="fog" args={[FOG, fogDensity]} />
 
-      <DynamicLights pool={high ? 8 : 4} />
+      {!dbg.off.has('lights') && <DynamicLights pool={high ? 8 : 4} />}
       <IsoControls />
+      {bloomOn && !dbg.off.has('postfx') && <SafePostFX />}
 
       <Suspense fallback={null}>
-        <SyntyScene />
-        <AnimatedRides />
-        <BulbGlow />
-        <BallTossGame />
+        {!dbg.off.has('synty') && <SyntyScene bloomOn={bloomOn} exclude={dbg.offp} />}
+        {!dbg.off.has('rides') && <AnimatedRides bloomOn={bloomOn} />}
+        {!dbg.off.has('glow') && <BulbGlow bloomOn={bloomOn} />}
+        {!dbg.off.has('game') && <BallTossGame />}
         {/* A child of Suspense: it only mounts once all the GLBs/textures above
             have loaded, so it's a reliable "scene is ready" signal for the intro. */}
         <SceneReady />
       </Suspense>
 
-      <Indicators />
+      {!dbg.off.has('indicators') && <Indicators />}
     </Canvas>
   );
 }

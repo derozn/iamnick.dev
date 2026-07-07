@@ -45,19 +45,29 @@ const smoothstep = (a: number, b: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-function applyEmissive(mat: Material | Material[], tex: Texture) {
+function applyEmissive(mat: Material | Material[], tex: Texture, intensity: number) {
   for (const m of Array.isArray(mat) ? mat : [mat]) {
     const sm = m as MeshStandardMaterial;
     if (!sm.emissiveMap) {
       sm.emissive = WHITE;
       sm.emissiveMap = tex;
-      sm.emissiveIntensity = 3;
+      sm.emissiveIntensity = intensity;
       sm.needsUpdate = true;
     }
   }
 }
 
-function Ride({ prefab, speed, emissive }: { prefab: string; speed: number; emissive: Texture }) {
+function Ride({
+  prefab,
+  speed,
+  emissive,
+  emissiveIntensity,
+}: {
+  prefab: string;
+  speed: number;
+  emissive: Texture;
+  emissiveIntensity: number;
+}) {
   const { scene } = useGLTF(`${SYNTY}${prefab}.glb`, true);
   const invalidate = useThree((s) => s.invalidate);
   const spin = useRef<Group>(null);
@@ -66,10 +76,10 @@ function Ride({ prefab, speed, emissive }: { prefab: string; speed: number; emis
     const c = scene.clone(true);
     c.traverse((o) => {
       const m = o as Mesh;
-      if (m.isMesh && m.material) applyEmissive(m.material, emissive);
+      if (m.isMesh && m.material) applyEmissive(m.material, emissive, emissiveIntensity);
     });
     return c;
-  }, [scene, emissive]);
+  }, [scene, emissive, emissiveIntensity]);
 
   const { pos, quat, scl, origin } = useMemo(() => {
     const m = unityTRS(data[prefab][0], new Matrix4());
@@ -104,7 +114,7 @@ function Ride({ prefab, speed, emissive }: { prefab: string; speed: number; emis
   );
 }
 
-export function AnimatedRides() {
+export function AnimatedRides({ bloomOn = false }: { bloomOn?: boolean }) {
   const emissive = useTexture(`${SYNTY}emissive-atlas.png`, (t) => {
     const tex = t as Texture;
     tex.flipY = false;
@@ -119,7 +129,14 @@ export function AnimatedRides() {
   return (
     <>
       {SPINNERS.map((s) => (
-        <Ride key={s.prefab} prefab={s.prefab} speed={s.speed} emissive={emissive} />
+        <Ride
+          key={s.prefab}
+          prefab={s.prefab}
+          speed={s.speed}
+          emissive={emissive}
+          // matches SyntyScene: the bloom pass supplies the glow when it's on
+          emissiveIntensity={bloomOn ? 1.8 : 3}
+        />
       ))}
     </>
   );

@@ -39,10 +39,12 @@ function PrefabGlow({
   url,
   transforms,
   sample,
+  opacity,
 }: {
   url: string;
   transforms: number[][];
   sample: Sampler;
+  opacity: number;
 }) {
   const { scene } = useGLTF(url, true);
 
@@ -82,13 +84,13 @@ function PrefabGlow({
         depthWrite={false}
         blending={AdditiveBlending}
         toneMapped={false}
-        opacity={0.9}
+        opacity={opacity}
       />
     </points>
   );
 }
 
-export function BulbGlow() {
+export function BulbGlow({ bloomOn = false }: { bloomOn?: boolean }) {
   const emissive = useTexture(`${SYNTY}emissive-atlas.png`) as Texture;
   const sample = useMemo(() => {
     const img = emissive.image as
@@ -103,7 +105,11 @@ export function BulbGlow() {
     [],
   );
 
-  if (!sample) return null;
+  // With the real bloom pass on, these sprites are redundant (they exist to FAKE
+  // bloom) — and worse: at overview zoom hundreds of additive, un-tone-mapped
+  // halos stack in the same pixels into extreme HDR values that the bloom
+  // mipmap-blur chain smears into a black frame. Composer on ⇒ sprites off.
+  if (bloomOn || !sample) return null;
   return (
     <>
       {list.map(([name, transforms]) => (
@@ -112,6 +118,7 @@ export function BulbGlow() {
           url={`${SYNTY}${name}.glb`}
           transforms={transforms}
           sample={sample}
+          opacity={0.9}
         />
       ))}
     </>

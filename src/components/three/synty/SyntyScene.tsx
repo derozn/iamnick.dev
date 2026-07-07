@@ -51,7 +51,16 @@ entries.forEach(([name]) => useGLTF.preload(`${SYNTY}${name}.glb`, true));
  * its authored position/rotation/scale, rendered instanced. The professional
  * arrangement, 1:1.
  */
-export function SyntyScene({ cullDist }: { cullDist?: number }) {
+export function SyntyScene({
+  cullDist,
+  bloomOn = false,
+  exclude,
+}: {
+  cullDist?: number;
+  bloomOn?: boolean;
+  /** Debug-only (headless bisection): drop prefabs whose name matches. */
+  exclude?: RegExp;
+}) {
   // configure in the load callback (glTF UV convention + sRGB glow); mostly-black
   // map so non-neon pixels stay dark.
   const emissive = useTexture(`${SYNTY}emissive-atlas.png`, (t) => {
@@ -78,19 +87,24 @@ export function SyntyScene({ cullDist }: { cullDist?: number }) {
 
   return (
     <>
-      {entries.map(([name, transforms]) => (
-        <InstancedPrefab
-          key={name}
-          url={`${SYNTY}${name}.glb`}
-          transforms={transforms}
-          emissive={emissive}
-          baseAtlas={baseAtlas}
-          // dedup the per-GLB atlas copies onto the one shared atlas (big VRAM win),
-          // except signs/posters which carry their own distinct text texture.
-          shareAtlas={!SHARE_SKIP.test(name)}
-          cullDist={cullDist}
-        />
-      ))}
+      {entries
+        .filter(([name]) => !exclude?.test(name))
+        .map(([name, transforms]) => (
+          <InstancedPrefab
+            key={name}
+            url={`${SYNTY}${name}.glb`}
+            transforms={transforms}
+            emissive={emissive}
+            // With the bloom composer on, emissives past the luminance threshold get
+            // their glow from the pass — the compensating boost (3) would blow out.
+            emissiveIntensity={bloomOn ? 1.8 : 3}
+            baseAtlas={baseAtlas}
+            // dedup the per-GLB atlas copies onto the one shared atlas (big VRAM win),
+            // except signs/posters which carry their own distinct text texture.
+            shareAtlas={!SHARE_SKIP.test(name)}
+            cullDist={cullDist}
+          />
+        ))}
     </>
   );
 }

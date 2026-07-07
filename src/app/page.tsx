@@ -2,6 +2,7 @@ import { MidwayCanvas } from '@/components/three/MidwayCanvas';
 import { ContentOverlay } from '@/components/content/ContentOverlay';
 import { StaticResume } from '@/components/content/StaticResume';
 import { IntroOverlay } from '@/components/content/IntroOverlay';
+import { DebugBridge } from '@/components/content/DebugBridge';
 import { BallTossHud } from '@/components/three/game/BallTossHud';
 
 export const dynamic = 'auto';
@@ -33,6 +34,9 @@ export default function Homepage() {
 
       {/* DOM overlay for the ball-toss game (score / balls / exit / win-lose) */}
       <BallTossHud />
+
+      {/* Headless-verification hook — inert unless the URL carries ?debug=1 */}
+      <DebugBridge />
     </>
   );
 }

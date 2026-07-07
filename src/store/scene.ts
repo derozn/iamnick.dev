@@ -35,6 +35,18 @@ export type BallTossPhase = 'intro' | 'aiming' | 'thrown' | 'won' | 'lost';
 /** Balls the visitor gets per ball-toss round. */
 export const BALL_TOSS_BALLS = 3;
 
+/** localStorage key: this device dropped the GL context with the composer on. */
+const POSTFX_BLOCKED_KEY = 'iamnick:postfx-blocked';
+
+/** SSR-safe localStorage read (the store module is evaluated on the server too). */
+const readPostFxBlocked = () => {
+  try {
+    return typeof window !== 'undefined' && window.localStorage.getItem(POSTFX_BLOCKED_KEY) === '1';
+  } catch {
+    return false;
+  }
+};
+
 /** Normalised [0, 1] scroll-progress band occupied by one Midway attraction. */
 export interface SectionRange {
   start: number;
@@ -49,6 +61,12 @@ export interface SceneState {
    *  vignette to the full overview and controls become live. */
   started: boolean;
   start: () => void;
+
+  /** This device lost the GL context while the bloom composer was mounted — the
+   *  composer stays off (persisted per-device) and the emissive-only look carries
+   *  the glow. The permanent safety net behind re-enabling post-processing. */
+  postFxBlocked: boolean;
+  blockPostFx: () => void;
 
   /** Current interaction mode — `travelling` on-rails, `viewing` a content tent, or `playing` a game. */
   mode: SceneMode;
@@ -100,6 +118,16 @@ export const useSceneStore = create<SceneState>()((set) => ({
   setSceneReady: (sceneReady) => set({ sceneReady }),
   started: false,
   start: () => set({ started: true }),
+
+  postFxBlocked: readPostFxBlocked(),
+  blockPostFx: () => {
+    try {
+      window.localStorage.setItem(POSTFX_BLOCKED_KEY, '1');
+    } catch {
+      // private mode etc. — the in-session flag still protects this visit
+    }
+    set({ postFxBlocked: true });
+  },
 
   mode: 'travelling',
   activeAttraction: null,

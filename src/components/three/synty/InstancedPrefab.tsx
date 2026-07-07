@@ -50,6 +50,35 @@ function applyBase(mat: Material | Material[], tex: Texture, force: boolean) {
   }
 }
 
+/**
+ * computeVertexNormals leaves a ZERO vector on vertices whose faces are all
+ * degenerate (zero-area tris exist in a few converted Synty meshes — e.g. the
+ * fortune-teller wagon): the cross products sum to (0,0,0) and three's CPU-side
+ * normalize() guards zero length with `|| 1`, so the zero survives. In the
+ * fragment shader, though, `normalize(vNormal)` on a zero vector is 0/0 = NaN.
+ * Rendered directly those are lone dead pixels — invisible. But the bloom
+ * composer's HDR mipmap-blur chain SMEARS any NaN fragment across the entire
+ * frame (and tone-mapping NaN reads as black), so ONE bad vertex on screen
+ * blacked out the whole overview. Replace zero/non-finite normals with
+ * straight-up.
+ */
+function sanitizeNormals(geometry: BufferGeometry) {
+  const n = geometry.getAttribute('normal');
+  if (!n) return;
+  const a = n.array as Float32Array;
+  for (let i = 0; i < a.length; i += 3) {
+    const x = a[i];
+    const y = a[i + 1];
+    const z = a[i + 2];
+    const finite = Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z);
+    if (!finite || x * x + y * y + z * z < 1e-6) {
+      a[i] = 0;
+      a[i + 1] = 1;
+      a[i + 2] = 0;
+    }
+  }
+}
+
 const cmScale = new Matrix4().makeScale(CM, CM, CM);
 
 interface SubMesh {
@@ -120,6 +149,7 @@ export function InstancedPrefab({
           }
         }
         m.geometry.computeVertexNormals(); // conversion flipped some normals -> black
+        sanitizeNormals(m.geometry); // degenerate tris → NaN normals → bloom blackout
         out.push({
           geometry: m.geometry,
           material: m.material,
