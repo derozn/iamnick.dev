@@ -15,6 +15,8 @@ import { BallTossGame } from './game/BallTossGame';
 import { SafePostFX } from './effects/SafePostFX';
 import { LoaderVeil } from './intro/LoaderVeil';
 import { Atmosphere } from './synty/Atmosphere';
+import { GoldenTickets } from './tickets/GoldenTickets';
+import { ConfettiBurst } from './effects/ConfettiBurst';
 import { type QualityTier } from './hooks/useQualityTier';
 
 interface SceneProps {
@@ -97,6 +99,8 @@ export default function Scene({ tier }: SceneProps) {
         {!dbg.off.has('rides') && <AnimatedRides bloomOn={bloomOn} />}
         {!dbg.off.has('glow') && <BulbGlow bloomOn={bloomOn} />}
         {!dbg.off.has('game') && <BallTossGame />}
+        {!dbg.off.has('tickets') && <GoldenTickets bloomOn={bloomOn} />}
+        <ConfettiBurst />
         {/* A child of Suspense: it only mounts once all the GLBs/textures above
             have loaded, so it's a reliable "scene is ready" signal for the intro. */}
         <SceneReady />

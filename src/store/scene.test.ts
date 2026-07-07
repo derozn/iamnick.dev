@@ -56,6 +56,26 @@ describe('store/scene', () => {
     useSceneStore.setState({ loadProgress: 0, veilLive: false });
   });
 
+  it('collectTicket appends once, persists, and fireBurst bumps the trigger', () => {
+    useSceneStore.getState().collectTicket('ferris');
+    useSceneStore.getState().collectTicket('ferris'); // idempotent
+    useSceneStore.getState().collectTicket('bigtop');
+    expect(useSceneStore.getState().ticketsFound).toEqual(['ferris', 'bigtop']);
+    expect(JSON.parse(window.localStorage.getItem('iamnick:tickets')!)).toEqual([
+      'ferris',
+      'bigtop',
+    ]);
+    const seq0 = useSceneStore.getState().burst.seq;
+    useSceneStore.getState().fireBurst([1, 2, 3]);
+    expect(useSceneStore.getState().burst).toEqual({ seq: seq0 + 1, pos: [1, 2, 3] });
+    useSceneStore.getState().celebrateTickets();
+    expect(useSceneStore.getState().ticketsCelebrated).toBe(true);
+    useSceneStore.getState().resetTickets();
+    expect(useSceneStore.getState().ticketsFound).toEqual([]);
+    expect(useSceneStore.getState().ticketsCelebrated).toBe(false);
+    expect(window.localStorage.getItem('iamnick:tickets')).toBeNull();
+  });
+
   it('toggleMuted flips and persists', () => {
     expect(useSceneStore.getState().muted).toBe(false);
     useSceneStore.getState().toggleMuted();

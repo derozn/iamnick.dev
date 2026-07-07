@@ -39,6 +39,20 @@ export const BALL_TOSS_BALLS = 3;
 const POSTFX_BLOCKED_KEY = 'iamnick:postfx-blocked';
 /** localStorage key: visitor muted the carnival audio. */
 const MUTED_KEY = 'iamnick:muted';
+/** localStorage keys: golden-ticket hunt progress. */
+const TICKETS_KEY = 'iamnick:tickets';
+const TICKETS_CELEBRATED_KEY = 'iamnick:tickets-celebrated';
+
+const readTickets = (): string[] => {
+  try {
+    if (typeof window === 'undefined') return [];
+    const raw = window.localStorage.getItem(TICKETS_KEY);
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+};
 
 /** SSR-safe localStorage flag read (the store module is evaluated on the server too). */
 const readFlag = (key: string) => {
@@ -81,6 +95,20 @@ export interface SceneState {
   /** Carnival audio muted (persisted). AudioDirector mirrors this into the mixer. */
   muted: boolean;
   toggleMuted: () => void;
+
+  /* --- Golden-ticket hunt (persisted) --- */
+  /** Ids of tickets already punched. */
+  ticketsFound: string[];
+  collectTicket: (id: string) => void;
+  /** The full-house modal has been shown (don't re-show on revisits). */
+  ticketsCelebrated: boolean;
+  celebrateTickets: () => void;
+  /** Tear them up: clear the hunt for a fresh run. */
+  resetTickets: () => void;
+  /** Confetti trigger — bump `seq` with a world position and the in-canvas
+   *  burst fires there. Shared by tickets and the high striker. */
+  burst: { seq: number; pos: [number, number, number] };
+  fireBurst: (pos: [number, number, number]) => void;
 
   /** Intro: real asset-load progress [0,1] (drei useProgress → LoaderVeil bridge). */
   loadProgress: number;
@@ -159,6 +187,35 @@ export const useSceneStore = create<SceneState>()((set) => ({
       writeFlag(MUTED_KEY, !s.muted);
       return { muted: !s.muted };
     }),
+
+  ticketsFound: readTickets(),
+  collectTicket: (id) =>
+    set((s) => {
+      if (s.ticketsFound.includes(id)) return s;
+      const ticketsFound = [...s.ticketsFound, id];
+      try {
+        window.localStorage.setItem(TICKETS_KEY, JSON.stringify(ticketsFound));
+      } catch {
+        // private mode — in-session progress still counts
+      }
+      return { ticketsFound };
+    }),
+  ticketsCelebrated: readFlag(TICKETS_CELEBRATED_KEY),
+  celebrateTickets: () => {
+    writeFlag(TICKETS_CELEBRATED_KEY, true);
+    set({ ticketsCelebrated: true });
+  },
+  resetTickets: () => {
+    try {
+      window.localStorage.removeItem(TICKETS_KEY);
+    } catch {
+      // ignore
+    }
+    writeFlag(TICKETS_CELEBRATED_KEY, false);
+    set({ ticketsFound: [], ticketsCelebrated: false });
+  },
+  burst: { seq: 0, pos: [0, 0, 0] },
+  fireBurst: (pos) => set((s) => ({ burst: { seq: s.burst.seq + 1, pos } })),
 
   mode: 'travelling',
   activeAttraction: null,

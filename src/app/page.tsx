@@ -4,6 +4,7 @@ import { StaticResume } from '@/components/content/StaticResume';
 import { IntroOverlay } from '@/components/content/IntroOverlay';
 import { DebugBridge } from '@/components/content/DebugBridge';
 import { AudioDirector } from '@/components/content/AudioDirector';
+import { TicketHud } from '@/components/three/tickets/TicketHud';
 import { BallTossHud } from '@/components/three/game/BallTossHud';
 
 export const dynamic = 'auto';
@@ -35,6 +36,9 @@ export default function Homepage() {
 
       {/* DOM overlay for the ball-toss game (score / balls / exit / win-lose) */}
       <BallTossHud />
+
+      {/* Golden-ticket hunt tally + full-house modal */}
+      <TicketHud />
 
       {/* Scene state → audio mixer (ambience on enter, duck under panels, mute) */}
       <AudioDirector />
