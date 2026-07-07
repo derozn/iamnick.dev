@@ -68,6 +68,14 @@ export interface SceneState {
   postFxBlocked: boolean;
   blockPostFx: () => void;
 
+  /** Intro: real asset-load progress [0,1] (drei useProgress → LoaderVeil bridge). */
+  loadProgress: number;
+  setLoadProgress: (p: number) => void;
+  /** Intro: the in-canvas shader veil has rendered its first frame — the HTML
+   *  splash can fade out and hand the loading screen over to the shader. */
+  veilLive: boolean;
+  setVeilLive: (live: boolean) => void;
+
   /** Current interaction mode — `travelling` on-rails, `viewing` a content tent, or `playing` a game. */
   mode: SceneMode;
   /** Attraction id whose content panel is open (viewing), or null. */
@@ -118,6 +126,12 @@ export const useSceneStore = create<SceneState>()((set) => ({
   setSceneReady: (sceneReady) => set({ sceneReady }),
   started: false,
   start: () => set({ started: true }),
+
+  loadProgress: 0,
+  // never regress (useProgress can jitter as new loaders register)
+  setLoadProgress: (p) => set((s) => (p > s.loadProgress ? { loadProgress: p } : s)),
+  veilLive: false,
+  setVeilLive: (veilLive) => set({ veilLive }),
 
   postFxBlocked: readPostFxBlocked(),
   blockPostFx: () => {

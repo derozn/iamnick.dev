@@ -45,6 +45,17 @@ describe('store/scene', () => {
     expect(useSceneStore.getState().activeStall).toBeNull();
   });
 
+  it('loadProgress only moves forward; veilLive toggles', () => {
+    useSceneStore.getState().setLoadProgress(0.4);
+    useSceneStore.getState().setLoadProgress(0.2); // useProgress jitter must not regress
+    expect(useSceneStore.getState().loadProgress).toBe(0.4);
+    useSceneStore.getState().setLoadProgress(0.9);
+    expect(useSceneStore.getState().loadProgress).toBe(0.9);
+    useSceneStore.getState().setVeilLive(true);
+    expect(useSceneStore.getState().veilLive).toBe(true);
+    useSceneStore.setState({ loadProgress: 0, veilLive: false });
+  });
+
   it('starts with post-fx allowed; blockPostFx trips and persists the flag', () => {
     expect(useSceneStore.getState().postFxBlocked).toBe(false);
     useSceneStore.getState().blockPostFx();

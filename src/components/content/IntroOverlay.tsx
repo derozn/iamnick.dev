@@ -13,24 +13,30 @@ import { useQualityTier } from '@/components/three/hooks/useQualityTier';
 const EASE = [0.22, 0.61, 0.27, 1] as const;
 
 /**
- * IntroOverlay — the Bruno-Simon-style entry sequence over the carnival canvas.
+ * IntroOverlay — the DOM half of the Bruno-Simon-style entry sequence. The
+ * visuals (dark veil, film grain, bulb-marquee progress, spotlight iris and the
+ * final dissolve) are drawn IN-CANVAS by the LoaderVeil shader; this overlay
+ * contributes what must be HTML:
  *
- *   1. Loading — a full-dark letterpress splash (the same gradient MidwayCanvas
- *      paints) with a marquee bar, shown until the scene's GLBs/textures have
- *      loaded (`sceneReady`). Masks the noticeable first-render delay.
- *   2. Reveal — seamlessly (same dark), the dark cover fades while the loading text
- *      fades out, opening a lit circular vignette of the framed entrance; the rest
- *      stays in the dark void. A hand-drawn arrow points at the disc to enter.
- *   3. Iris open — clicking expands the disc + fades the mask to reveal the whole
- *      carnival while the camera pulls back to the overview (`start()`).
+ *   1. An instant-paint dark cover for the window before the 3-D chunk arrives
+ *      (fades once the veil reports its first frame via `veilLive`).
+ *   2. The letterpress title block + live load percentage (`loadProgress`).
+ *   3. The "click to enter" button + hand-drawn arrow, whose tip lands on the
+ *      shader disc's rim (both sized 23vmin) once `sceneReady`.
  *
- * Skipped entirely on the reduced-motion / no-canvas tier.
+ * Clicking start() irises the shader open in sync with the camera pull-out while
+ * this overlay fades. Skipped entirely on the reduced-motion / no-canvas tier.
  */
 export function IntroOverlay() {
   const tier = useQualityTier();
   const sceneReady = useSceneStore((s) => s.sceneReady);
   const started = useSceneStore((s) => s.started);
   const start = useSceneStore((s) => s.start);
+  // The in-canvas shader veil (LoaderVeil) owns the dark cover + spotlight once
+  // it has rendered its first frame; until then (3-D chunk still downloading)
+  // this overlay's own dark cover carries the splash. Same colours ⇒ seamless.
+  const veilLive = useSceneStore((s) => s.veilLive);
+  const pct = useSceneStore((s) => Math.round(s.loadProgress * 100));
 
   // No canvas → no intro to gate (reduced-motion, or tier still resolving on first
   // paint). Bailing is seamless: the loading backdrop is the same gradient
@@ -49,25 +55,15 @@ export function IntroOverlay() {
           exit={{ opacity: 0 }}
           transition={{ duration: 1.1, ease: EASE }}
         >
-          {/* The lit disc masks the dark void (scale ~1). On start it irises open
-              (exit scale → 6) to reveal the carnival. */}
-          <motion.div
-            aria-hidden
-            className="intro-spotlight"
-            initial={{ scale: 0.92 }}
-            animate={{ scale: sceneReady ? 1 : 0.92 }}
-            exit={{ scale: 6, transition: { duration: 1.1, ease: EASE } }}
-            transition={{ duration: 1, ease: EASE }}
-          />
-
-          {/* Loading cover — full dark over the disc too while assets load; fades out as
-          the centre "opens" into the vignette (same colour ⇒ seamless). */}
+          {/* HTML loading cover — only until the shader veil's first frame (it
+          paints the identical gradient, grain and marquee in-canvas). Covers the
+          window before the 3-D chunk arrives. */}
           <motion.div
             aria-hidden
             className="absolute inset-0 bg-gradient-to-b from-[#14141f] to-[#070810]"
             initial={{ opacity: 1 }}
-            animate={{ opacity: sceneReady ? 0 : 1 }}
-            transition={{ duration: 0.9, ease: EASE }}
+            animate={{ opacity: veilLive ? 0 : 1 }}
+            transition={{ duration: 0.4, ease: EASE }}
           />
 
           {/* Loading text — stays put, then fades out together with the reveal. */}
@@ -84,14 +80,22 @@ export function IntroOverlay() {
               iamnick<span className="text-accent">.dev</span>
             </p>
             <p className="font-fell mt-3 text-[15px] italic text-paper/70">Raising the big top…</p>
-            {/* Indeterminate rail — a brass marquee sweep while assets load. */}
-            <div className="relative mt-7 h-[3px] w-56 overflow-hidden rounded-full bg-paper/15">
-              <motion.div
-                className="absolute inset-y-0 w-1/3 rounded-full bg-brass"
-                animate={{ x: ['-110%', '320%'] }}
-                transition={{ duration: 1.3, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            </div>
+            {/* Before the 3-D chunk lands: an indeterminate brass sweep. Once the
+            shader veil is live, its in-canvas bulb marquee is the progress bar —
+            this swaps to a live percentage above it. */}
+            {veilLive ? (
+              <p className="font-fell-sc mt-6 text-[15px] tracking-[0.3em] text-brass tabular-nums">
+                {pct}%
+              </p>
+            ) : (
+              <div className="relative mt-7 h-[3px] w-56 overflow-hidden rounded-full bg-paper/15">
+                <motion.div
+                  className="absolute inset-y-0 w-1/3 rounded-full bg-brass"
+                  animate={{ x: ['-110%', '320%'] }}
+                  transition={{ duration: 1.3, repeat: Infinity, ease: 'easeInOut' }}
+                />
+              </div>
+            )}
           </motion.div>
 
           {/* Enter prompt — full-screen click target (click anywhere / the iris), with a

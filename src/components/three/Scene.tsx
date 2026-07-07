@@ -13,6 +13,7 @@ import { Indicators } from './synty/Indicators';
 import { DynamicLights } from './synty/DynamicLights';
 import { BallTossGame } from './game/BallTossGame';
 import { SafePostFX } from './effects/SafePostFX';
+import { LoaderVeil } from './intro/LoaderVeil';
 import { type QualityTier } from './hooks/useQualityTier';
 
 interface SceneProps {
@@ -85,6 +86,9 @@ export default function Scene({ tier }: SceneProps) {
       {!dbg.off.has('lights') && <DynamicLights pool={high ? 8 : 4} />}
       <IsoControls />
       {bloomOn && !dbg.off.has('postfx') && <SafePostFX />}
+      {/* In-canvas shader loading screen — outside Suspense so it renders (and
+          reports real progress) while the GLBs below stream in. */}
+      <LoaderVeil />
 
       <Suspense fallback={null}>
         {!dbg.off.has('synty') && <SyntyScene bloomOn={bloomOn} exclude={dbg.offp} />}
