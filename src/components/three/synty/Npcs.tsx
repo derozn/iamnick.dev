@@ -14,6 +14,7 @@ import {
 } from 'three';
 
 import npcManifest from './npcManifest.json';
+import { ATTRACTIONS } from './attractions';
 
 /**
  * Npcs — the carnival's people: Synty characters run through Mixamo (idle /
@@ -31,30 +32,84 @@ import npcManifest from './npcManifest.json';
  */
 
 interface NpcPlacement {
-  /** GLB basename in /models/npcs (CharName__AnimName). */
   file: string;
   pos: [number, number, number];
   yaw: number;
-  /** Per-NPC uniform scale fix if a conversion lands off (Mixamo cm units). */
   scale?: number;
 }
 
-const NPCS: NpcPlacement[] = [
-  // barker working the ball-toss stall
-  { file: 'SM_Chr_Carny_01__Idle', pos: [12.1, 0.1, -9.7], yaw: 2.36 },
-  // clapping visitor at the teacups
-  { file: 'SM_Chr_Visitor_Male_01__Clapping', pos: [-15.5, 0.12, -3.0], yaw: -0.6 },
-  // visitor taking in the entrance
-  { file: 'SM_Chr_Visitor_female_01__HappyIdle', pos: [-3.3, 0.02, -27.0], yaw: 0.4 },
+/**
+ * NPCs are placed RELATIVE to their attraction (single source of truth in
+ * attractions.ts) rather than by blind coordinates, so they can't drift away
+ * from their booth. For an attraction with ground centre `C` and opening normal
+ * `facing` (which points from the structure toward the visitor/iso camera):
+ *   - `out`  metres along +facing = how far in FRONT of the structure they stand
+ *   - `side` metres along the ground-right vector = lateral shift off the fly-in
+ *            axis, so they dress the scene without blocking the focused view
+ *   - `look` = 'out' (greeter/barker facing passers-by) or 'in' (spectator
+ *            watching the attraction)
+ */
+const GROUND_Y = 0.02;
+
+/**
+ * Model forward axis. Synty/Mixamo humanoids export facing +Z; if the whole
+ * crowd ends up facing backwards, flip this to Math.PI (one line fixes all).
+ */
+const FORWARD_OFFSET = 0;
+
+interface NpcSpec {
+  file: string;
+  at: string; // attraction id
+  out: number;
+  side: number;
+  look: 'in' | 'out';
+}
+
+const NPC_SPECS: NpcSpec[] = [
+  // barker working the front of the ball-toss stall, calling to the crowd
+  { file: 'SM_Chr_Carny_01__Idle', at: 'ball-toss', out: 1.8, side: 1.4, look: 'out' },
+  // visitor clapping at the teacup ride
+  { file: 'SM_Chr_Visitor_Male_01__Clapping', at: 'about', out: 3.4, side: -2.0, look: 'in' },
+  // visitor just INSIDE the entrance arch (negative out = fair side, not out on
+  // the dark approach), gazing into the fair
+  { file: 'SM_Chr_Visitor_female_01__HappyIdle', at: 'intro', out: -2.5, side: 3.2, look: 'in' },
   // clown waving at the big-top mouth
-  { file: 'SM_Chr_Clown_Male_01__Waving', pos: [0.5, 0.15, 17.9], yaw: 3.1 },
-  // clown loitering by the high striker
-  { file: 'SM_Chr_Clown_Female_01__Idle', pos: [-8.1, 0.1, 7.0], yaw: 1.1 },
-  // the ringleader cheering by the ferris queue
-  { file: 'SM_Chr_RingLeader_01__Cheering', pos: [-19.9, 0.2, 25.1], yaw: 0.2 },
-  // visitor wandering the bumper cars
-  { file: 'SM_Chr_Visitor_Male_01__LookingAround', pos: [26.4, 0.1, 2.0], yaw: -1.9 },
+  { file: 'SM_Chr_Clown_Male_01__Waving', at: 'work', out: 2.6, side: 2.2, look: 'out' },
+  // clown watching hopefuls at the high striker
+  { file: 'SM_Chr_Clown_Female_01__Idle', at: 'high-striker', out: 2.8, side: -1.8, look: 'in' },
+  // the ringleader presenting the ferris wheel
+  { file: 'SM_Chr_RingLeader_01__Cheering', at: 'contact', out: 3.2, side: 2.6, look: 'out' },
+  // visitor taking in the bumper-car arena
+  {
+    file: 'SM_Chr_Visitor_Male_01__LookingAround',
+    at: 'projects',
+    out: 3.4,
+    side: 2.2,
+    look: 'in',
+  },
 ];
+
+const yawTo = (dx: number, dz: number) => Math.atan2(dx, dz) + FORWARD_OFFSET;
+
+const NPCS: NpcPlacement[] = NPC_SPECS.flatMap((s) => {
+  const a = ATTRACTIONS.find((x) => x.id === s.at);
+  if (!a) return [];
+  const [fx, , fz] = a.facing; // opening normal (structure → visitor), y ignored
+  const flen = Math.hypot(fx, fz) || 1;
+  const nx = fx / flen;
+  const nz = fz / flen;
+  // ground-right vector (facing rotated −90° about Y)
+  const rx = nz;
+  const rz = -nx;
+  const pos: [number, number, number] = [
+    a.position[0] + nx * s.out + rx * s.side,
+    GROUND_Y,
+    a.position[2] + nz * s.out + rz * s.side,
+  ];
+  // face the visitor (out = +facing) or the attraction (in = −facing)
+  const yaw = s.look === 'out' ? yawTo(nx, nz) : yawTo(-nx, -nz);
+  return [{ file: s.file, pos, yaw }];
+});
 
 /** Camera distance beyond which an NPC's mixer pauses (high tier). */
 const MIXER_RANGE = 45;
