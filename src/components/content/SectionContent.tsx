@@ -1,5 +1,6 @@
 import { profile, roles, sideProjects, skillGroups, contact, type Role } from '@/content/cv';
 import { formatYearMonth } from '@/lib/formatDate';
+import { FortunePanel } from './FortunePanel';
 
 /** Small letterpress kicker (brass small-caps + hairline rule) shared across panels. */
 function Kicker({ children }: { children: React.ReactNode }) {
@@ -176,6 +177,9 @@ export function SectionContent({ section }: { section: string }) {
   // `work` (Career) is handled by <CareerTickets> in ContentOverlay, not here.
   if (section === 'projects') return <Projects />;
   if (section === 'contact') return <Contact />;
+  // `chat:` sections raise a content panel like any other — the fortune teller
+  // is Madame Zara's chat, not a playable.
+  if (section === 'chat:fortune') return <FortunePanel />;
   // `game:` sections (e.g. ball-toss) step into the in-canvas game instead of
   // raising a content panel, so they never reach SectionContent.
   if (section.startsWith('role:')) {
