@@ -95,10 +95,11 @@ const yawTo = (dx: number, dz: number) => Math.atan2(dx, dz) + FORWARD_OFFSET;
  * Explicit placements (not derived from an attraction) — one-off spots keyed to
  * scene geometry rather than a POI. The dive-board diver perches on the board of
  * `SM_Prop_Dive_Tower_01` (three (-11.5, 12.1), yaw 146°, board points toward the
- * pool); DIVE_PERCH_Y is the deck height — nudge it if her feet float/sink (the
- * tower is ~8.9 m; this assumes the low board).
+ * pool); DIVE_PERCH_Y is the deck height — the TOP platform, found from a vertex
+ * histogram of the tower (a 612-vertex flat surface at 8.25 m; the 8.75 m band
+ * is the guard rail). Her origin is at her feet, so this stands her on the deck.
  */
-const DIVE_PERCH_Y = 2.9;
+const DIVE_PERCH_Y = 8.25;
 const EXPLICIT: NpcPlacement[] = [
   {
     file: 'SM_Chr_Clown_Female_01__Idle',
