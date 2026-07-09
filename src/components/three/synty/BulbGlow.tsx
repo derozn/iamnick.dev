@@ -94,8 +94,7 @@ export function BulbGlow({ bloomOn = false }: { bloomOn?: boolean }) {
   const emissive = useTexture(`${SYNTY}emissive-atlas.png`) as Texture;
   const sample = useMemo(() => {
     const img = emissive.image as
-      | (CanvasImageSource & { width: number; height: number })
-      | undefined;
+      (CanvasImageSource & { width: number; height: number }) | undefined;
     return img && img.width ? makeSampler(img) : null;
   }, [emissive]);
 

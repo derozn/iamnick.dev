@@ -90,7 +90,9 @@ export function FortunePanel() {
         body: JSON.stringify({ messages: history.slice(-MAX_TURNS) }),
         signal: controller.signal,
       });
-      if (!res.ok || !res.body) throw new Error(`fortune: ${res.status}`);
+      // 429s stream an in-character reading too (rate limit / daily budget) —
+      // render those; anything else falls to the mist reply.
+      if ((!res.ok && res.status !== 429) || !res.body) throw new Error(`fortune: ${res.status}`);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let text = '';
