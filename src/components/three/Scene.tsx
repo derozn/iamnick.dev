@@ -41,6 +41,11 @@ const FOG = '#2b2f57';
  */
 export default function Scene({ tier }: SceneProps) {
   const high = tier === 'high';
+  // The composer may only mount once the loading veil has fully dissolved: its
+  // final pass re-encodes the veil's raw shader colours (linear → ACES → sRGB),
+  // washing the letterpress dark into grey-blue. Bloom ramping in as the iris
+  // finishes doubles as the "lights come alive" beat.
+  const veilDone = useSceneStore((s) => s.veilDone);
   // Debug-only bisection gates (headless verification): ?off=synty,rides,glow,
   // lights,game,indicators unmounts pieces; ?offp=<regex> drops matching Synty
   // prefabs. Inert in normal visits; SSR-safe (Scene is dynamic ssr:false).
@@ -53,10 +58,12 @@ export default function Scene({ tier }: SceneProps) {
     const offp = q.get('offp') ? new RegExp(q.get('offp')!) : undefined;
     return { off, offp };
   }, []);
-  // DEPLOY SAFETY: the bloom composer stays OFF by default until the zero-normal
-  // NaN fix is verified (Phase 1 circle-back) — a NaN black-frame does NOT drop
-  // the GL context, so SafePostFX's tripwire can't catch it. Opt in for testing
-  // with ?bloom=1. Flip the default to `high && !postFxBlocked` once verified.
+  // Bloom is ON by default for the high tier. Verified (July 2026): the historical
+  // black-frame was zero-length normals → shader NaN → mipmap-blur smear, fixed by
+  // sanitizeNormals in InstancedPrefab and confirmed headlessly (overview renders
+  // with the composer where it used to black out); the SafePostFX context-loss
+  // tripwire was end-to-end tested with a forced WEBGL_lose_context (flag persists,
+  // reload stays composer-free). ?bloom=0 forces it off for A/B comparison.
   //
   // Bloom is a MOUNT-TIME decision: emissive intensities are baked into materials
   // once (applyEmissive guards re-application), so they can't follow a mid-session
@@ -64,8 +71,8 @@ export default function Scene({ tier }: SceneProps) {
   // the scene runs a touch dim until reload — the persisted flag makes the next
   // visit tune emissives for the no-composer look from the start.
   const bloomOn = useMemo(() => {
-    const optIn = typeof window !== 'undefined' && window.location.search.includes('bloom=1');
-    return high && optIn && !useSceneStore.getState().postFxBlocked;
+    const optOut = typeof window !== 'undefined' && window.location.search.includes('bloom=0');
+    return high && !optOut && !useSceneStore.getState().postFxBlocked;
   }, [high]);
   // Atmospheric fog for depth — paired with the luminous FOG colour above and the
   // capped zoom-out, the far edge of the carnival fades into haze (not darkness),
@@ -101,7 +108,7 @@ export default function Scene({ tier }: SceneProps) {
           made whole areas drop their light when the tier flipped on resize. */}
       {!dbg.off.has('lights') && <DynamicLights pool={8} />}
       <IsoControls />
-      {bloomOn && !dbg.off.has('postfx') && <SafePostFX />}
+      {bloomOn && veilDone && !dbg.off.has('postfx') && <SafePostFX />}
       {/* In-canvas shader loading screen — outside Suspense so it renders (and
           reports real progress) while the GLBs below stream in. */}
       <LoaderVeil />

@@ -155,6 +155,7 @@ export function LoaderVeil() {
 
     if (u.uReveal.value > 0.995) {
       setDone(true);
+      st.setVeilDone(true); // unblocks the bloom composer (see store)
       return;
     }
     // self-sustaining render loop while visible (demand frameloop on low tier)

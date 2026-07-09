@@ -131,6 +131,11 @@ export interface SceneState {
    *  splash can fade out and hand the loading screen over to the shader. */
   veilLive: boolean;
   setVeilLive: (live: boolean) => void;
+  /** Intro: the veil has fully dissolved and unmounted. Gates the bloom composer:
+   *  mounting it under the veil washes the letterpress dark out (the composer
+   *  re-encodes the raw shader values as linear → ACES → sRGB). */
+  veilDone: boolean;
+  setVeilDone: (done: boolean) => void;
 
   /** Current interaction mode — `travelling` on-rails, `viewing` a content tent, or `playing` a game. */
   mode: SceneMode;
@@ -208,6 +213,8 @@ export const useSceneStore = create<SceneState>()((set) => ({
   setLoadProgress: (p) => set((s) => (p > s.loadProgress ? { loadProgress: p } : s)),
   veilLive: false,
   setVeilLive: (veilLive) => set({ veilLive }),
+  veilDone: false,
+  setVeilDone: (veilDone) => set({ veilDone }),
 
   postFxBlocked: readFlag(POSTFX_BLOCKED_KEY),
   blockPostFx: () => {

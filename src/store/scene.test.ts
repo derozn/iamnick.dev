@@ -54,7 +54,9 @@ describe('store/scene', () => {
     expect(useSceneStore.getState().loadProgress).toBe(0.9);
     useSceneStore.getState().setVeilLive(true);
     expect(useSceneStore.getState().veilLive).toBe(true);
-    useSceneStore.setState({ loadProgress: 0, veilLive: false });
+    useSceneStore.getState().setVeilDone(true);
+    expect(useSceneStore.getState().veilDone).toBe(true);
+    useSceneStore.setState({ loadProgress: 0, veilLive: false, veilDone: false });
   });
 
   it('striker: arm → strike → replay round-trips', () => {
