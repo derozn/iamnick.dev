@@ -68,15 +68,15 @@ interface NpcSpec {
 const NPC_SPECS: NpcSpec[] = [
   // barker working the front of the ball-toss stall, calling to the crowd
   { file: 'SM_Chr_Carny_01__Idle', at: 'ball-toss', out: 1.8, side: 1.4, look: 'out' },
-  // visitor clapping at the teacup ride
-  { file: 'SM_Chr_Visitor_Male_01__Clapping', at: 'about', out: 3.4, side: -2.0, look: 'in' },
+  // visitor clapping at the teacup ride — well clear of the ride's wide radius
+  { file: 'SM_Chr_Visitor_Male_01__Clapping', at: 'about', out: 6.5, side: -1.0, look: 'in' },
   // visitor just INSIDE the entrance arch (negative out = fair side, not out on
   // the dark approach), gazing into the fair
   { file: 'SM_Chr_Visitor_female_01__HappyIdle', at: 'intro', out: -2.5, side: 3.2, look: 'in' },
   // clown waving at the big-top mouth
   { file: 'SM_Chr_Clown_Male_01__Waving', at: 'work', out: 2.6, side: 2.2, look: 'out' },
-  // clown watching hopefuls at the high striker
-  { file: 'SM_Chr_Clown_Female_01__Idle', at: 'high-striker', out: 2.8, side: -1.8, look: 'in' },
+  // (the clown that used to spectate the striker is now the nervous diver on the
+  //  dive board — see EXPLICIT below; her striker spot sat in the dive POOL)
   // the ringleader presenting the ferris wheel
   { file: 'SM_Chr_RingLeader_01__Cheering', at: 'contact', out: 3.2, side: 2.6, look: 'out' },
   // visitor taking in the bumper-car arena
@@ -90,6 +90,22 @@ const NPC_SPECS: NpcSpec[] = [
 ];
 
 const yawTo = (dx: number, dz: number) => Math.atan2(dx, dz) + FORWARD_OFFSET;
+
+/**
+ * Explicit placements (not derived from an attraction) — one-off spots keyed to
+ * scene geometry rather than a POI. The dive-board diver perches on the board of
+ * `SM_Prop_Dive_Tower_01` (three (-11.5, 12.1), yaw 146°, board points toward the
+ * pool); DIVE_PERCH_Y is the deck height — nudge it if her feet float/sink (the
+ * tower is ~8.9 m; this assumes the low board).
+ */
+const DIVE_PERCH_Y = 2.9;
+const EXPLICIT: NpcPlacement[] = [
+  {
+    file: 'SM_Chr_Clown_Female_01__Idle',
+    pos: [-10.3, DIVE_PERCH_Y, 10.3],
+    yaw: yawTo(0.56, -0.83), // face out along the board, toward the water
+  },
+];
 
 const NPCS: NpcPlacement[] = NPC_SPECS.flatMap((s) => {
   const a = ATTRACTIONS.find((x) => x.id === s.at);
@@ -109,7 +125,7 @@ const NPCS: NpcPlacement[] = NPC_SPECS.flatMap((s) => {
   // face the visitor (out = +facing) or the attraction (in = −facing)
   const yaw = s.look === 'out' ? yawTo(nx, nz) : yawTo(-nx, -nz);
   return [{ file: s.file, pos, yaw }];
-});
+}).concat(EXPLICIT);
 
 /** Camera distance beyond which an NPC's mixer pauses (high tier). */
 const MIXER_RANGE = 45;
