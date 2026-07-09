@@ -69,10 +69,12 @@ export function BallTossHud() {
               </span>
             </div>
 
+            {/* Exit ✕ takes the burger's exact slot (h-10 w-10, top-3 right-4) so the
+                swap is seamless and it sits flush with the mute button at right-16. */}
             <button
               onClick={exit}
               aria-label="Exit game"
-              className="paper-button pointer-events-auto absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-[3px] font-rye text-[15px] md:right-6 md:top-6"
+              className="paper-button pointer-events-auto absolute right-4 top-3 flex h-10 w-10 items-center justify-center rounded-[4px] font-rye text-[15px]"
             >
               ✕
             </button>

@@ -41,6 +41,7 @@ export const EXTRA_INSTANCES: Record<string, number[][]> = {
   SM_Prop_Lamp_Post_02: EXTRA_LAMPS.map(([x, z, yaw]) => at(x, z, yaw ?? 0)),
   // the Ball Toss booth — a stall (facing SW, toward the iso camera) in an open spot
   SM_Prop_Stall_02: [at(13, -12, 45, 0.1)],
-  // the milk-bottle rack sits on its counter, plus a row to knock down
-  SM_Prop_Milk_Bottle_Toss_Stand_01: [at(12.3, -12.7, 45, 1.0)],
+  // NB no separate milk-bottle rack: the game's bottle pyramid rests directly on
+  // the stall counter (ballTossConfig.STACK_ANCHOR). The rack prop used to float
+  // at y=1.0 behind the counter reading as "a random table in the air".
 };

@@ -111,10 +111,13 @@ export function ContentOverlay() {
             <rect width="100%" height="100%" filter="url(#overlay-grain)" />
           </svg>
 
+          {/* ✕ takes the burger's exact slot (h-10 w-10, top-3 right-4) so it sits
+              flush with the mute button at right-16 — one geometry for every
+              top-right control. */}
           <button
             onClick={close}
             aria-label="Close panel"
-            className="font-rye paper-button absolute right-4 top-4 z-30 flex h-9 w-9 items-center justify-center rounded-[3px] text-[15px]"
+            className="font-rye paper-button absolute right-4 top-3 z-30 flex h-10 w-10 items-center justify-center rounded-[4px] text-[15px]"
           >
             ✕
           </button>
