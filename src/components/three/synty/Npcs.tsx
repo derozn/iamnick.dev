@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { useAnimations, useGLTF, useTexture } from '@react-three/drei';
 import { clone as skeletonClone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import {
+  CatmullRomCurve3,
   type Group,
   MeshStandardMaterial,
   type Mesh,
@@ -135,6 +136,114 @@ const SYNTY = '/models/synty/';
 const available = new Set(npcManifest as string[]);
 const PLACED = NPCS.filter((n) => available.has(n.file));
 
+/* ------------------------------------------------------------- walkers */
+
+/**
+ * Strollers that follow a looped path (needs the in-place Walking clip). High
+ * tier only — a walker frozen mid-stride on the demand-frameloop low tier reads
+ * as broken, so mobile keeps the static crowd above.
+ *
+ * Each path is a closed Catmull-Rom loop of three-space [x, z] waypoints. These
+ * are hand-routed through what LOOKS like open ground — **tune the waypoints if
+ * a walker clips a tent or ride** (they're the obvious knob, like the NPC specs
+ * above). `speed` is m/s; `phase` [0,1) staggers where each starts on its loop.
+ */
+const WALK_FILE = 'SM_Chr_Visitor_Male_01__Walking';
+const WALK_SPEED = 1.15;
+
+interface WalkerSpec {
+  path: [number, number][];
+  speed: number;
+  phase: number;
+}
+
+const WALKERS: WalkerSpec[] = [
+  // promenade on the open approach between the entrance arch and the first stalls
+  {
+    path: [
+      [4, -24],
+      [6, -19],
+      [1, -16],
+      [-4, -18],
+      [-5, -23],
+      [-1, -26],
+    ],
+    speed: WALK_SPEED,
+    phase: 0,
+  },
+  // a wander across the open ground south-west of the plaza (clear of the rides)
+  {
+    path: [
+      [-14, 16],
+      [-10, 20],
+      [-14, 24],
+      [-19, 22],
+      [-19, 17],
+    ],
+    speed: WALK_SPEED * 0.9,
+    phase: 0.5,
+  },
+];
+
+const _wp = new Vector3();
+const _wt = new Vector3();
+
+function Walker({ spec, material }: { spec: WalkerSpec; material: MeshStandardMaterial }) {
+  const { scene, animations } = useGLTF(`/models/npcs/${WALK_FILE}.glb`);
+  const model = useMemo(() => {
+    const c = skeletonClone(scene) as Group;
+    c.traverse((o) => {
+      const m = o as Mesh;
+      if (m.isMesh) {
+        m.material = material;
+        m.castShadow = false;
+        m.receiveShadow = false;
+        m.frustumCulled = false;
+      }
+    });
+    return c;
+  }, [scene, material]);
+
+  const group = useRef<Group>(null);
+  const { actions } = useAnimations(animations, model);
+  const curve = useMemo(
+    () =>
+      new CatmullRomCurve3(
+        spec.path.map(([x, z]) => new Vector3(x, GROUND_Y, z)),
+        true,
+      ),
+    [spec.path],
+  );
+  const len = useMemo(() => curve.getLength(), [curve]);
+  const t = useRef(spec.phase);
+
+  useEffect(() => {
+    const a = Object.values(actions)[0];
+    a?.reset().play();
+    return () => {
+      a?.stop();
+    };
+  }, [actions]);
+
+  useFrame((_, delta) => {
+    const g = group.current;
+    if (!g) return;
+    // advance along the loop; the in-place walk cycle plays underneath, speed
+    // roughly matched to the cadence so the feet don't obviously skate
+    t.current = (t.current + (spec.speed * Math.min(delta, 0.1)) / len) % 1;
+    curve.getPointAt(t.current, _wp);
+    g.position.copy(_wp);
+    curve.getTangentAt(t.current, _wt);
+    g.rotation.y = Math.atan2(_wt.x, _wt.z) + FORWARD_OFFSET;
+  });
+
+  return (
+    <group ref={group}>
+      <primitive object={model} />
+    </group>
+  );
+}
+
 function Npc({
   placement,
   material,
@@ -212,7 +321,9 @@ export function Npcs({ high }: { high: boolean }) {
     [baseAtlas],
   );
 
-  if (PLACED.length === 0) return null;
+  const walkersOn = high && available.has(WALK_FILE);
+
+  if (PLACED.length === 0 && !walkersOn) return null;
   return (
     <>
       {PLACED.map((p, i) => (
@@ -224,6 +335,8 @@ export function Npcs({ high }: { high: boolean }) {
           high={high}
         />
       ))}
+      {walkersOn &&
+        WALKERS.map((w, i) => <Walker key={`walker-${i}`} spec={w} material={material} />)}
     </>
   );
 }
