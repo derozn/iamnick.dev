@@ -16,6 +16,7 @@ import {
 
 import npcManifest from './npcManifest.json';
 import { ATTRACTIONS } from './attractions';
+import scenePlacements from './scenePlacements.json';
 
 /**
  * Npcs — the carnival's people: Synty characters run through Mixamo (idle /
@@ -109,7 +110,8 @@ const EXPLICIT: NpcPlacement[] = [
   },
 ];
 
-const NPCS: NpcPlacement[] = NPC_SPECS.flatMap((s) => {
+/** Attraction-derived placements (the code baseline / seed for the scene map). */
+const DERIVED: NpcPlacement[] = NPC_SPECS.flatMap((s) => {
   const a = ATTRACTIONS.find((x) => x.id === s.at);
   if (!a) return [];
   const [fx, , fz] = a.facing; // opening normal (structure → visitor), y ignored
@@ -127,7 +129,16 @@ const NPCS: NpcPlacement[] = NPC_SPECS.flatMap((s) => {
   // face the visitor (out = +facing) or the attraction (in = −facing)
   const yaw = s.look === 'out' ? yawTo(nx, nz) : yawTo(-nx, -nz);
   return [{ file: s.file, pos, yaw }];
-}).concat(EXPLICIT);
+});
+
+/**
+ * Ground NPCs come from the scene map (`docs/redesign/scene-map.txt` →
+ * `scripts/scene-map.mjs parse` → scenePlacements.json) once it's been authored;
+ * until then the attraction-derived baseline above renders. The dive-board diver
+ * is ALWAYS from EXPLICIT — the grid can't express her 8.25 m perch height.
+ */
+const mapped = scenePlacements.npcs as unknown as NpcPlacement[];
+const NPCS: NpcPlacement[] = (mapped.length ? mapped : DERIVED).concat(EXPLICIT);
 
 /** Camera distance beyond which an NPC's mixer pauses (high tier). */
 const MIXER_RANGE = 45;
@@ -157,7 +168,8 @@ interface WalkerSpec {
   phase: number;
 }
 
-const WALKERS: WalkerSpec[] = [
+/** Attraction-derived baseline; the scene map overrides it once authored. */
+const WALKERS_BASELINE: WalkerSpec[] = [
   // promenade on the open approach between the entrance arch and the first stalls
   {
     path: [
@@ -184,6 +196,9 @@ const WALKERS: WalkerSpec[] = [
     phase: 0.5,
   },
 ];
+
+const mappedWalkers = scenePlacements.walkers as unknown as WalkerSpec[];
+const WALKERS: WalkerSpec[] = mappedWalkers.length ? mappedWalkers : WALKERS_BASELINE;
 
 const _wp = new Vector3();
 const _wt = new Vector3();

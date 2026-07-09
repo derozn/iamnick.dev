@@ -34,4 +34,11 @@ export default tseslint.config(
       'react/no-unknown-property': 'off',
     },
   },
+  {
+    // Node CLI scripts (build/asset tooling) — Node globals, not browser
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      globals: { console: 'readonly', process: 'readonly' },
+    },
+  },
 );
