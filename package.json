@@ -41,6 +41,7 @@
     "tailwind-merge": "^3.6.0",
     "three": "^0.185.1",
     "varlock": "1.10.0",
+    "zod": "^4.4.3",
     "zustand": "^5.0.14"
   },
   "devDependencies": {

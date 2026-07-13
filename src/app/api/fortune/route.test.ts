@@ -83,6 +83,11 @@ describe('POST /api/fortune — validation', () => {
     expect(res.status).toBe(403);
   });
 
+  it('rejects a malformed Origin header with 403, not a crash', async () => {
+    const res = await post(ask(), { origin: 'not a url' });
+    expect(res.status).toBe(403);
+  });
+
   it('accepts a same-origin request', async () => {
     const res = await post(ask(), { origin: 'https://iamnick.dev' });
     expect(res.status).toBe(200);

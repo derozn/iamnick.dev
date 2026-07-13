@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { z } from 'zod';
 
 import {
   buildSystemPrompt,
@@ -30,29 +31,22 @@ export const runtime = 'edge';
 /** Body ceiling well above 12 × 1k-char messages + JSON overhead. */
 const MAX_BODY_BYTES = 32_768;
 
-interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
+const ChatMessageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string().min(1).max(MAX_MESSAGE_CHARS),
+});
 
-const isChatMessage = (m: unknown): m is ChatMessage => {
-  if (typeof m !== 'object' || m === null) return false;
-  const { role, content } = m as { role?: unknown; content?: unknown };
-  return (
-    (role === 'user' || role === 'assistant') &&
-    typeof content === 'string' &&
-    content.length > 0 &&
-    content.length <= MAX_MESSAGE_CHARS
-  );
-};
+const BodySchema = z.object({
+  messages: z.array(ChatMessageSchema).min(1),
+});
+
+type ChatMessage = z.infer<typeof ChatMessageSchema>;
 
 /** Parse + validate the request body; null means reject with 400. */
 const parseMessages = (body: unknown): ChatMessage[] | null => {
-  if (typeof body !== 'object' || body === null) return null;
-  const { messages } = body as { messages?: unknown };
-  if (!Array.isArray(messages) || messages.length === 0) return null;
-  if (!messages.every(isChatMessage)) return null;
-  const capped = messages.slice(-MAX_TURNS);
+  const parsed = BodySchema.safeParse(body);
+  if (!parsed.success) return null;
+  const capped = parsed.data.messages.slice(-MAX_TURNS);
   if (capped[capped.length - 1].role !== 'user') return null;
   return capped;
 };
@@ -94,8 +88,13 @@ export async function POST(req: Request): Promise<Response> {
   // bounded by the rate limits below.)
   const origin = req.headers.get('origin');
   const host = req.headers.get('host');
-  if (origin && host && new URL(origin).host !== host) {
-    return new Response('forbidden', { status: 403 });
+  if (origin && host) {
+    // A malformed Origin must read as forbidden, not crash the handler with a 500.
+    try {
+      if (new URL(origin).host !== host) return new Response('forbidden', { status: 403 });
+    } catch {
+      return new Response('forbidden', { status: 403 });
+    }
   }
 
   const raw = await req.text();
@@ -104,6 +103,7 @@ export async function POST(req: Request): Promise<Response> {
   try {
     body = JSON.parse(raw);
   } catch {
+    console.error('[fortune] unparseable body:', raw.slice(0, 120));
     return new Response('bad request', { status: 400 });
   }
   const messages = parseMessages(body);
