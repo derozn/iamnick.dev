@@ -40,6 +40,9 @@ suite is flaky under headless SwiftShader and is run locally with
 
 Set these in **Vercel → Project → Settings → Environment Variables**. See
 `.env.schema` for the canonical list (`pnpm env:check` validates locally).
+**varlock** owns env loading at runtime (it replaces Next's internal `@next/env`
+via a pnpm override), so `.env.schema` is enforced on every build, `@sensitive`
+values are redacted from logs, and env leaks are caught at build + runtime.
 
 | Variable                 | Enables                               | Notes                                                                  |
 | ------------------------ | ------------------------------------- | ---------------------------------------------------------------------- |
