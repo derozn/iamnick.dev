@@ -4,7 +4,7 @@ import { afterEach, vi } from 'vitest';
 
 import { setupMatchMedia } from './helpers/matchMedia';
 
-// jsdom ships neither of these; the journey + reveal components touch both.
+// jsdom ships neither of these; kept as a global safety net for motion/drei code.
 class MockIntersectionObserver implements IntersectionObserver {
   readonly root = null;
   readonly rootMargin = '';

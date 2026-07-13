@@ -7,30 +7,15 @@ const reset = () =>
   useSceneStore.setState({
     mode: 'travelling',
     activeStall: null,
-    progress: 0,
-    sections: {},
   });
 
 describe('store/scene', () => {
   afterEach(reset);
 
-  it('starts travelling at progress 0 with no sections', () => {
-    const { mode, activeStall, progress, sections } = useSceneStore.getState();
+  it('starts travelling with no active stall', () => {
+    const { mode, activeStall } = useSceneStore.getState();
     expect(mode).toBe('travelling');
     expect(activeStall).toBeNull();
-    expect(progress).toBe(0);
-    expect(sections).toEqual({});
-  });
-
-  it('setProgress updates progress', () => {
-    useSceneStore.getState().setProgress(0.42);
-    expect(useSceneStore.getState().progress).toBe(0.42);
-  });
-
-  it('setSections stores per-attraction bands', () => {
-    const bands = { header: { start: 0, end: 0.2 }, contact: { start: 0.9, end: 1 } };
-    useSceneStore.getState().setSections(bands);
-    expect(useSceneStore.getState().sections).toEqual(bands);
   });
 
   it('stepIn enters playing mode and records the active stall', () => {

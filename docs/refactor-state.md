@@ -1,0 +1,77 @@
+# Refactor execution state — chore/standards-refactor
+
+> **What this is.** The shared context manager for the standards refactor
+> (`docs/refactor-plan.md`). Every sub-agent working a refactor task reads this
+> file first; the orchestrating session folds results back in after each step.
+> It is committed so progress survives sessions. When the refactor completes,
+> this file is deleted — `refactor-plan.md` + the ADRs are the durable record.
+
+## Ground rules for agents
+
+- Read `docs/refactor-plan.md` (the phase you're working), `CONTEXT.md`
+  (glossary — use CV not resume, Overlay/HUD as defined), and
+  `docs/CODE_QUALITY_AUDIT.md` "Conventions for the next agent" before writing.
+- Gate: `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build`. Never run
+  the build while a dev server holds `.next`.
+- Approved dependency list in refactor-plan Constraints is CLOSED — no other
+  additions.
+- Record deviations from the plan here, not silently.
+
+## Phase status
+
+| Phase                      | Status                           | PR  |
+| -------------------------- | -------------------------------- | --- |
+| 1 — Dead code purge        | IN PROGRESS (started 2026-07-13) | —   |
+| 2 — Component architecture | pending                          | —   |
+| 3 — Config/deps/varlock    | pending                          | —   |
+| 4 — Fortune API + a11y     | pending                          | —   |
+| 5 — Dedup & extraction     | pending                          | —   |
+| 6 — Tests & tooling        | pending                          | —   |
+| 7 — Ops hardening          | pending                          | —   |
+
+## Phase 1 working state
+
+- Branch cut from `feature/fortune-teller` @ `9fa7ee9` (escape-hatch path —
+  persona QA still pending, refactor not blocked on it).
+- Dead-code re-verification: DONE — all targets confirmed zero live importers;
+  survivors (JsonLd, fonts, PostFX-via-SafePostFX, matchMedia helper) confirmed live.
+- Deletions: DONE — 163 files (retired three/ scene + models/carnival 9.7MB +
+  6 textures + organisms cascade + atoms + ui-modules/image + src/modules +
+  src/hooks + IntersectionObserver test helper). eslint glob updated.
+- Store cleanup: DONE — vestigial fields stripped, iso header comment,
+  scene.test.ts updated.
+- Docs rewrite: DONE — README.md + STATUS.md (agent), ADR-0007 written,
+  CONTEXT.md Midway/Step-in entries corrected to free-roam.
+- Gate: PASSED 2026-07-13 — typecheck ✓ lint ✓ 40 tests ✓ build ✓; retired-path
+  greps clean; knip: no orphans from the purge (also deleted the dead
+  `src/content/index.ts` barrel it found). Screenshots: overview pixel-identical
+  to the 2026-07-09 baseline; ball-toss fly-in + step-in card render correctly.
+
+## Verified facts (carry across phases)
+
+- Reduced-motion tier renders `StaticResume` as the VISIBLE page (`clip: auto`
+  in globals.css) — it is user-facing UI, not just crawler content. Its styling
+  is self-contained; organisms deletion does not affect it.
+- `JsonLd` is live via `layout.tsx`; fonts live via `layout.tsx` — both survive
+  Phase 1, move in Phase 2.
+- Screenshot rig = scenario scripts in `/tmp/shot/` (`npcs.mjs`,
+  `fortune-panel.mjs`, …) — NOT a single `shot.mjs`. Uncommitted until Phase 6.
+
+## Handovers to later phases (from Phase 1 gate)
+
+- Phase 3: remove now-unused `class-variance-authority` dep (only consumers were
+  deleted atoms); add `@banterstudiosuk/prettier-config` to devDependencies
+  (knip: unlisted but referenced by .prettierrc.json).
+- Phase 6 knip config: ignore/entry rules needed for `scripts/scene-map.mjs`
+  (manual CLI), game-config tuning exports, `__resetAudioForTests`.
+
+## Deviations from plan
+
+- `stepIn`/`exit` NOT renamed: CONTEXT.md defines Step-in as canonical domain
+  language — the glossary overrides the audit's rename suggestion. Plan updated.
+- `test/helpers/IntersectionObserver.ts` deleted (added scope): verified orphan
+  once useOnScreen test died; `test/setup.ts` has its own inline mock.
+- `src/content/index.ts` deleted (added scope): dead barrel, zero importers —
+  knip finding; aligns with the Phase 2 no-barrels convention.
+- CONTEXT.md Midway/Step-in entries corrected — the glossary itself still
+  described the retired on-rails camera; aligned with ADR-0007.

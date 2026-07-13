@@ -1,1 +1,0 @@
-export { TruncateText } from './TruncateText';

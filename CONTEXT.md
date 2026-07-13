@@ -5,7 +5,7 @@ Nick de Rozarieux's portfolio site — a single, scroll-driven 3D experience. Th
 ## Language
 
 **Midway**:
-The single scrollable path the camera travels through the Dark Carnival, lined with attractions in order: header → Career Highlights → ball-toss → side projects → contact → doodle wall. The spine of the whole experience. Navigated on-rails (scroll-driven camera), not free-roam.
+The carnival street lined with attractions — header → Career Highlights → ball-toss → side projects → contact → doodle wall — that the visitor explores freely with an isometric drag/zoom camera; clicking an attraction's indicator flies the camera in (free-roam superseded on-rails, ADR-0007).
 _Avoid_: journey, path, track, the scroll
 
 **Attraction**:
@@ -25,7 +25,7 @@ The world/setting the entire site takes place in — a neon-lit funfair at night
 _Avoid_: cyberpunk city, neon city, funfair (too bright/cheerful), gore/blood/grime, jump-scares
 
 **Step-in**:
-Opting into an interactive stall (a game). By default the visitor travels past a stall as scenery; tapping its Play affordance "steps in" — scroll locks and input switches to driving the game until they exit. The opposite of travelling.
+Opting into an interactive stall (a game). By default a stall is scenery; tapping its Play affordance "steps in" — input switches to driving the game until the visitor exits back to exploring. The opposite of travelling.
 _Avoid_: enter game, open game, launch
 
 **Full** (experience profile):

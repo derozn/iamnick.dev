@@ -29,7 +29,7 @@ export default tseslint.config(
   },
   {
     // react-three-fiber JSX uses three.js scene-graph props unknown to eslint-plugin-react
-    files: ['src/modules/Interactive/**', 'src/components/three/**'],
+    files: ['src/components/three/**'],
     rules: {
       'react/no-unknown-property': 'off',
     },

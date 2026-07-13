@@ -68,8 +68,9 @@ execution time — the repo moves fast.
 - Remove the now-dead `'src/modules/Interactive/**'` glob from
   `eslint.config.mjs` (keep `src/components/three/**`).
 - Store cleanup: strip vestigial `progress/sections/setProgress/setSections` from
-  `src/store/scene.ts`; rename scroll-era `stepIn/exit` vocabulary; fix the
-  header comment.
+  `src/store/scene.ts`; fix the scroll-era header comment. (`stepIn`/`exit` are
+  KEPT — the audit suggested renaming them, but CONTEXT.md defines Step-in as
+  canonical domain language; the glossary wins. Recorded 2026-07-13.)
 - Docs: rewrite `README.md` + `docs/redesign/STATUS.md` around the iso Dark
   Carnival; add ADR-0007 superseding ADR-0004 (free-roam is the shipped design;
   ADR-0006 — taxonomy/organisms — was written during the grilling session).
