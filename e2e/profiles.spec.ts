@@ -3,15 +3,19 @@ import { expect, test } from '@playwright/test';
 test.describe('experience profiles', () => {
   // Reduced motion → the 'none' tier: no canvas, the sr-only CV becomes the
   // visible page. Runs on desktop only (the assertion is about the tier, not size).
-  test('reduced motion renders the CV document instead of the canvas', async ({ browser }) => {
-    const context = await browser.newContext({ reducedMotion: 'reduce' });
-    const page = await context.newPage();
-    await page.goto('/', { waitUntil: 'load' });
+  test(
+    'reduced motion renders the CV document instead of the canvas',
+    { tag: '@ci' },
+    async ({ browser }) => {
+      const context = await browser.newContext({ reducedMotion: 'reduce' });
+      const page = await context.newPage();
+      await page.goto('/', { waitUntil: 'load' });
 
-    await expect(page.getByRole('heading', { name: /Nick de Rozarieux/i }).first()).toBeVisible();
-    await expect(page.locator('canvas')).toHaveCount(0);
-    await context.close();
-  });
+      await expect(page.getByRole('heading', { name: /Nick de Rozarieux/i }).first()).toBeVisible();
+      await expect(page.locator('canvas')).toHaveCount(0);
+      await context.close();
+    },
+  );
 
   test('the mobile (Lite) viewport boots and shows the nav', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'mobile', 'Lite profile is the mobile project');

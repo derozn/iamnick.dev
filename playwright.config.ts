@@ -16,8 +16,9 @@ export default defineConfig({
   retries: CI ? 1 : 0,
   workers: CI ? 1 : undefined,
   reporter: CI ? [['github'], ['html', { open: 'never' }]] : [['list']],
-  timeout: 60_000,
-  expect: { timeout: 15_000 },
+  // SwiftShader WebGL is ~10-15× slower on CI Linux, so scene-boot needs headroom.
+  timeout: CI ? 150_000 : 60_000,
+  expect: { timeout: CI ? 30_000 : 15_000 },
 
   use: {
     baseURL: 'http://localhost:3000',

@@ -1,7 +1,0 @@
-# Not a real workspace — this only carries pnpm's build-script approvals.
-# packageManager pins pnpm@11.6.0, which reads approvals from `allowBuilds` here
-# (the older package.json `pnpm.onlyBuiltDependencies` list errors on pnpm 11).
-# Committed so Vercel + CI approve these native builds the same way local does.
-allowBuilds:
-  sharp: true # next/image optimization
-  '@sentry/cli': true # source-map upload during build (when Sentry is configured)

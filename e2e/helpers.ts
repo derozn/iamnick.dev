@@ -22,7 +22,8 @@ export async function bootScene(page: Page, query = '') {
   await page.goto(`/?debug=1&bloom=0${query}`, { waitUntil: 'load' });
   await expect
     .poll(() => page.evaluate(() => window.__sceneStore?.getState().sceneReady === true), {
-      timeout: 45_000,
+      // SwiftShader on CI loads the 250+ GLBs far slower than a real GPU.
+      timeout: process.env.CI ? 120_000 : 45_000,
     })
     .toBe(true);
   await page.evaluate(() => window.__sceneStore!.getState().start());

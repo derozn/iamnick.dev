@@ -14,8 +14,27 @@ as you add credentials.
 - Rate limiting is active (in-memory, per instance).
 - Sentry and Vercel Analytics are inert.
 
-Build approvals for native deps (`sharp`, `@sentry/cli`) are committed in
-`pnpm-workspace.yaml`, so `pnpm install` needs no interactive approval.
+### pnpm build approvals (two mechanisms, one per pnpm version)
+
+Native deps `sharp` and `@sentry/cli` run install scripts that pnpm must approve.
+Vercel installs with **pnpm 9** (chosen by project-creation date, ignoring the
+`packageManager` field), which reads approvals from **`package.json` →
+`pnpm.onlyBuiltDependencies`** and rejects a packages-less `pnpm-workspace.yaml`.
+Local + CI use **pnpm 11** (via `packageManager`), which reads **`allowBuilds`**
+from a `pnpm-workspace.yaml` (gitignored; CI writes it) and ignores the
+package.json key with a harmless warning. Both are kept in sync.
+
+> **Recommended cleanup:** enable Corepack on Vercel (set
+> `ENABLE_EXPERIMENTAL_COREPACK=1` in the project's env) so Vercel also uses
+> pnpm 11. Then a single committed `pnpm-workspace.yaml` (allowBuilds) covers
+> everything, the package.json key + the pnpm-11 warning go away.
+
+### CI
+
+The `E2E (Playwright)` job runs only the reliable `@ci`-tagged subset (API
+contract, a boot smoke, the no-canvas reduced-motion path) — the full scene
+suite is flaky under headless SwiftShader and is run locally with
+`pnpm test:e2e`.
 
 ## Environment variables (all optional)
 

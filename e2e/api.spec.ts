@@ -5,7 +5,7 @@ const ORIGIN = 'http://localhost:3000';
 
 /** The route's guardrails, exercised directly (no browser). Stub mode → the 200s
  *  stream a canned reading without a model call. */
-test.describe('/api/fortune contract', () => {
+test.describe('/api/fortune contract', { tag: '@ci' }, () => {
   test('200: a well-formed same-origin request streams a reading', async ({ request }) => {
     const res = await request.post(URL, {
       headers: { origin: ORIGIN },
