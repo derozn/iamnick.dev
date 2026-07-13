@@ -1,0 +1,7 @@
+# Not a real workspace — carries pnpm's build-script approvals only.
+# Everywhere uses pnpm 11 (local + CI via packageManager; Vercel via Corepack,
+# ENABLE_EXPERIMENTAL_COREPACK=1), which reads approvals from `allowBuilds`.
+# Committed so every environment approves these native builds identically.
+allowBuilds:
+  sharp: true # next/image optimization
+  '@sentry/cli': true # source-map upload during build (when Sentry is configured)

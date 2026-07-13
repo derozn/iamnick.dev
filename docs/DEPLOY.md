@@ -41,13 +41,13 @@ suite is flaky under headless SwiftShader and is run locally with
 Set these in **Vercel → Project → Settings → Environment Variables**. See
 `.env.schema` for the canonical list (`pnpm env:check` validates locally).
 
-| Variable                            | Enables                               | Notes                                                                  |
-| ----------------------------------- | ------------------------------------- | ---------------------------------------------------------------------- |
-| `ANTHROPIC_API_KEY`                 | Real Madame Zara (live Claude Haiku)  | Absent or invalid → stub/canned Readings. Server-only.                 |
-| `FORTUNE_STUB=1`                    | Forces stub mode even with a key      | For preview environments.                                              |
-| `SENTRY_DSN`                        | Server + edge error reporting         | Read at runtime; init is gated on it.                                  |
-| `NEXT_PUBLIC_SENTRY_DSN`            | Browser error reporting               | **Read at BUILD time** — set it before the deploy build to bake it in. |
-| `UPSTASH_REDIS_REST_URL` / `_TOKEN` | (Future) cross-instance rate limiting | Not wired yet — the limiter is in-memory; see `rateLimit.ts`.          |
+| Variable                 | Enables                               | Notes                                                                  |
+| ------------------------ | ------------------------------------- | ---------------------------------------------------------------------- |
+| `ANTHROPIC_API_KEY`      | Real Madame Zara (live Claude Haiku)  | Absent or invalid → stub/canned Readings. Server-only.                 |
+| `FORTUNE_STUB=1`         | Forces stub mode even with a key      | For preview environments.                                              |
+| `SENTRY_DSN`             | Server + edge error reporting         | Read at runtime; init is gated on it.                                  |
+| `NEXT_PUBLIC_SENTRY_DSN` | Browser error reporting               | **Read at BUILD time** — set it before the deploy build to bake it in. |
+| `REDIS_URL`              | (Future) cross-instance rate limiting | Not wired yet — the limiter is in-memory; see `rateLimit.ts`.          |
 
 Vercel Analytics activates automatically on Vercel (the `<Analytics />` component
 is already mounted); no variable needed.

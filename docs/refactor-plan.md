@@ -141,7 +141,9 @@ src/components/
   drop-in replacement for `@next/env`): replace `.env.example` with a committed
   **`.env.schema`** declaring every env var with decorators —
   `ANTHROPIC_API_KEY` (`@sensitive`, optional: absence = stub mode),
-  `FORTUNE_STUB`, and slots for `UPSTASH_REDIS_REST_URL`/`TOKEN` (`@sensitive`)
+  `FORTUNE_STUB`, and slots for future rate-limit Redis (`@sensitive`; the
+  slot was later corrected from Upstash-REST vars to a plain `REDIS_URL` when
+  rate-limiter-flexible replaced @upstash/ratelimit)
   and `SENTRY_DSN`. Buys build-time validation, generated types, `@sensitive`
   log redaction, and build+runtime leak detection (its edge-runtime `Response`
   patching covers `/api/fortune` directly). Supersedes any zod-env idea — zod is
