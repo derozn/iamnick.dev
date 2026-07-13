@@ -283,8 +283,14 @@ Runtime: `zod`, `ai` + `@ai-sdk/anthropic` (replacing `@anthropic-ai/sdk`),
 `@vercel/analytics`, `varlock` + `@varlock/nextjs-integration` (pinned — young
 tool). Dev: `knip`, `@playwright/test`, `@axe-core/playwright`; Renovate as a
 GitHub app + `renovate.json`.
-Rejected: `rate-limiter-flexible` (edge-incompatible — needs TCP Redis; its
-memory mode adds nothing over the current limiter); Lighthouse CI.
+Adopted 2026-07-13 (reversing the earlier rejection): `rate-limiter-flexible`
+(RateLimiterMemory) replaced the hand-rolled limiter, and the fortune route
+moved from the Edge to the **Node runtime** — this route's latency is dominated
+by the US Anthropic call so an edge PoP buys little, and Node removes the
+library constraint (a real Redis backend works later without an Upstash REST
+shim). This also SUPERSEDES the deferred @upstash/ratelimit sub-step: the
+cross-instance upgrade path is now RateLimiterRedis, still deferred pending a
+Redis/Upstash instance. Rejected: Lighthouse CI.
 
 ## Verification
 

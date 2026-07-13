@@ -41,6 +41,9 @@ importers:
       next:
         specifier: ^16.2.10
         version: 16.2.10(@babel/core@7.29.7)(@playwright/test@1.61.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      rate-limiter-flexible:
+        specifier: ^11.2.0
+        version: 11.2.0
       react:
         specifier: ^19.2.7
         version: 19.2.7
@@ -2609,6 +2612,9 @@ packages:
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
+
+  rate-limiter-flexible@11.2.0:
+    resolution: {integrity: sha512-L0eIK+BmFMi6NcvmtEg7RSswOFKi9MMD5RhBIypFfOve+G6Jl1Xbb8qEHgK3uRzNtkOFYF0L9f7P4rSf2PnUVw==}
 
   react-dom@19.2.7:
     resolution: {integrity: sha512-t0BRVXvbiE/o20Hfw669rLbMCDWtYZLvmJigy2f0MxsXF+71pxhR3xOkspmsO8h3ZlNzyibAmtCa3l4lYKk6gQ==}
@@ -5684,6 +5690,8 @@ snapshots:
       react-is: 16.13.1
 
   punycode@2.3.1: {}
+
+  rate-limiter-flexible@11.2.0: {}
 
   react-dom@19.2.7(react@19.2.7):
     dependencies:

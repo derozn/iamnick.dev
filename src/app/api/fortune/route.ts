@@ -15,10 +15,13 @@ import { checkRateLimit } from './rateLimit';
 
 /**
  * Madame Zara — the fortune-teller chat endpoint (see
- * docs/redesign/fortune-teller-ai-handoff.md). The repo's first server-side
- * runtime dependency: an Edge route streaming Claude Haiku, grounded in
+ * docs/redesign/fortune-teller-ai-handoff.md). Streams Claude Haiku, grounded in
  * serializeCv() via the persona prompt, with input validation and best-effort
- * rate limiting (see ./rateLimit.ts for the Upstash upgrade path).
+ * rate limiting (./rateLimit.ts).
+ *
+ * Node runtime, not Edge: this route's latency is dominated by the Anthropic
+ * API call (US), so an edge PoP buys little, and Node lets us use the full
+ * rate-limiter-flexible + a real Redis backend later without an Upstash REST shim.
  *
  * Stub mode — no ANTHROPIC_API_KEY, or FORTUNE_STUB=1 — streams a canned
  * in-character reading instead, so dev/headless verification never spends
@@ -27,7 +30,7 @@ import { checkRateLimit } from './rateLimit';
  * Reply protocol (shared with FortunePanel): plain text; the FIRST line is the
  * drawn card's name, everything after the first newline is the reading.
  */
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 /** Body ceiling well above 12 × 1k-char messages + JSON overhead. */
 const MAX_BODY_BYTES = 32_768;
@@ -118,7 +121,7 @@ export async function POST(req: Request): Promise<Response> {
 
   // Abuse/cost controls (in-character replies, honest status codes).
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown';
-  const verdict = checkRateLimit(ip);
+  const verdict = await checkRateLimit(ip);
   if (verdict === 'rate-limited') return cannedStream(RATE_LIMIT_READING, 429);
   if (verdict === 'budget-exhausted') return cannedStream(BUDGET_READING, 429);
 
