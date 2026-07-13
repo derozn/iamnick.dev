@@ -36,9 +36,33 @@ _Avoid_: desktop mode
 The deliberately lighter Dark Carnival for phones/touch: the same continuous 3D scene at reduced fidelity, with the ball-toss game shown as non-playable scenery. The doodle wall and blog remain fully usable (view + draw) on Lite.
 _Avoid_: mobile mode, reduced mode
 
+**CV**:
+Nick's professional history as structured data (`content/cv.ts`) — the single source of truth rendered as the crawlable/visible DOM document and grounding Madame Zara's readings.
+_Avoid_: resume, work history, profile data
+
+**Overlay**:
+Any DOM UI layered over the canvas — content panels, the intro veil, HUDs. The carnival is canvas; everything readable floats above it as an overlay.
+_Avoid_: modal (only some overlays are modal), popup, layer
+
+**HUD**:
+An in-game or status overlay — the ball-toss and high-striker game panels and the golden-ticket tally. A subset of overlays; the `Hud` suffix and `hud-*` styling are reserved for these.
+_Avoid_: game UI, scoreboard, widget
+
 **Ball-toss**:
 The fairground game where you throw a ball at stacked tins. Playable only on Full; appears as lit scenery on Lite.
 _Avoid_: tin game, coconut shy, throwing game
+
+**Madame Zara**:
+The fortune teller — the character in the painted wagon who answers visitor questions about Nick, grounded solely in the CV. Her wagon is an attraction, not a stall — conversation happens in an overlay, no step-in.
+_Avoid_: chatbot, AI assistant, fortune bot
+
+**Reading**:
+One reply from Madame Zara — a drawn Card named as the heading, then a short in-character body.
+_Avoid_: response, completion, answer
+
+**Card**:
+One of the fixed twelve-card deck; every Reading opens by naming the drawn Card.
+_Avoid_: tarot card, prompt template
 
 **Doodle wall**:
 The communal stall where any visitor draws and everyone sees what past visitors drew. A grid of tiles showing the most recent approved contributions (bounded, older tiles age out); persisted, not live. Full-feature on both Full and Lite (view + draw).

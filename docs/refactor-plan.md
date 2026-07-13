@@ -33,7 +33,7 @@ server/client boundaries all verified clean.
 - `src/modules/Interactive/Portrait/` is entirely dead (zero external importers).
   Storybook is not configured; both `.stories.tsx` files are dead weight.
 - **Nick's decisions:** delete the dormant layer (don't revive); standardize on
-  role-based component folders `ui/ overlays/ resume/ nav/ three/`.
+  role-based component folders `ui/ overlays/ cv/ nav/ three/`.
 
 ## Execution model
 
@@ -71,7 +71,8 @@ execution time — the repo moves fast.
   `src/store/scene.ts`; rename scroll-era `stepIn/exit` vocabulary; fix the
   header comment.
 - Docs: rewrite `README.md` + `docs/redesign/STATUS.md` around the iso Dark
-  Carnival; add ADR-0006 superseding ADR-0004 (free-roam is the shipped design).
+  Carnival; add ADR-0007 superseding ADR-0004 (free-roam is the shipped design;
+  ADR-0006 — taxonomy/organisms — was written during the grilling session).
 - Done when: greps clean; knip (Phase 6 tool, run early here as verification)
   reports no orphans; gate green; repo ~10 MB lighter.
 
@@ -86,7 +87,7 @@ src/components/
   overlays/   ContentOverlay, SectionContent, CareerTickets, FortunePanel(+test),
               IntroOverlay, AudioDirector, DebugBridge, TicketHud, BallTossHud,
               HighStrikerHud
-  resume/     StaticResume, JsonLd            (server-only)
+  cv/         StaticCv (renamed from StaticResume), JsonLd   (server-only)
   nav/        SiteNav, MuteButton             (unchanged)
   three/      unchanged except HUDs leaving; configs stay
 ```
@@ -96,7 +97,8 @@ src/components/
    `three/game/{BallTossHud,HighStrikerHud}.tsx` → `overlays/`; their three-free
    configs (`ticketConfig`, `highStrikerConfig`) stay in `three/`. Expect new
    lint findings as HUDs leave the `three/**` eslint override.
-3. `resume/`: `StaticResume` + `organisms/JsonLd.tsx`; fonts →
+3. `cv/` (canonical term per CONTEXT.md — not "resume"): `StaticResume` →
+   `StaticCv` + `organisms/JsonLd.tsx`; fonts →
    `src/lib/fonts/` (not components; `lib/` already hosts `cn`/`formatDate`).
    **Must rewrite `local.ts` relative `src:` paths** (`../../../../assets/…` →
    `../../assets/…`) — next/font resolves relative to the declaring file; the
@@ -107,17 +109,19 @@ src/components/
 
 **Codified conventions:**
 
-- Folders are roles, not atomic-design ranks. New component? Ask what it _does_.
+- Folders are roles, not atomic-design ranks (`Overlay`/`HUD`/`CV` are defined in CONTEXT.md). New component? Ask what it _does_.
 - `ui/` only: folder-per-component + CVA `.styles.ts` + `index.ts`. Everywhere
   else: flat `.tsx` + colocated `.test.tsx`; no folder-level barrels.
-- `resume/` is server-only (`'use client'` banned); may import `@/content/cv`
+- `cv/` is server-only (`'use client'` banned); may import `@/content/cv`
   directly.
 - Client code gets data via props or `useSceneStore`. Documented exceptions:
   `SectionContent` + `CareerTickets` import cv (remediation would move the same
   bytes from JS bundle to RSC payload — not a win; per ADR-0003 the sr-only
-  `StaticResume` already carries the content in HTML). Optional enforcement:
-  eslint `no-restricted-imports` on `@/content/cv` in `overlays|nav|three` with
-  those two excepted.
+  `StaticResume` already carries the content in HTML). **Enforced (agreed
+  2026-07-13):** eslint `no-restricted-imports` on `@/content/cv` in
+  `overlays|nav|three`, the two exceptions listed inline in `eslint.config.mjs`
+  with a comment pointing here — new exceptions are a visible, reviewable act,
+  not silent drift.
 - `overlays/`/`nav/` may import from `three/` only three-free data modules; keep
   the "static bundle must not import `@react-three/*`" guard.
 - RSC boundaries: independent client islands under a server `page.tsx` is the
@@ -156,8 +160,10 @@ One sub-PR each, in order:
    swallowing them.
 2. **Vercel AI SDK**: swap `@anthropic-ai/sdk` → `ai` + `@ai-sdk/anthropic`;
    `streamText(...).toTextStreamResponse()` server-side (keeps the plain-text
-   "first line = card name" protocol); `useChat`-style streaming replaces
-   `FortunePanel`'s hand-rolled `fetch`+`getReader` loop. Preserve: stub mode
+   "first line = card name" protocol); `useChat` replaces `FortunePanel`'s
+   hand-rolled `fetch`+`getReader` loop — **client MUST configure the AI SDK's
+   text-stream transport** to match `toTextStreamResponse()`; the v5 default is
+   the SSE UI-message protocol and will not parse a plain-text stream. Preserve: stub mode
    (no key / `FORTUNE_STUB=1` streams the canned reading), in-character 429s,
    abort-on-close, `MIST_REPLY` fallback. **Honest cost:** `route.test.ts` and
    `FortunePanel.test.tsx` mocks are rewritten against the AI SDK; card-split
@@ -175,7 +181,11 @@ Also in this phase:
   `OPENERS` must track CV changes.
 - Done when: malformed-Origin request → 403; zod rejects the same fixtures the
   old guards did (reuse existing test cases); stub mode still streams
-  headlessly; Tab cycles inside open modals and focus restores on close.
+  headlessly; Tab cycles inside open modals and focus restores on close; and a
+  **real-key manual smoke on a deployed preview** (one live question + one
+  forced mid-stream abort) — every automated test mocks the model, so this is
+  the only guard on the unmocked path after the transport swap (agreed
+  2026-07-13).
 
 ## Phase 5 — Deduplication & extraction (MEDIUM)
 
@@ -217,9 +227,13 @@ Test pyramid — each layer tests only what the layer below can't:
   - A11y: `@axe-core/playwright` sweep of DOM overlays — settles the audit's
     untested letterpress contrast question; keyboard assertions (Escape closes,
     Tab stays trapped).
-  - Visual: `toHaveScreenshot` on the store-driven scenario (load/enter/
-    overview/each POI) — artifact screenshots per PR first; tolerance-tuned
-    pixel-diff once stable.
+  - Visual (split by surface, agreed 2026-07-13): **DOM overlays get full
+    `toHaveScreenshot` pixel-diff** (deterministic browser rendering — diffs
+    are real). **The canvas gets artifact screenshots per PR forever** plus
+    programmatic sanity checks that don't depend on colour fidelity (canvas
+    non-black, POI shots differ from each other, no full-frame smear) — per
+    the audit, headless swiftshader colour is unreliable, so canvas pixel-diff
+    would flake or lie; real-GPU eyeballs remain the final judge.
 - **CI**: e2e job after build (`build → start → test`), uploading traces +
   screenshots on failure. Existing lint→typecheck→unit→build gate unchanged.
 - **knip** (devDep; config modeled on the zzZac monorepo's): automates the
@@ -244,7 +258,11 @@ Test pyramid — each layer tests only what the layer below can't:
 Atlas-dedup GLB re-export (~17 MB → ~2 MB, biggest user-facing win), keyboard
 nav for scene/games, `synty/landmarks.ts` single source of world positions,
 CSP + self-hosted draco, bundle-analyzer baseline, Lighthouse CI (considered,
-rejected: threshold noise on a 3D-heavy site). Content bugs (bloom NaN
+rejected: threshold noise on a 3D-heavy site). **Evaluate a real visual
+regression service** (Chromatic, Percy, Argos, Lost Pixel) once the Phase 6
+suite exists — a service with a consistent rendering environment could make
+canvas diffs meaningful where local swiftshader can't; adopt only if it
+demonstrably beats the artifact-screenshot + real-GPU workflow. Content bugs (bloom NaN
 verification, ferris wheel spin, NPC tuning) are not standards work.
 
 ## Constraints
