@@ -52,6 +52,9 @@ export function ContentOverlay() {
             initialFocus: false,
             escapeDeactivates: false, // the store's Escape handler closes us
             allowOutsideClick: true,
+            // The panel animates in; skip the visibility check (it also lets the
+            // trap work under jsdom, which has no layout — see ContentOverlay.test).
+            tabbableOptions: { displayCheck: 'none' },
           }}
         >
           <motion.div

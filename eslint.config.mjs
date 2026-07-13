@@ -55,10 +55,12 @@ export default tseslint.config(
   },
   {
     // Recorded exceptions: the overlay content panels render CV sections directly
-    // (moving the import server-side would shift the same bytes to the RSC payload).
+    // (moving the import server-side would shift the same bytes to the RSC
+    // payload). Tests may read the CV to compute expected values.
     files: [
       'src/components/overlays/SectionContent.tsx',
       'src/components/overlays/CareerTickets.tsx',
+      'src/**/*.test.{ts,tsx}',
     ],
     rules: {
       'no-restricted-imports': 'off',
