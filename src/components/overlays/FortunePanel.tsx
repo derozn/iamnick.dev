@@ -180,8 +180,10 @@ export function FortunePanel() {
         })}
         {errorReading && <Reading content={errorReading} />}
         {streaming &&
-          (visible[visible.length - 1]?.role === 'user' ||
-            textOf(visible[visible.length - 1]) === '') && (
+          (() => {
+            const last = visible[visible.length - 1];
+            return !last || last.role === 'user' || textOf(last) === '';
+          })() && (
             <p className="font-fell text-[14px] italic text-ink-soft">
               Madame Zara is reading the cards…
             </p>
