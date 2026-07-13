@@ -68,6 +68,27 @@ glossary-guard}.md` — register on session reload; this session ran their
   status header stale ("approved, not started" but Zara is built);
   hud-letterpress-overhaul.md "no post-processing" claim pre-dates SafePostFX.
 
+## Phase 3 result (2026-07-13)
+
+- All "latest" deps pinned to caret ranges matching the lockfile (react 19.2.7,
+  next 16.2.10, three 0.185.1, …); `class-variance-authority` removed (Phase 1
+  handover); `@banterstudiosuk/prettier-config@^0.2.0` now a real devDep (was
+  phantom-resolving; effective config identical, zero reformat).
+- pnpm warning KILLED: dead `pnpm.*` keys removed from package.json. pnpm 11.6
+  workspace syntax is `allowBuilds:` (the older onlyBuiltDependencies list
+  ERRORS) — local gitignored pnpm-workspace.yaml and the CI write-step both
+  updated; CI's step also got a YAML block-scalar fix.
+- App Router: redundant `dynamic = 'auto'` and empty `<head />` removed;
+  `src/lib/site.ts#SITE_URL` feeds metadataBase/OG/robots/sitemap.
+- varlock: SCHEMA-FIRST. `.env.schema` committed (all vars @optional,
+  default-sensitive, redacted CLI output verified); `pnpm env:check` script +
+  CI step; `.env.example` retired (README updated). Runtime integration
+  DEFERRED — plugin hard-requires the @next/env override; pnpm 11 reads
+  overrides only from the gitignored pnpm-workspace.yaml. Unblock: test a
+  committed settings-only workspace file on a Vercel preview (Nick), then
+  `pnpm add -E @varlock/nextjs-integration` and wire the plugin.
+- Gate: typecheck ✓ lint ✓ 41 tests ✓ build ✓ install warning-free ✓.
+
 ## Hotfix (2026-07-13, out-of-phase)
 
 - Nick reported the fortune teller dead when asking a question. Root cause:

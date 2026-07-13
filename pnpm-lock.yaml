@@ -12,80 +12,83 @@ importers:
         specifier: ^0.110.0
         version: 0.110.0(zod@4.4.3)
       '@react-three/drei':
-        specifier: latest
+        specifier: ^10.7.7
         version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.185.1))(@types/react@19.2.17)(@types/three@0.185.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.185.1)
       '@react-three/fiber':
-        specifier: latest
+        specifier: ^9.6.1
         version: 9.6.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.185.1)
       '@react-three/postprocessing':
-        specifier: latest
+        specifier: ^3.0.4
         version: 3.0.4(@react-three/fiber@9.6.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.185.1))(@types/three@0.185.0)(react@19.2.7)(three@0.185.1)
-      class-variance-authority:
-        specifier: latest
-        version: 0.7.1
       clsx:
-        specifier: latest
+        specifier: ^2.1.1
         version: 2.1.1
       maath:
         specifier: ^0.10.8
         version: 0.10.8(@types/three@0.185.0)(three@0.185.1)
       motion:
-        specifier: latest
+        specifier: ^12.42.2
         version: 12.42.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       next:
-        specifier: latest
+        specifier: ^16.2.10
         version: 16.2.10(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: latest
+        specifier: ^19.2.7
         version: 19.2.7
       react-dom:
-        specifier: latest
+        specifier: ^19.2.7
         version: 19.2.7(react@19.2.7)
       tailwind-merge:
-        specifier: latest
+        specifier: ^3.6.0
         version: 3.6.0
       three:
-        specifier: latest
+        specifier: ^0.185.1
         version: 0.185.1
+      varlock:
+        specifier: 1.10.0
+        version: 1.10.0
       zustand:
-        specifier: latest
+        specifier: ^5.0.14
         version: 5.0.14(@types/react@19.2.17)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
     devDependencies:
+      '@banterstudiosuk/prettier-config':
+        specifier: ^0.2.0
+        version: 0.2.0
       '@eslint/js':
-        specifier: latest
+        specifier: ^10.0.1
         version: 10.0.1(eslint@9.39.4(jiti@2.7.0))
       '@tailwindcss/postcss':
-        specifier: latest
+        specifier: ^4.3.2
         version: 4.3.2
       '@testing-library/jest-dom':
-        specifier: latest
+        specifier: ^6.9.1
         version: 6.9.1
       '@testing-library/react':
-        specifier: latest
+        specifier: ^16.3.2
         version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@testing-library/user-event':
-        specifier: latest
+        specifier: ^14.6.1
         version: 14.6.1(@testing-library/dom@10.4.1)
       '@types/css-mediaquery':
         specifier: ^0.1.4
         version: 0.1.4
       '@types/node':
-        specifier: latest
+        specifier: ^26.1.1
         version: 26.1.1
       '@types/react':
-        specifier: latest
+        specifier: ^19.2.17
         version: 19.2.17
       '@types/react-dom':
-        specifier: latest
+        specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.17)
       '@types/three':
-        specifier: latest
+        specifier: ^0.185.0
         version: 0.185.0
       '@vitejs/plugin-react':
-        specifier: latest
+        specifier: ^6.0.3
         version: 6.0.3(vite@8.0.16(@types/node@26.1.1)(jiti@2.7.0)(yaml@2.9.0))
       '@vitest/coverage-v8':
-        specifier: latest
+        specifier: ^4.1.10
         version: 4.1.10(vitest@4.1.10)
       css-mediaquery:
         specifier: ^0.1.2
@@ -94,40 +97,40 @@ importers:
         specifier: ^9.39.4
         version: 9.39.4(jiti@2.7.0)
       eslint-config-prettier:
-        specifier: latest
+        specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.4(jiti@2.7.0))
       eslint-plugin-jsx-a11y:
-        specifier: latest
+        specifier: ^6.10.2
         version: 6.10.2(eslint@9.39.4(jiti@2.7.0))
       eslint-plugin-react:
-        specifier: latest
+        specifier: ^7.37.5
         version: 7.37.5(eslint@9.39.4(jiti@2.7.0))
       eslint-plugin-react-hooks:
-        specifier: latest
+        specifier: ^7.1.1
         version: 7.1.1(eslint@9.39.4(jiti@2.7.0))
       husky:
-        specifier: latest
+        specifier: ^9.1.7
         version: 9.1.7
       jsdom:
-        specifier: latest
+        specifier: ^29.1.1
         version: 29.1.1
       lint-staged:
-        specifier: latest
+        specifier: ^17.0.8
         version: 17.0.8
       prettier:
-        specifier: latest
+        specifier: ^3.9.4
         version: 3.9.4
       tailwindcss:
-        specifier: latest
+        specifier: ^4.3.2
         version: 4.3.2
       typescript:
-        specifier: latest
+        specifier: ^6.0.3
         version: 6.0.3
       typescript-eslint:
-        specifier: latest
+        specifier: ^8.63.0
         version: 8.63.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
       vitest:
-        specifier: latest
+        specifier: ^4.1.10
         version: 4.1.10(@types/node@26.1.1)(@vitest/coverage-v8@4.1.10)(jsdom@29.1.1)(vite@8.0.16(@types/node@26.1.1)(jiti@2.7.0)(yaml@2.9.0))
 
 packages:
@@ -233,6 +236,9 @@ packages:
   '@babel/types@7.29.7':
     resolution: {integrity: sha512-4zBIxpPzowiZpusoFkyGVwakdRJUyuH5PxQ/PrqghfdFWWasvnCdPfQXHrenDai+gyLARulZjZowCOj6fjT4pA==}
     engines: {node: '>=6.9.0'}
+
+  '@banterstudiosuk/prettier-config@0.2.0':
+    resolution: {integrity: sha512-ZDFL4q3+e+6qNvBrsieCKtZJjqKIERIl4GTWBzHXwmM70+xkcc+ZQKFiTP1jTq4iiWW4A6H/zEfeMDkXjVx0KQ==}
 
   '@bcoe/v8-coverage@1.0.2':
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
@@ -1226,9 +1232,6 @@ packages:
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
     engines: {node: '>=10'}
-
-  class-variance-authority@0.7.1:
-    resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
 
   cli-cursor@5.0.0:
     resolution: {integrity: sha512-aCj4O5wKyszjMmDT4tZj93kxyydN/K5zPWSCe6/0AV/AA1pqe5ZBIw0a2ZfPQV7lL5/yb5HsUreJ6UFAF1tEQw==}
@@ -2631,6 +2634,11 @@ packages:
     resolution: {integrity: sha512-6Z7Ma2aVEWisaL6TvBCy7P8rm2LQoPv6dJ7ecIaIixHcwfbJ0x7mWdbcwlIM5IGQxPZSFYeqRCqlOOeKoJYMkw==}
     engines: {node: '>= 4'}
 
+  varlock@1.10.0:
+    resolution: {integrity: sha512-o4YahQPmNFGjnYDkBYNWffMQBoQqrlzkBS473k4rFsbYfHH3J627/+62gfPYMTqhsg9HF4qC8ogtOR1vJSZUPA==}
+    engines: {bun: '>=1.3.3', node: '>=22.3.0'}
+    hasBin: true
+
   vite@8.0.16:
     resolution: {integrity: sha512-h9bXPmJichP5fLmVQo3PyaGSDE2n3aPuomeAlVRm0JLmt4rY6zmPKd59HYI4LNW8oTK7tlTsuC7l/m7awx9Jcw==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -2970,6 +2978,8 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
+
+  '@banterstudiosuk/prettier-config@0.2.0': {}
 
   '@bcoe/v8-coverage@1.0.2': {}
 
@@ -3876,10 +3886,6 @@ snapshots:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
-
-  class-variance-authority@0.7.1:
-    dependencies:
-      clsx: 2.1.1
 
   cli-cursor@5.0.0:
     dependencies:
@@ -5456,6 +5462,8 @@ snapshots:
       react: 19.2.7
 
   utility-types@3.11.0: {}
+
+  varlock@1.10.0: {}
 
   vite@8.0.16(@types/node@26.1.1)(jiti@2.7.0)(yaml@2.9.0):
     dependencies:

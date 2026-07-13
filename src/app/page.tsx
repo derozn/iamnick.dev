@@ -8,8 +8,6 @@ import { TicketHud } from '@/components/overlays/TicketHud';
 import { BallTossHud } from '@/components/overlays/BallTossHud';
 import { HighStrikerHud } from '@/components/overlays/HighStrikerHud';
 
-export const dynamic = 'auto';
-
 /**
  * Homepage — the isometric, explorable Dark Carnival.
  *

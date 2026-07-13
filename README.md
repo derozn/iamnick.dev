@@ -31,7 +31,7 @@ pnpm install
 pnpm dev          # dev server at http://localhost:3000
 ```
 
-Copy `.env.example` to `.env.local` if you want Madame Zara live:
+See `.env.schema` for every env var (validate with `pnpm env:check`). For a live Madame Zara, set in `.env.local`:
 `ANTHROPIC_API_KEY` is optional — without it (or with `FORTUNE_STUB=1`) the
 fortune route streams a canned in-character reading, so nothing else needs
 credentials.
