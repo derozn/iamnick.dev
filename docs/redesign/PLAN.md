@@ -60,6 +60,8 @@ A grid of neon "polaroid" **tiles** showing the most recent **approved** contrib
 
 `/blog` + `/blog/[slug]`, sleek fast neon-styled reading template, **no live canvas**. **MDX files in `content/blog/`** + frontmatter, statically generated. Per-post SEO: metadata, auto OG image, `Article` JSON-LD, sitemap, RSS. Primary indexable-text/SEO surface of the site.
 
+> **Typography:** consider [Utopia.fyi](https://utopia.fyi/) for fluid type + space — `clamp()`-based scales that interpolate across the viewport, no per-breakpoint overrides. A strong fit for the long-form reading template (and Tailwind v4's `@theme` can hold the generated custom properties). Noted 2026-07-13.
+
 ## Mobile / quality tiers
 
 Reuse and extend `useQualityTier` (`high | low | none`). Map to profiles: **Full** ≈ high (capable pointer device), **Lite** ≈ low (phone/touch — reduced DPR, bloom off/cheap, fewer lights, simpler props), **none** = reduced-motion/no-WebGL → static styled fallback with full content. Interactive ball-toss gated on `pointer: fine` + viewport/tier; everything visual scales by tier.

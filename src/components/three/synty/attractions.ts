@@ -97,6 +97,23 @@ export const ATTRACTIONS: Attraction[] = [
     focusDist: 12.5,
   },
   {
+    // Madame Zara's fortune-teller wagon ("FORTUNE TELLER" painted on its side),
+    // right beside the ball-toss stall. Opens the letterpress chat panel
+    // (`chat:` section — a content panel, not a playable). The quat gives the
+    // painted side's normal as [-0.97, 0, 0.25] (U = 2·atan2(qy, qw) ≈ −75°);
+    // dead-on from there the camera lands inside the ball-toss awning, so the
+    // facing is swung ~20° south to shoot from the gap between the two stalls.
+    // Verified by headless screenshot.
+    id: 'fortune',
+    title: 'Fortune Teller',
+    section: 'chat:fortune',
+    prefab: 'SM_Veh_Wagon_02',
+    transform: [21.607, -0.015, 11.343, 0, -0.611, 0, 0.792, 1, 1, 1],
+    position: [21.61, 2.2, -11.34],
+    facing: [-0.85, 0, 0.53],
+    focusDist: 9,
+  },
+  {
     id: 'ball-toss',
     title: 'Ball Toss',
     section: 'game:ball-toss',

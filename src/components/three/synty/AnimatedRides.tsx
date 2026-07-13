@@ -2,23 +2,13 @@
 
 import { useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useGLTF, useTexture } from '@react-three/drei';
-import {
-  Color,
-  type Group,
-  LinearFilter,
-  type Material,
-  Matrix4,
-  type Mesh,
-  type MeshStandardMaterial,
-  Quaternion,
-  SRGBColorSpace,
-  type Texture,
-  Vector3,
-} from 'three';
+import { useGLTF } from '@react-three/drei';
+import { type Group, Matrix4, type Mesh, Quaternion, type Texture, Vector3 } from 'three';
 
-import demoInstances from './demo-instances.json';
 import { CM, unityTRS } from './conversion';
+import { useEmissiveAtlas } from './textures';
+import { demoData } from './demoInstances';
+import { applyEmissive } from './materials';
 
 /**
  * AnimatedRides — brings the carnival to life. The vertical-axis rides (carousel,
@@ -28,8 +18,7 @@ import { CM, unityTRS } from './conversion';
  * when far — which also keeps the demand frameloop quiet most of the time.
  */
 
-const data = demoInstances as Record<string, number[][]>;
-const WHITE = new Color('#ffffff');
+const data = demoData;
 const SYNTY = '/models/synty/';
 
 /** Prefabs whose whole model spins about Y (their base sits on the axis). */
@@ -44,18 +33,6 @@ const smoothstep = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
   return t * t * (3 - 2 * t);
 };
-
-function applyEmissive(mat: Material | Material[], tex: Texture, intensity: number) {
-  for (const m of Array.isArray(mat) ? mat : [mat]) {
-    const sm = m as MeshStandardMaterial;
-    if (!sm.emissiveMap) {
-      sm.emissive = WHITE;
-      sm.emissiveMap = tex;
-      sm.emissiveIntensity = intensity;
-      sm.needsUpdate = true;
-    }
-  }
-}
 
 function Ride({
   prefab,
@@ -115,16 +92,7 @@ function Ride({
 }
 
 export function AnimatedRides({ bloomOn = false }: { bloomOn?: boolean }) {
-  const emissive = useTexture(`${SYNTY}emissive-atlas.png`, (t) => {
-    const tex = t as Texture;
-    tex.flipY = false;
-    tex.colorSpace = SRGBColorSpace;
-    // Keep the tiny bulb swatches sharp at distance — see SyntyScene for why.
-    tex.generateMipmaps = false;
-    tex.minFilter = LinearFilter;
-    tex.magFilter = LinearFilter;
-    tex.needsUpdate = true;
-  }) as Texture;
+  const emissive = useEmissiveAtlas();
 
   return (
     <>

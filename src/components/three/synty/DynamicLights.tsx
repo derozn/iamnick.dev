@@ -4,10 +4,10 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Color, type DirectionalLight, Matrix4, type PointLight, Vector3 } from 'three';
 
-import demoInstances from './demo-instances.json';
 import { unityTRS } from './conversion';
 import { ATTRACTIONS } from './attractions';
 import { EXTRA_LAMPS } from './sceneAdditions';
+import { demoData } from './demoInstances';
 
 /**
  * DynamicLights — the Synty Demo lighting mood, but bounded for real GPUs.
@@ -19,7 +19,7 @@ import { EXTRA_LAMPS } from './sceneAdditions';
  * The shader cost is constant (pool size) no matter how many candidates exist.
  */
 
-const data = demoInstances as Record<string, number[][]>;
+const data = demoData;
 const _m = new Matrix4();
 const _v = new Vector3();
 const _fwd = new Vector3();

@@ -5,3 +5,6 @@ coverage
 pnpm-lock.yaml
 pnpm-workspace.yaml
 **/*.d.ts
+
+# ASCII scene map — prettier would wreck the fixed-width grid alignment
+docs/redesign/scene-map.txt

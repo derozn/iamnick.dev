@@ -1,0 +1,96 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`serializeCv > is deterministic and matches the snapshot (Madame Zara grounding prompt) 1`] = `
+"# Nick de Rozarieux
+Lead Software Engineer · Full-Stack — Kent, UK
+Lead full-stack engineer with over a decade shipping consumer-facing React and Node.js products. Front-end leaning — React, Next.js, TypeScript, design systems — with the API and product-delivery depth to ship features end-to-end. Currently Lead Software Engineer at Travelex, sitting on the global architecture group and leading a cross-functional product team. Earlier, Tech Lead at Lick, where I owned the D2C platform and shipped B&Q's first in-store digital experience.
+
+## Roles (newest first)
+
+### Lead Software Engineer at Travelex (Nov 2025 – present)
+Promoted from Senior Software Engineer (Jan 2025 – Nov 2025)
+London / Tonbridge. Global currency and travel money brand — online team on a multi-tenant, worldwide consumer website serving tens of thousands of monthly users.
+- Lead a cross-functional team of 5 engineers, 1 product owner and 1 UI/UX designer building a multi-tenant global consumer website on Next.js, React, TypeScript and AWS.
+- Promoted from Senior to Lead Software Engineer inside ten months on the strength of website re-platform delivery and visible cross-team work.
+- Drive architectural standards across the wider engineering organisation as a member of Travelex's global architecture group.
+- Architected and shipped the replacement of legacy in-store media display screens across 850 Travelex stores globally — retired an aging on-prem stack with a modern React-based content solution.
+- Orchestrating a gradual, monitored rollout of the new website on AWS — sections shipped behind feature flags with observability tied to clear performance baselines.
+- Led the migration of the team's observability stack from Datadog to a self-hosted Grafana + Prometheus setup, cutting third-party monitoring cost.
+- Embedded GitHub Copilot and Claude Code into the team's day-to-day delivery workflow and runs regular internal workshops on AI-assisted, spec-driven development.
+Tech: Next.js, React, TypeScript, AWS, Sanity, Grafana, Prometheus, Feature flags, GitHub Copilot, Claude Code
+
+### Tech Lead at Lick (Aug 2021 – Nov 2024)
+Promoted internally to Tech Lead in 2023
+London. D2C paint and decor brand — owned the e-commerce platform and B&Q in-store experience end-to-end.
+- Architected and shipped B&Q's first-ever digital experience kiosk screens to 110 stores — built on Next.js and PWA with React on the front end and Node.js on the back.
+- Designed and shipped containerised micro-services on Node.js, Docker and AWS ECS for drop-ship ordering between Screwfix and Lick's internal fulfilment/finance systems, instrumented end-to-end with Datadog and CloudWatch.
+- Owned the D2C and PRO ordering stack — maintained 99%+ uptime throughout the Tech Lead tenure, serving thousands of MAU and hundreds of orders per month.
+- Created Lick's component library from scratch using an atomic-design approach with Tailwind CSS, React and Storybook.
+- Delivered Lick's D2C e-commerce site on Shopify's headless CMS, wired into Next.js, React, Node.js and Hygraph.
+- Led 3 engineers (2 juniors, 1 senior) — 1-2-1s, mentoring, growth conversations and performance reviews.
+Tech: Next.js, React, TypeScript, Node.js, Docker, AWS ECS, Tailwind CSS, Storybook, Shopify, Hygraph, CircleCI, Datadog, Snyk, Rudderstack
+
+### Senior Software Engineer at Gousto (Jun 2020 – Aug 2021)
+London. UK recipe-box business serving millions of meals per week.
+- Led the replatforming of recipe ratings as Delivery/Epic Lead — coordinated across squads, authored technical design documents, and shipped an event-driven system on TypeScript and Node.js at scale.
+- Built an internal experimentation platform for A/B tests and gradual feature rollouts on TypeScript, AWS Lambda and DynamoDB via the Serverless Framework.
+- Integrated the core menu service with a new recommendations engine — squad-wide test plans, staged rollout, and live performance monitoring.
+- Migrated legacy services to TypeScript, raising long-term maintainability and reducing classes of runtime errors.
+Tech: TypeScript, Node.js, AWS Lambda, DynamoDB, Serverless Framework, React
+
+### Full Stack Engineer at Lyvly (Jan 2020 – May 2020)
+London. Co-living startup — customer-portal work and third-party integration glue.
+- Introduced integration testing across React front-end projects.
+- Automated and integrated third-party APIs to replace manual operational processes.
+Tech: React, Node.js, TypeScript
+
+### Senior Front End Developer at Yoti (Oct 2018 – Dec 2019)
+London. Digital identity platform — security-sensitive customer-facing SDK work.
+- Led the rebuild of Yoti's Web SDK (JavaScript/TypeScript) so customers could embed identity services natively within their own domain — a security-sensitive integration handling identity data.
+- Co-established Yoti's React design system with designers and engineers, accelerating delivery and improving brand consistency.
+Tech: JavaScript, TypeScript, React, Node.js
+
+### Senior Software Engineer at Arcadia Group (Sept 2017 – Oct 2018)
+London. High-street fashion group (Topshop, Topman, Dorothy Perkins and others) — multi-brand e-commerce engineering.
+- Led the rebuild of Arcadia's multi-brand CMS (JavaScript, Node.js) for seamless integration with the primary e-commerce platform, materially improving content delivery times across each brand.
+- Introduced and enforced coding standards to keep a multi-brand codebase maintainable and extensible.
+Tech: JavaScript, Node.js, React
+
+### Front End Developer at Vitamin London (Sept 2014 – Sept 2017)
+London. Boutique digital agency — multi-client e-commerce and consumer mobile work.
+- Designed and built multiple client-facing e-commerce sites on Shopify, React and Redux.
+- Designed, built and released a "pay as you gym" cross-platform app for iOS and Android.
+Tech: React, Redux, JavaScript, Shopify
+
+## Side projects
+
+### Podback (https://podback.org)
+UK-wide coffee pod recycling service backed by Nespresso, NESCAFE Dolce Gusto and Tassimo — consumers find their nearest drop-off via a postcode lookup.
+- Built the entire frontend from a set of designs and wired it up to a headless CMS and API.
+- Featured in the national news at launch; today serves a highly active consumer user base across the UK.
+Tech: React, Next.js, Headless CMS
+
+### Eversys
+Brochure site showcasing Eversys's premium espresso machines.
+- Designed and built a brochure-style marketing site showcasing the machines.
+- Built on React and Next.js with Framer Motion powering the animations.
+Tech: React, Next.js, Framer Motion
+
+## Skills
+- Languages: TypeScript, JavaScript, Node.js
+- Frontend: React, Next.js, Tailwind CSS, Storybook, PWA, Atomic design, Design systems
+- APIs & Backend: Node.js services, REST APIs, Event-driven systems, Micro-services
+- Cloud / AWS: Lambda, ECS, DynamoDB, S3, CloudWatch, Serverless Framework
+- CI-CD & Observability: CircleCI, GitHub Actions, Docker, Grafana, Prometheus, Datadog, Feature flags
+- AI Workflow: GitHub Copilot, Claude Code, AI-assisted workflows, Spec-driven development
+- Leadership: Tech leadership, Mentoring, Cross-functional collaboration, Technical design docs, Architecture review, Hiring & interviewing
+
+## Education
+BSc (Hons) Computer Game Development, Southampton Solent University (2010 – 2013) — 1st Class Honours
+
+## Contact
+Email: nick@iamnick.dev
+LinkedIn: https://linkedin.com/in/nickderozarieux
+GitHub: https://github.com/derozn
+CV download: available on this site (the Contact attraction)"
+`;

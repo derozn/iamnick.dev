@@ -193,12 +193,12 @@
   touch-action: none;
 }
 
-/* The crawlable / assistive-tech résumé (StaticResume). Visually hidden for canvas
+/* The crawlable / assistive-tech résumé (StaticCv). Visually hidden for canvas
  * users via the clip "sr-only" technique (screen readers still read it). But under
  * prefers-reduced-motion — where the 3-D scene never mounts — we REVEAL it as a
  * styled letterpress document so those visitors get the full CV instead of a bare
  * backdrop. Pure CSS: no flash, no hydration cost, works even without JS. */
-.static-resume {
+.static-cv {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -211,7 +211,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .static-resume {
+  .static-cv {
     position: relative;
     z-index: 1; /* above the fixed canvas-gradient backdrop (z-0) */
     width: min(720px, 92vw);
@@ -230,13 +230,13 @@
     font-size: 16px;
     line-height: 1.65;
   }
-  .static-resume h1 {
+  .static-cv h1 {
     margin: 0 0 10px;
     font-family: var(--font-rye), serif;
     font-size: 34px;
     line-height: 1.12;
   }
-  .static-resume h2 {
+  .static-cv h2 {
     margin: 40px 0 14px;
     padding-top: 22px;
     border-top: 1px solid color-mix(in srgb, var(--color-ink-soft) 40%, transparent);
@@ -244,22 +244,22 @@
     font-size: 24px;
     color: var(--color-oxblood);
   }
-  .static-resume h3 {
+  .static-cv h3 {
     margin: 20px 0 4px;
     font-family: var(--font-fell-sc), serif;
     font-size: 18px;
   }
-  .static-resume article {
+  .static-cv article {
     margin: 10px 0 22px;
   }
-  .static-resume ul {
+  .static-cv ul {
     margin: 8px 0 8px 1.15em;
     list-style: square;
   }
-  .static-resume li {
+  .static-cv li {
     margin: 4px 0;
   }
-  .static-resume a {
+  .static-cv a {
     color: var(--color-oxblood);
     text-decoration: underline;
   }

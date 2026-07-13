@@ -5,7 +5,9 @@ import { useFrame } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
 import { AdditiveBlending, BackSide, Color, type Group, type Mesh, ShaderMaterial } from 'three';
 
-import { getGlowTexture } from './bulbGlowExtract';
+import { getGlowTexture } from '@/components/three/shared/glowTexture';
+import { NOISE_GLSL } from '@/components/three/shaders/noise';
+import { useDisposeOnUnmount } from '@/components/three/hooks/useDisposable';
 
 /**
  * Atmosphere — the cheap set dressing that sells the night: a gradient sky dome
@@ -62,19 +64,7 @@ const FOG_FRAG = /* glsl */ `
   varying vec2 vUv;
   uniform float uTime;
 
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-  }
-  float vnoise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(
-      mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
-      mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
-      u.y
-    );
-  }
+  ${NOISE_GLSL}
 
   void main() {
     // two octaves of drifting value noise — seamless by construction (the old
@@ -134,6 +124,8 @@ const MOON_POS: [number, number, number] = [
 export function Atmosphere({ high }: { high: boolean }) {
   const skyMaterial = useMemo(() => makeSky(), []);
   const fogMaterial = useMemo(() => makeGroundFog(), []);
+  useDisposeOnUnmount(skyMaterial);
+  useDisposeOnUnmount(fogMaterial);
   const moonRef = useRef<Group>(null);
   // uniforms are mutated through this element ref in useFrame (never through the
   // useMemo return — the codebase's react-hooks/immutability rule)

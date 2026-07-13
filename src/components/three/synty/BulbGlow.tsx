@@ -11,20 +11,15 @@ import {
   Vector3,
 } from 'three';
 
-import demoInstances from './demo-instances.json';
 import { unityTRS } from './conversion';
 import { entries } from './SyntyScene';
 import { SPINNERS } from './AnimatedRides';
-import {
-  CM_SCALE,
-  extractBulbs,
-  getGlowTexture,
-  makeSampler,
-  type Sampler,
-} from './bulbGlowExtract';
+import { demoData } from './demoInstances';
+import { getGlowTexture } from '@/components/three/shared/glowTexture';
+import { CM_SCALE, extractBulbs, makeSampler, type Sampler } from './bulbGlowExtract';
 
 const SYNTY = '/models/synty/';
-const data = demoInstances as Record<string, number[][]>;
+const data = demoData;
 
 /**
  * BulbGlow — additive halo sprites at every bulb in the scene, so the carnival
@@ -94,8 +89,7 @@ export function BulbGlow({ bloomOn = false }: { bloomOn?: boolean }) {
   const emissive = useTexture(`${SYNTY}emissive-atlas.png`) as Texture;
   const sample = useMemo(() => {
     const img = emissive.image as
-      | (CanvasImageSource & { width: number; height: number })
-      | undefined;
+      (CanvasImageSource & { width: number; height: number }) | undefined;
     return img && img.width ? makeSampler(img) : null;
   }, [emissive]);
 

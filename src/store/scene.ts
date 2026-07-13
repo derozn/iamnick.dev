@@ -1,21 +1,18 @@
 import { create } from 'zustand';
 
 /**
- * Scene-state model — the spine of the Dark Carnival (see docs/redesign/architecture.md).
+ * Scene-state model — the spine of the Dark Carnival (see CONTEXT.md for the language).
  *
- * A single explicit `mode` drives camera, scroll-lock and input routing:
- *   - `travelling` — default. Scroll moves the camera along the Midway spline;
- *     attractions pass as the visitor scrolls. Input = scroll.
- *   - `playing` — entered via step-in at a stall. Scroll is locked; pointer/touch
- *     drives the active game; Exit/Skip returns to `travelling` at the same scroll
- *     position.
+ * A single explicit `mode` drives the iso camera and input routing:
+ *   - `travelling` — default. The visitor drags/zooms around the isometric Midway;
+ *     attractions are scenery until focused.
+ *   - `viewing`    — a content overlay is open for an attraction (camera parked on it).
+ *   - `playing`    — stepped into a stall; pointer/touch drives the active game
+ *     until exit returns to `travelling`.
  *
- * Written by ScrollDriver (DOM side) and step-in affordances; read imperatively
- * by FirstPersonRig inside useFrame via `useSceneStore.getState()` so per-scroll
+ * Written by the overlays and step-in affordances; read imperatively by
+ * IsoControls inside useFrame via `useSceneStore.getState()` so per-frame
  * updates never trigger React re-renders.
- *
- * Note: no stall is interactive until Phase 3 (ball-toss) / Phase 4 (doodle wall),
- * so nothing sets `mode = 'playing'` yet — the spine is in place ahead of them.
  */
 
 export type SceneMode = 'travelling' | 'viewing' | 'playing';
@@ -48,6 +45,16 @@ export type StrikerPhase = 'intro' | 'armed' | 'struck' | 'result' | 'done';
 
 /** Swings the visitor gets per high-striker round. */
 export const STRIKER_SWINGS = 3;
+
+/** The high-striker slice reset to its pre-play state — the fresh round the
+ *  visitor gets on step-in and on "reset". */
+const FRESH_STRIKER = {
+  strikerPhase: 'intro',
+  strikerArmedAt: 0,
+  strikerPower: 0,
+  strikerAttemptsLeft: STRIKER_SWINGS,
+  strikerBest: 0,
+} as const;
 
 /** localStorage key: this device dropped the GL context with the composer on. */
 const POSTFX_BLOCKED_KEY = 'iamnick:postfx-blocked';
@@ -84,12 +91,6 @@ const writeFlag = (key: string, on: boolean) => {
     // private mode etc. — the in-session state still applies
   }
 };
-
-/** Normalised [0, 1] scroll-progress band occupied by one Midway attraction. */
-export interface SectionRange {
-  start: number;
-  end: number;
-}
 
 export interface SceneState {
   /** Intro: the scene's GLBs/textures have finished loading (Suspense resolved). */
@@ -147,19 +148,13 @@ export interface SceneState {
   focus: (attraction: string | null) => void;
   /** Attraction id of the stall currently stepped into for a game, or null. */
   activeStall: string | null;
-  /** Overall document scroll progress: scrollTop / (scrollHeight - clientHeight), clamped [0, 1]. */
-  progress: number;
-  /** Per-attraction bands keyed by `data-attraction` id, measured by ScrollDriver. */
-  sections: Record<string, SectionRange>;
-  setProgress: (progress: number) => void;
-  setSections: (sections: Record<string, SectionRange>) => void;
-  /** Open a content tent — locks scroll, raises the HUD panel. */
+  /** Open a content overlay for an attraction. */
   open: (attraction: string) => void;
   /** Close the content panel back to travelling. */
   close: () => void;
-  /** Step into a stall — locks scroll, routes input to the game. */
+  /** Step into a stall — routes input to the game (see CONTEXT.md: Step-in). */
   stepIn: (stall: string) => void;
-  /** Exit the active stall back to travelling at the same scroll position. */
+  /** Exit the active stall back to travelling. */
   exit: () => void;
 
   /* --- Ball-toss game slice (summary only; the sim runs in refs) --- */
@@ -262,14 +257,17 @@ export const useSceneStore = create<SceneState>()((set) => ({
   activeAttraction: null,
   focusedAttraction: null,
   activeStall: null,
-  progress: 0,
-  sections: {},
-  setProgress: (progress) => set({ progress }),
-  setSections: (sections) => set({ sections }),
   focus: (attraction) => set({ focusedAttraction: attraction }),
   open: (attraction) => set({ mode: 'viewing', activeAttraction: attraction }),
   close: () => set({ mode: 'travelling', activeAttraction: null, focusedAttraction: null }),
-  stepIn: (stall) => set({ mode: 'playing', activeStall: stall }),
+  // Stepping into the high-striker gives a fresh round atomically (no HUD effect
+  // reaching back to reset it once it sees `activeStall` change).
+  stepIn: (stall) =>
+    set(
+      stall === 'high-striker'
+        ? { mode: 'playing', activeStall: stall, ...FRESH_STRIKER }
+        : { mode: 'playing', activeStall: stall },
+    ),
   // Also clear focusedAttraction so IsoControls releases the booth and the iso
   // camera eases back to the overview (otherwise it stays parked at the stall).
   exit: () => set({ mode: 'travelling', activeStall: null, focusedAttraction: null }),
@@ -288,14 +286,7 @@ export const useSceneStore = create<SceneState>()((set) => ({
   strikerBest: 0,
   strikerRound: 0,
   setStriker: (patch) => set(patch),
-  resetStriker: () =>
-    set({
-      strikerPhase: 'intro',
-      strikerArmedAt: 0,
-      strikerPower: 0,
-      strikerAttemptsLeft: STRIKER_SWINGS,
-      strikerBest: 0,
-    }),
+  resetStriker: () => set({ ...FRESH_STRIKER }),
   replayStriker: () =>
     set((s) => ({
       strikerPhase: 'armed',

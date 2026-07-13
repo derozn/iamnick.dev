@@ -24,17 +24,11 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
-      # pnpm 11 (resolved from package.json's packageManager) reads build-script
-      # approvals from pnpm-workspace.yaml, NOT package.json's
-      # pnpm.onlyBuiltDependencies — so without this it errors on sharp's ignored
-      # build (ERR_PNPM_IGNORED_BUILDS). The repo keeps pnpm-workspace.yaml
-      # gitignored (Vercel's pnpm 9 rejects a packages-less workspace file), so we
-      # write a settings-only one here, just for CI, before installing.
-      - name: Approve native builds (sharp)
-        run: printf 'onlyBuiltDependencies:\n  - sharp\n' > pnpm-workspace.yaml
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Validate env schema
+        run: pnpm env:check
 
       - name: Lint
         run: pnpm lint
@@ -45,5 +39,46 @@ jobs:
       - name: Test
         run: pnpm test:ci
 
+      - name: Knip (dead code / unused deps)
+        run: pnpm knip
+
       - name: Build
         run: pnpm build
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      # CI runs the reliable @ci subset (API contract, a boot smoke, the
+      # no-canvas reduced-motion path) on desktop — the full scene suite is
+      # flaky under SwiftShader and is run locally (pnpm test:e2e). webServer
+      # builds+starts with FORTUNE_STUB=1, so it's self-contained.
+      - name: Run E2E
+        run: pnpm exec playwright test --grep @ci --project=desktop
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14

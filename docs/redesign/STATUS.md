@@ -1,70 +1,161 @@
 # Dark Carnival — build status & handoff
 
-> **Start here for a new session.** Current state of the v2 Dark Carnival scene, how it's built, how to change it, and what's next. Companion to `PLAN.md` (roadmap), `CONTEXT.md` (glossary), `scene-layout.md` (the scene map), and the ADRs (locked decisions).
+> **Start here for a new session.** What the shipped scene is, how it's built,
+> how to verify a change, and what's in flight. Companions: `CONTEXT.md`
+> (glossary — use its language), `docs/refactor-plan.md` (the standards refactor
+> now executing), `docs/CODE_QUALITY_AUDIT.md` (July 2026 audit), the ADRs
+> (locked decisions), and `scene-map-guide.md` (authoring NPC/walker placements).
 
 ## Where we are
 
-Phase 1 (the immersive 3-D home) is in active build on branch **`feature/modernise`**. The homepage is currently a **scene-evaluation build**: just the 3-D carnival + a scroll spacer — **no HUD / content yet** (deliberately deferred; the DOM section components still exist for when the spine returns).
+The homepage is an **isometric, drag-to-explore Dark Carnival** — a faithful
+translation of the Synty "POLYGON Horror Carnival" demo scene, navigated
+Bruno-Simon-style: a fixed iso camera the visitor pans and zooms, with floating
+indicators over each attraction; clicking one flies the camera in and opens
+that attraction's content overlay. The earlier first-person on-rails walk
+(ADR-0004) was reversed in the iso pivot; free-roam is the shipped design.
 
-The scene is a **first-person, on-rails walk** down a **textured dirt road** through a **structured fairground**: entrance arch → games section → food section → **plaza ringed with rides** (ferris wheel closing it). Stalls/tents line the road in **neat rows facing it**; foliage frames the field. Night, neon, fog, twinkling string lights. **Atmospheric, not gory** (ADR-0005 revised — figures allowed, no blood/gore).
+Live on top of the scene: two playable stalls (ball-toss, high-striker), a
+golden-ticket hunt, Madame Zara's fortune wagon (`/api/fortune`,
+Anthropic-backed with a keyless stub mode), a letterpress-carnival HUD
+language, and Full/Lite quality tiers plus a no-canvas tier — under
+`prefers-reduced-motion` the sr-only `StaticCv` (the CV as DOM) becomes the
+visible page (ADR-0003).
 
-Decisions locked with Nick this round: **atmospheric+figures (no gore)**, **first-person on-rails**, **road-with-rows structure + plaza** (not a scattered field). Reference: the Synty POLYGON Horror Carnival promo, toned non-gory.
+## Scene architecture (files)
 
-## How it's built (files)
+Entry chain — `src/app/page.tsx` mounts client islands over a server page:
 
-All under `src/components/three/`:
+- **`src/components/three/MidwayCanvas.tsx`** — `dynamic(ssr:false)` shell,
+  fixed full-viewport at `z-0`. `hooks/useQualityTier` gates `high`/`low`
+  (Full/Lite) /`none` (reduced-motion / no WebGL → no canvas at all).
+- **`src/components/three/Scene.tsx`** — the single persistent R3F canvas:
+  exp² fog + ACES tone mapping, `SyntyScene`, `AnimatedRides`, `BulbGlow`,
+  `DynamicLights`, `Npcs`, `Atmosphere`, `GoldenTickets`, both games,
+  `LoaderVeil` (shader loading veil) and `SafePostFX` (bloom, mounted only
+  after the veil dissolves; a persisted context-loss tripwire can disable it
+  per-device). Header comments in the file explain the bloom/veil ordering and
+  the historical NaN black-frame fix.
+- **`src/components/three/synty/`** — the Unity→three translation layer.
+  `conversion.ts` (`unityTRS`: Z-flip position, quaternion handedness — the
+  convention everything sits on), `InstancedPrefab` (instanced GLBs, shared
+  base atlas, normal sanitising), `SyntyScene` (renders
+  `demo-instances.json` + `manifest.json` + `sceneAdditions.ts`, with exclusion
+  filters for translation artefacts).
+- **`synty/attractions.ts`** — **the single source of truth for POIs.** Eight
+  attractions: `intro`, `about`, `work`, `projects`, `contact`,
+  `high-striker`, `fortune`, `ball-toss`. Each carries its prefab, authored
+  Unity transform, world-centre `position` (indicator anchor + camera focus
+  target), `facing` and `focusDist`. Indicators, camera fly-ins, SiteNav links
+  and overlay routing all derive from this array.
+- **`synty/IsoControls.tsx`** — camera + gestures: fixed iso angle (225°
+  azimuth, ~53° tilt), drag-to-pan (viewport-relative sensitivity, gentler on
+  touch), scroll/pinch zoom (clamped), and the fly-in/return easing when
+  `focusedAttraction` changes.
+- **Games** — `three/game/BallTossGame.tsx` (slingshot pull-back throw, tuning
+  in `ballTossConfig.ts`) and `three/game/HighStrikerGame.tsx`
+  (`highStrikerConfig.ts`); `three/tickets/GoldenTickets.tsx` for the hunt.
 
-- **`carnival.config.ts`** — the scene as DATA, and the **one place to tune layout**. Exports: `CAMERA_PATH` / `LOOK_PATH` (the on-rails curves), `MODELS` (GLB url map), `PLACEMENTS` (core props — rows + plaza + stall interiors), `DENSE_PLACEMENTS` (fillers + foliage, high-tier only), `FLAG_PLACEMENTS`, `LAMP_PLACEMENTS`, `FENCE_PLACEMENTS`. Helpers: `face(x,z)` (yaw toward plaza centre `C`), `ROT_LEFT/RIGHT` (rows face the road). A `Placement` = `{ model, position:[x,y,z], rotationY, size, warm? }`. `size` is the **largest normalised dimension** (props are auto-scaled to it and dropped to the ground).
-- **`FirstPersonRig.tsx`** — samples the two CatmullRom curves by scroll progress → eye-level camera position + gaze, damped, with a progress-driven head-bob.
-- **`CarnivalStreet.tsx`** — renders PLACEMENTS (all tiers) + DENSE/FENCE (high tier) + warm pool lights on `warm` stalls + lit lamp posts + ride accents + StringLights + dust + bloom.
-- **`attractions/CarnivalProp.tsx`** — loads a GLB, **normalises** it (scale to `size`, recentre X/Z, base on ground) so placement is just position+yaw. Draco via `useGLTF(url, true)`.
-- **`shared/Ground.tsx`** — grass plane + a **textured dirt road** (real Synty `ground-dirt` tiles down the spine) + a dirt **plaza circle** (`ground-dirt-round`). `GroundTile` places ground GLBs at a **raw scale** (not normalised — tiles keep real size).
-- **`shared/StringLights.tsx`** — one instanced mesh of emissive bulbs in catenary sags that **twinkle** (per-bulb flicker; animates on high tier).
-- **`shared/SceneLighting.tsx`** — ambient + moon key + hemisphere + (high) magenta rim + tiny Lightformer env. **Brightness lives here** + `Scene.tsx` `toneMappingExposure`.
-- **`Scene.tsx`** — Canvas: fog, camera, AgX tone-map. **`frameloop` = `always` on high tier** (so lights twinkle) / `demand` on low. **`SpaceDust.tsx`** = sparse fog motes (kept subtle per feedback).
-- **`MidwayCanvas.tsx`** — `dynamic(ssr:false)` shell; `useQualityTier` gates high/low/none (none = no canvas, reduced-motion/no-WebGL).
-- Store: **`src/store/scene.ts`** (`useSceneStore`: mode/activeStall/progress/sections + stepIn/exit) — the spine for future step-in games.
+## Overlay layer (DOM over the canvas)
 
-## Asset pipeline (add/convert models)
+Everything DOM-over-canvas lives in `src/components/overlays/` (flat `.tsx`,
+tests colocated, no barrels — the Phase 2 conventions in
+`docs/redesign/architecture.md`):
 
-**70 GLBs** live in `public/models/carnival/` (~7.7 MB; each embeds its atlas — see Optimisations). Source pack: `~/Documents/Assets/POLYGON_Horror_Carnival_SourceFiles_v3.zip` (FBX). **Neutral/non-gory assets only** (ADR-0005).
+- **`overlays/ContentOverlay.tsx`** — the panel that rises over the dimmed
+  carnival in `viewing` mode; backdrop click / ✕ / Escape close it. Routes by
+  attraction `section`: **`SectionContent.tsx`** renders the CV panels
+  (letterpress styling, data from `content/cv.ts`), `chat:fortune` renders
+  **`FortunePanel.tsx`** (streams Readings from `/api/fortune`), and the
+  career attraction opens **`CareerTickets.tsx`** (the ticket deck) on its
+  own stage.
+- **Game HUDs** — `overlays/BallTossHud.tsx`, `overlays/HighStrikerHud.tsx`
+  and `overlays/TicketHud.tsx`: DOM overlays mounted from `page.tsx`. Their
+  tuning configs stay canvas-side (`three/game/ballTossConfig.ts`,
+  `three/game/highStrikerConfig.ts`, `three/tickets/ticketConfig.ts`).
+- **`IntroOverlay`, `AudioDirector`, `DebugBridge`** (`overlays/`) — entry
+  vignette, scene-state→audio mixer, and the headless-verification hook.
+- **`src/components/cv/`** — server-only: `StaticCv.tsx` (the sr-only CV
+  document, visible page under reduced motion) and `JsonLd.tsx`.
+- **`src/components/nav/SiteNav.tsx`** — burger menu (mounted in
+  `layout.tsx`), links built from `ATTRACTIONS`; content attractions open in
+  place, stalls route through the camera fly-in. Plus `MuteButton`.
 
-Tooling is **arm64-native** (the npm `fbx2gltf` binary is x86 + Rosetta absent): **`assimp`** (`brew install assimp`) + **`@gltf-transform/cli`**. Working dir **`/tmp/cv_test`** holds `assimp`, the atlas textures in `tex/`, and **`rewrite.mjs`** (maps the FBX's baked broken Windows atlas paths → the local atlas; `.psd`/missing → `_A.png`; **drops unresolvable texture slots** like stray cross-pack normal maps).
+An eslint `no-restricted-imports` rule bans `@/content/cv` from client code
+(`overlays/`, `nav/`, `three/`); the two documented exceptions
+(`SectionContent`, `CareerTickets`) are listed inline in `eslint.config.mjs`.
 
-Per model: `assimp export X.fbx out.gltf` → `node rewrite.mjs out.gltf` → `gltf-transform optimize out.gltf out.glb --compress draco --texture-compress webp --texture-size 512` (1024 for hero props). Then `cp` into `public/models/carnival/` and add to `MODELS`. **Verify** the new prop is Y-up/upright via its bbox (gltf-transform `inspect`). Some props convert tiny/untextured (e.g. `popcorn`, `table`, `milk-toss`) — their material didn't resolve; skip them.
+## Store
 
-## How to self-verify the scene (no eyes on a live canvas)
+**`src/store/scene.ts`** (`useSceneStore`, zustand, SSR-safe). One explicit
+`mode` drives camera and input routing:
 
-Headless WebGL screenshots — this is how every pass was checked:
+- `travelling` — default; drag/zoom the Midway, attractions are scenery.
+- `viewing` — a content overlay is open, camera parked on the attraction.
+- `playing` — stepped into a stall; input drives the game until `exit()`.
+
+Plus: intro/veil progress flags, `focusedAttraction`/`activeAttraction`/
+`activeStall`, persisted `postFxBlocked`/`muted`/ticket progress, and summary
+slices for both games (the physics lives in refs; only HUD-facing summaries hit
+the store). Per-frame consumers read imperatively via
+`useSceneStore.getState()` inside `useFrame` so updates never re-render React.
+
+## How to verify a change
+
+Quality gate (CI runs the same):
 
 ```
-pnpm build && pnpm start           # serve the prod build on :3000
-node /tmp/shot/shot.mjs            # Playwright/chromium, swiftshader, scrolls + screenshots
+pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build
+```
+
+Scene changes additionally need headless screenshots — no green build proves
+the carnival renders:
+
+```
+pnpm build && pnpm start        # never build while a dev server holds .next
+node /tmp/shot/<scenario>.mjs   # Playwright chromium + swiftshader
 # then Read the PNGs in /tmp/shot/
 ```
 
-`shot.mjs` launches chromium with `--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader`, waits for load, scrolls to 4 points (entrance / avenue / plaza-enter / plaza), screenshots each. Tweak `carnival.config.ts`, rebuild, re-shoot.
+The rig is a set of scenario scripts in `/tmp/shot/` (e.g. `npcs.mjs`,
+`fortune-panel.mjs`) — **uncommitted and outside CI**; refactor Phase 6
+formalises it into a versioned `@playwright/test` e2e suite. Deterministic
+states come from the debug hooks, all inert without `?debug=1`:
 
-## Verify / quality gates
+- `window.__sceneStore` (via `DebugBridge`) — drive the store directly:
+  `__sceneStore.getState().start()`, `.focus('fortune')`, etc.
+- `?off=synty,rides,glow,lights,game,indicators` and `?offp=<regex>` — Scene.tsx
+  bisection gates for unmounting pieces/prefabs.
+- `?bloom=0` — force the composer off for A/B comparison.
 
-`pnpm typecheck` · `pnpm lint` · `pnpm test:ci` (29 Vitest) · `pnpm build` — all green. Pre-commit (husky/lint-staged) runs eslint --fix + prettier.
+Headless swiftshader colour/fps is unreliable — real-GPU eyeballs remain the
+final judge for grading changes.
 
-## Done
+## What just happened
 
-- First-person on-rails engine; scene-state store; FBX→GLB pipeline (70 neutral GLBs).
-- Structured fairground: dirt-road spine + neat stall rows + sections + plaza of rides + foliage frame + dressed stall counters.
-- Night lighting (lit lamps, warm pools, neon, bloom, twinkle); textured ground; brightness + particle density tuned to feedback.
-- ADR-0005 revised (figures ok, no gore); `CONTEXT.md` register updated; `scene-layout.md` is the scene map.
+**Refactor Phase 2 — component architecture** (branch
+`chore/standards-refactor`, see `docs/refactor-plan.md` +
+`docs/refactor-state.md` for live status). Components moved into role-based
+folders: `components/content/` → `overlays/`, the three game HUDs left the
+three tree for `overlays/` (configs stayed canvas-side), `cv/` was created for
+the server-only CV document — `StaticResume` renamed `StaticCv` (component and
+`.static-cv` class) alongside `JsonLd` — and fonts moved to
+`src/lib/fonts/{local,google}.ts`. `organisms/` and `ui-modules/` no longer
+exist. The cv-import ban is enforced by eslint. Conventions are codified in
+`docs/redesign/architecture.md`. Phase 1 (dead-code purge: the retired
+first-person scene, the dormant organisms/section layer, vestigial store
+fields; ADR-0007 supersedes ADR-0004) landed immediately before.
 
-## Next (proposed, to plan step-by-step with Nick)
+## What's next (refactor phases, one line each)
 
-1. **Figures / people** — the remaining "bustle". Synty character rigs export **T-pose**; they need posing before use (don't drop in raw). Decide a posing approach (Mixamo/Blender pose, or pick animatronics that are modelled posed).
-2. **Lay out the content spine** — map the CV sections (Header/About, Career Highlights earliest→present, Side Projects, Contact — components already built) onto positions/stops along the road, and bring the **HUD** back over the walk. Re-enable the real DOM in `app/page.tsx` (currently a scroll spacer).
-3. **Polish** — ride rotation/animation for life (needs isolating ride sub-meshes), audio (deferred), camera pacing.
-4. Later phases (PLAN.md): blog (MDX/SSG), ball-toss (Rapier), doodle wall (Supabase).
+2. **Component architecture** — DONE (see above).
+3. **Config/deps/secrets** — pin the `"latest"` deps, varlock `.env.schema`, App Router cleanups.
+4. **Fortune API + a11y** — zod body schema, Vercel AI SDK transport, Upstash rate limiting, modal focus traps.
+5. **Dedup & extraction** — single homes for `EASE`/atlas-texture/GLSL-noise duplicates, `useDisposable()`.
+6. **Tests & tooling** — unit gaps (`unityTRS`, audio), Playwright e2e absorbing the `/tmp/shot` rig, knip in CI.
+7. **Ops hardening** — Sentry, Renovate, Vercel Analytics.
 
-## Optimisations to consider
-
-- **Model payload (~7.7 MB):** every GLB embeds its own copy of the shared Synty atlas. Dedup via **one external atlas** (strip embedded textures, apply a shared `useTexture` map in `CarnivalProp`) → could cut models to <1 MB. Watch UV flipY/colorSpace.
-- **Draw calls / instancing:** repeated props (fences, foliage, barrels) use `<Clone>` (one draw call each); switch heavy repeats to instancing if perf needs it.
-- **Continuous frameloop** on high tier costs GPU even when idle — fine for desktop wow; revisit for battery.
+Beyond the refactor (tracked in the audit/plan, not standards work): the Synty
+atlas dedup (~17 MB → ~2 MB model payload — the biggest user-facing win),
+keyboard navigation for scene and games, and Madame Zara persona QA before the
+fortune-teller branch merges.

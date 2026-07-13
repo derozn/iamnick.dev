@@ -1,4 +1,4 @@
-import { CanvasTexture, Matrix4, type Mesh, type Object3D, SRGBColorSpace, Vector3 } from 'three';
+import { Matrix4, type Mesh, type Object3D, Vector3 } from 'three';
 
 /**
  * Bulb-glow extraction — gives the carnival its night-time halos WITHOUT a
@@ -12,26 +12,6 @@ import { CanvasTexture, Matrix4, type Mesh, type Object3D, SRGBColorSpace, Vecto
  */
 
 const CM = 0.01;
-
-/** Soft white radial-gradient sprite — the halo shape, tinted per-point by vertex colour. */
-let glowTex: CanvasTexture | null = null;
-export function getGlowTexture(): CanvasTexture {
-  if (glowTex) return glowTex;
-  const s = 64;
-  const c = document.createElement('canvas');
-  c.width = c.height = s;
-  const ctx = c.getContext('2d')!;
-  const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
-  g.addColorStop(0, 'rgba(255,255,255,1)');
-  g.addColorStop(0.25, 'rgba(255,255,255,0.55)');
-  g.addColorStop(0.6, 'rgba(255,255,255,0.12)');
-  g.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, s, s);
-  glowTex = new CanvasTexture(c);
-  glowTex.colorSpace = SRGBColorSpace;
-  return glowTex;
-}
 
 /** Sample the emissive atlas: returns the lit colour at (u,v), or null if dark. */
 export type Sampler = (u: number, v: number) => [number, number, number] | null;

@@ -6,7 +6,7 @@ import { AdditiveBlending, type Group, type Sprite } from 'three';
 
 import { useSceneStore } from '@/store/scene';
 import { playSfx } from '@/lib/audio';
-import { getGlowTexture } from '../synty/bulbGlowExtract';
+import { getGlowTexture } from '@/components/three/shared/glowTexture';
 import {
   FALL_G,
   HOLD_TIME,

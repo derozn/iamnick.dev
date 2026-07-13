@@ -14,7 +14,8 @@ import {
 
 import { useSceneStore } from '@/store/scene';
 import { playSfx } from '@/lib/audio';
-import { getGlowTexture } from '../synty/bulbGlowExtract';
+import { useDisposeOnUnmount } from '@/components/three/hooks/useDisposable';
+import { getGlowTexture } from '@/components/three/shared/glowTexture';
 import { ANIM_RANGE, BOB_AMP, BOB_HZ, SPIN, TICKETS } from './ticketConfig';
 
 /**
@@ -51,6 +52,11 @@ export function GoldenTickets({ bloomOn = false }: { bloomOn?: boolean }) {
       }),
     [bloomOn],
   );
+  // Disposed when the hunt ends (component unmounts) or the material rebuilds on
+  // a bloom-tier change.
+  useDisposeOnUnmount(geometry);
+  useDisposeOnUnmount(hitGeometry);
+  useDisposeOnUnmount(material);
 
   const remaining = useMemo(() => TICKETS.filter((t) => !found.includes(t.id)), [found]);
 

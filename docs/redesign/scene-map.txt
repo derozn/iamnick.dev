@@ -1,0 +1,69 @@
+        x=-32             x=+32
+       +--------------------------+
+ z= -40 |      % % %    %% %%      |
+ z=-37.5 |                          |
+ z= -35 |                          |
+ z=-32.5 | %       %n E %%   %    % |
+ z= -30 |%    %%  %x       %       |
+ z=-27.5 | %        % 6   %%%       |
+ z= -25 |  %  % n%%5   1%  %       |
+ z=-22.5 |    %                     |
+ z= -20 |  %        43 %2        % |
+ z=-17.5 |     n       I        %   |
+ z= -15 | %%     %%   n         %  |
+ z=-12.5 |   nv    nn   n      Z    |
+ z= -10 |  n          n%   k       |
+ z=-7.5 |%    T   nn  %    %    %  |
+ z=  -5 | n                n%  %   |
+ z=-2.5 |         nn   %% %  %     |
+ z=   0 | %n         nnnn          |
+ z= 2.5 | %                    l   |
+ z=   5 |nnnnn     I            U  |
+ z= 7.5 |nnnnn    ~                |
+ z=  10 |nnnnn   D n               |
+ z=12.5 |nnnnn    %      S         |
+ z=  15 |nnnnne a  %               |
+ z=17.5 |nnnnn      j      %       |
+ z=  20 |nnnnnd  b   C             |
+ z=22.5 |       c%%        %       |
+ z=  25 | %r  %                O   |
+ z=27.5 |   F      nnn n           |
+ z=  30 |  %              %        |
+ z=32.5 |      %%           %    % |
+ z=  35 |%    %    % %      %      |
+ z=37.5 |n n n n n n n n n n n n   |
+       +--------------------------+
+
+ LEGEND
+    scene-map — author NPC + walker placements on a top-down ASCII grid instead of
+    blind float coordinates. Two commands:
+   
+      node scripts/scene-map.mjs generate   # (re)draw the structures backdrop into
+                                            # docs/redesign/scene-map.txt, PRESERVING
+                                            # any annotation characters already placed
+      node scripts/scene-map.mjs parse      # read the map's annotations → write
+                                            # src/components/three/synty/scenePlacements.json
+                                            # (Npcs.tsx consumes it)
+   
+    The grid is the explorable field: three-space x∈[-32,32] (cols, +x = east/right)
+    × z∈[-40,40] (rows, −z = north/top). 1 char = 2.5 m. The iso camera views from
+    the TOP-LEFT corner (−x,−z), so "toward camera" = up-left on the map.
+   
+    Backdrop chars (read-only reference, redrawn by `generate`):
+      F ferris  O carousel  T teacups  S swings  U bumpers  I high-striker
+      D dive-tower  ~ dive-pool  E entrance  C big-top  Z fortune-wagon
+      n stall/tent/building   % foliage   . misc prop   (space) open ground
+   
+    Annotation chars (YOU place these on OPEN cells; `parse` reads them):
+      NPCs (position = cell centre; facing auto — greeters face away from the
+      nearest structure, spectators face toward it):
+        k Carny (barker, faces out)        j Clown male (waving, out)
+        v Visitor male (clapping, in)      r Ringleader (cheering, out)
+        l Visitor male (looking, in)       x Visitor female (happy, in)
+      Walker loops (ordered waypoints, closed loop):
+        1..9  loop A, in numeric order     a..i  loop B, in letter order
+   
+    The dive-board diver keeps her explicit height in Npcs.tsx (a grid can't do Y),
+    so she is NOT on the map.
+   
+     barker who shares his stall's cell doesn't get dropped). */

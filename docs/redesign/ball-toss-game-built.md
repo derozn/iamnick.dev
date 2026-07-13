@@ -54,8 +54,10 @@ src/components/three/game/
   BallTossGame.tsx    — in-Canvas. The whole sim: bottle assets, ball asset, pointer input,
                         per-frame integrator (ball + bottles), collisions, scoring. Self-gates
                         on store state; mounts <Sim> only while playing the ball-toss booth.
+src/components/overlays/
   BallTossHud.tsx     — DOM overlay. Score/balls chip, Exit ✕, aiming hint, and the modal
                         cards (intro / won / lost) + Play again. Reads summary state only.
+                        (Moved out of three/game/ in refactor Phase 2 — HUDs live in overlays/.)
 
 Touched elsewhere:
   src/store/scene.ts                       — ball-toss slice (score/balls/phase/round) + actions

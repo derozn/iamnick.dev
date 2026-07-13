@@ -3,11 +3,13 @@ import '@/styles/globals.css';
 import type { Metadata, Viewport } from 'next';
 import { PropsWithChildren } from 'react';
 
-import { montserratFont, openSansFont } from '@/components/ui-modules/next/fonts/local';
-import { ryeFont, fellFont, fellScFont } from '@/components/ui-modules/next/fonts/google';
-import { JsonLd } from '@/components/organisms/JsonLd';
+import { montserratFont, openSansFont } from '@/lib/fonts/local';
+import { ryeFont, fellFont, fellScFont } from '@/lib/fonts/google';
+import { Analytics } from '@vercel/analytics/next';
+import { JsonLd } from '@/components/cv/JsonLd';
 import { SiteNav } from '@/components/nav/SiteNav';
 import { cn } from '@/lib/cn';
+import { SITE_URL } from '@/lib/site';
 import { profile } from '@/content/cv';
 
 export const viewport: Viewport = {
@@ -18,7 +20,7 @@ export const viewport: Viewport = {
 const metaDescription = profile.shortBio.split('. ')[0] + '.';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://iamnick.dev'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Nick de Rozarieux — Lead Software Engineer',
     template: '%s · iamnick.dev',
@@ -47,7 +49,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Nick de Rozarieux — Lead Software Engineer',
     description: metaDescription,
-    url: 'https://iamnick.dev',
+    url: SITE_URL,
     siteName: 'iamnick.dev',
     locale: 'en_GB',
     type: 'website',
@@ -62,8 +64,6 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = 'auto';
-
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html
@@ -76,11 +76,12 @@ export default function RootLayout({ children }: PropsWithChildren) {
         fellScFont.variable,
       )}
     >
-      <head />
       <body className="bg-background-primary font-functional text-text-primary">
         <JsonLd />
         <SiteNav />
         {children}
+        {/* Privacy-friendly visit + vitals; a no-op off Vercel. */}
+        <Analytics />
       </body>
     </html>
   );
