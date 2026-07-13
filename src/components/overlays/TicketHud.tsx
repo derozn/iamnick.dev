@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 
 import { useSceneStore } from '@/store/scene';
 import { playSfx } from '@/lib/audio';
-import { TICKET_COUNT } from './ticketConfig';
+import { TICKET_COUNT } from '@/components/three/tickets/ticketConfig';
 
 // NB: no @react-three/* imports — this HUD lives in the static bundle
 // (ticketConfig is deliberately three-free).

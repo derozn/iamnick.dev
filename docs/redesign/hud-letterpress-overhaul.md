@@ -20,7 +20,7 @@ All of it lives in `src/styles/globals.css` so the rest of the overhaul builds o
 utilities (`bg-paper`, `text-ink`, `text-oxblood`, `border-keyline`, …).
 
 **Fonts** — period faces via `next/font/google` in
-`src/components/ui-modules/next/fonts/google.ts`: **Rye** (wood-type display), **IM Fell
+`src/lib/fonts/google.ts`: **Rye** (wood-type display), **IM Fell
 English** (body, roman + italic), **IM Fell English SC** (small-caps). Self-hosted at build
 (no client Google calls). Wired into `<html>` in `layout.tsx`.
 
@@ -45,7 +45,7 @@ used by live HUD surfaces.
 
 ## 2. Career booth → stacked ticket deck
 
-`src/components/content/CareerTickets.tsx` — the Career section is now a **deck of carnival
+`src/components/overlays/CareerTickets.tsx` — the Career section is now a **deck of carnival
 tickets** shuffled one role at a time (decisions locked with Nick: full letterpress · prev/next
 stepper · condensed face that expands).
 

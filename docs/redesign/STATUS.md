@@ -19,7 +19,7 @@ Live on top of the scene: two playable stalls (ball-toss, high-striker), a
 golden-ticket hunt, Madame Zara's fortune wagon (`/api/fortune`,
 Anthropic-backed with a keyless stub mode), a letterpress-carnival HUD
 language, and Full/Lite quality tiers plus a no-canvas tier — under
-`prefers-reduced-motion` the sr-only `StaticResume` (the CV as DOM) becomes the
+`prefers-reduced-motion` the sr-only `StaticCv` (the CV as DOM) becomes the
 visible page (ADR-0003).
 
 ## Scene architecture (files)
@@ -58,24 +58,32 @@ Entry chain — `src/app/page.tsx` mounts client islands over a server page:
 
 ## Overlay layer (DOM over the canvas)
 
-- **`src/components/content/ContentOverlay.tsx`** — the panel that rises over
-  the dimmed carnival in `viewing` mode; backdrop click / ✕ / Escape close it.
-  Routes by attraction `section`: **`SectionContent.tsx`** renders the CV
-  panels (letterpress styling, data from `content/cv.ts`), `chat:fortune`
-  renders **`FortunePanel.tsx`** (streams Readings from `/api/fortune`), and
-  the career attraction opens **`CareerTickets.tsx`** (the ticket deck) on its
+Everything DOM-over-canvas lives in `src/components/overlays/` (flat `.tsx`,
+tests colocated, no barrels — the Phase 2 conventions in
+`docs/redesign/architecture.md`):
+
+- **`overlays/ContentOverlay.tsx`** — the panel that rises over the dimmed
+  carnival in `viewing` mode; backdrop click / ✕ / Escape close it. Routes by
+  attraction `section`: **`SectionContent.tsx`** renders the CV panels
+  (letterpress styling, data from `content/cv.ts`), `chat:fortune` renders
+  **`FortunePanel.tsx`** (streams Readings from `/api/fortune`), and the
+  career attraction opens **`CareerTickets.tsx`** (the ticket deck) on its
   own stage.
-- **Game HUDs** — `BallTossHud`, `HighStrikerHud` (`three/game/`) and
-  `TicketHud` (`three/tickets/`): DOM overlays mounted from `page.tsx`.
-- **`IntroOverlay`, `AudioDirector`, `DebugBridge`** (`components/content/`) —
-  entry vignette, scene-state→audio mixer, and the headless-verification hook.
+- **Game HUDs** — `overlays/BallTossHud.tsx`, `overlays/HighStrikerHud.tsx`
+  and `overlays/TicketHud.tsx`: DOM overlays mounted from `page.tsx`. Their
+  tuning configs stay canvas-side (`three/game/ballTossConfig.ts`,
+  `three/game/highStrikerConfig.ts`, `three/tickets/ticketConfig.ts`).
+- **`IntroOverlay`, `AudioDirector`, `DebugBridge`** (`overlays/`) — entry
+  vignette, scene-state→audio mixer, and the headless-verification hook.
+- **`src/components/cv/`** — server-only: `StaticCv.tsx` (the sr-only CV
+  document, visible page under reduced motion) and `JsonLd.tsx`.
 - **`src/components/nav/SiteNav.tsx`** — burger menu (mounted in
   `layout.tsx`), links built from `ATTRACTIONS`; content attractions open in
   place, stalls route through the camera fly-in. Plus `MuteButton`.
 
-Phase 2 of the refactor moves these into role-based folders
-(`overlays/ cv/ nav/ three/`) — check `docs/refactor-plan.md` before adding
-components.
+An eslint `no-restricted-imports` rule bans `@/content/cv` from client code
+(`overlays/`, `nav/`, `three/`); the two documented exceptions
+(`SectionContent`, `CareerTickets`) are listed inline in `eslint.config.mjs`.
 
 ## Store
 
@@ -125,19 +133,22 @@ final judge for grading changes.
 
 ## What just happened
 
-**Refactor Phase 1 — dead-code purge** (branch `chore/standards-refactor`, see
-`docs/refactor-plan.md` + `docs/refactor-state.md` for live status). The
-retired first-person scene that previous versions of this document described —
-`CarnivalStreet`, `FirstPersonRig`, `carnival.config.ts`, the `three/shared/`
-pieces, `public/models/carnival/` (9.7 MB) — is deleted, along with the dormant
-organisms/section-component layer (`StaticResume`'s inline sections carry the
-live content; `JsonLd` survives). The store lost its vestigial scroll-era
-fields. ADR-0004 (on-rails spine) no longer matches shipped reality and is
-superseded in writing as part of this phase.
+**Refactor Phase 2 — component architecture** (branch
+`chore/standards-refactor`, see `docs/refactor-plan.md` +
+`docs/refactor-state.md` for live status). Components moved into role-based
+folders: `components/content/` → `overlays/`, the three game HUDs left the
+three tree for `overlays/` (configs stayed canvas-side), `cv/` was created for
+the server-only CV document — `StaticResume` renamed `StaticCv` (component and
+`.static-cv` class) alongside `JsonLd` — and fonts moved to
+`src/lib/fonts/{local,google}.ts`. `organisms/` and `ui-modules/` no longer
+exist. The cv-import ban is enforced by eslint. Conventions are codified in
+`docs/redesign/architecture.md`. Phase 1 (dead-code purge: the retired
+first-person scene, the dormant organisms/section layer, vestigial store
+fields; ADR-0007 supersedes ADR-0004) landed immediately before.
 
-## What's next (refactor Phases 2–7, one line each)
+## What's next (refactor phases, one line each)
 
-2. **Component architecture** — role-based folders (`ui/ overlays/ cv/ nav/ three/`); HUDs leave the three tree; `StaticResume` → `StaticCv`.
+2. **Component architecture** — DONE (see above).
 3. **Config/deps/secrets** — pin the `"latest"` deps, varlock `.env.schema`, App Router cleanups.
 4. **Fortune API + a11y** — zod body schema, Vercel AI SDK transport, Upstash rate limiting, modal focus traps.
 5. **Dedup & extraction** — single homes for `EASE`/atlas-texture/GLSL-noise duplicates, `useDisposable()`.

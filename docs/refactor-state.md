@@ -47,6 +47,27 @@
   `src/content/index.ts` barrel it found). Screenshots: overview pixel-identical
   to the 2026-07-09 baseline; ball-toss fly-in + step-in card render correctly.
 
+## Phase 2 result (2026-07-13)
+
+- Tree is now `cv/ nav/ overlays/ three/` (`ui/` created lazily later). All
+  moves via git mv; `StaticResume` → `cv/StaticCv` (+ `.static-cv` CSS class);
+  fonts → `src/lib/fonts/` with `src:` depths fixed; organisms/ + ui-modules/
+  gone. cv-import ban lint-ENFORCED with negative test (injected violation
+  fired; exceptions SectionContent/CareerTickets hold).
+- Gate: typecheck ✓ lint ✓ 40 tests ✓ build ✓; refactor-verifier sweep CLEAR
+  (zero live old-path refs, font woff2 paths resolve); glossary-guard CLEAN
+  (one advisory: `id="resume-*"` attrs in StaticCv — carry-over, left).
+- Screenshots: overview pixel-identical; Career panel + High Striker step-in
+  card/HUD render from new paths. Gotcha for future sessions: a stale
+  `next start` on :3000 makes new `pnpm start` fail EADDRINUSE and shots hit
+  the OLD build — check `lsof -iTCP:3000` first.
+- Reusable sub-agents created: `.claude/agents/{refactor-verifier,docs-scribe,
+glossary-guard}.md` — register on session reload; this session ran their
+  briefs via generic agent types.
+- Docs-scribe flagged (not fixed, historical docs): fortune-teller-ai-handoff.md
+  status header stale ("approved, not started" but Zara is built);
+  hud-letterpress-overhaul.md "no post-processing" claim pre-dates SafePostFX.
+
 ## Verified facts (carry across phases)
 
 - Reduced-motion tier renders `StaticResume` as the VISIBLE page (`clip: auto`
@@ -65,7 +86,12 @@
 - Phase 6 knip config: ignore/entry rules needed for `scripts/scene-map.mjs`
   (manual CLI), game-config tuning exports, `__resetAudioForTests`.
 
-## Deviations from plan
+## Deviations from plan (Phase 2)
+
+- Conventions codified in `docs/redesign/architecture.md`, NOT CONTEXT.md as
+  the plan literally said — CONTEXT.md is glossary-only (grill-session rule).
+
+## Deviations from plan (Phase 1)
 
 - `stepIn`/`exit` NOT renamed: CONTEXT.md defines Step-in as canonical domain
   language — the glossary overrides the audit's rename suggestion. Plan updated.

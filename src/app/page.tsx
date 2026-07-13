@@ -1,12 +1,12 @@
 import { MidwayCanvas } from '@/components/three/MidwayCanvas';
-import { ContentOverlay } from '@/components/content/ContentOverlay';
-import { StaticResume } from '@/components/content/StaticResume';
-import { IntroOverlay } from '@/components/content/IntroOverlay';
-import { DebugBridge } from '@/components/content/DebugBridge';
-import { AudioDirector } from '@/components/content/AudioDirector';
-import { TicketHud } from '@/components/three/tickets/TicketHud';
-import { BallTossHud } from '@/components/three/game/BallTossHud';
-import { HighStrikerHud } from '@/components/three/game/HighStrikerHud';
+import { ContentOverlay } from '@/components/overlays/ContentOverlay';
+import { StaticCv } from '@/components/cv/StaticCv';
+import { IntroOverlay } from '@/components/overlays/IntroOverlay';
+import { DebugBridge } from '@/components/overlays/DebugBridge';
+import { AudioDirector } from '@/components/overlays/AudioDirector';
+import { TicketHud } from '@/components/overlays/TicketHud';
+import { BallTossHud } from '@/components/overlays/BallTossHud';
+import { HighStrikerHud } from '@/components/overlays/HighStrikerHud';
 
 export const dynamic = 'auto';
 
@@ -17,14 +17,14 @@ export const dynamic = 'auto';
  * mark each point of interest, and clicking one flies the camera in and opens that
  * CV section in the neon HUD overlay (ContentOverlay).
  *
- * The full CV is also mirrored in <StaticResume> as visually-hidden, always-present
+ * The full CV is also mirrored in <StaticCv> as visually-hidden, always-present
  * DOM, so the page is crawlable and screen-reader-navigable without the canvas.
  */
 export default function Homepage() {
   return (
     <>
       {/* Crawlable / accessible CV — the page's real content (sr-only) */}
-      <StaticResume />
+      <StaticCv />
 
       {/* Isometric Dark Carnival — fixed, fills the viewport */}
       <MidwayCanvas />

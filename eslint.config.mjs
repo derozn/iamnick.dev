@@ -35,6 +35,36 @@ export default tseslint.config(
     },
   },
   {
+    // Client code gets CV data via props or the scene store — only the server-only
+    // cv/ components read @/content/cv directly (docs/refactor-plan.md, Phase 2).
+    files: ['src/components/overlays/**', 'src/components/nav/**', 'src/components/three/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@/content/cv',
+              message:
+                'Client code must not import the CV directly — take props or read the scene store. See docs/refactor-plan.md Phase 2.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Recorded exceptions: the overlay content panels render CV sections directly
+    // (moving the import server-side would shift the same bytes to the RSC payload).
+    files: [
+      'src/components/overlays/SectionContent.tsx',
+      'src/components/overlays/CareerTickets.tsx',
+    ],
+    rules: {
+      'no-restricted-imports': 'off',
+    },
+  },
+  {
     // Node CLI scripts (build/asset tooling) — Node globals, not browser
     files: ['scripts/**/*.mjs'],
     languageOptions: {

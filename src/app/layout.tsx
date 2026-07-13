@@ -3,9 +3,9 @@ import '@/styles/globals.css';
 import type { Metadata, Viewport } from 'next';
 import { PropsWithChildren } from 'react';
 
-import { montserratFont, openSansFont } from '@/components/ui-modules/next/fonts/local';
-import { ryeFont, fellFont, fellScFont } from '@/components/ui-modules/next/fonts/google';
-import { JsonLd } from '@/components/organisms/JsonLd';
+import { montserratFont, openSansFont } from '@/lib/fonts/local';
+import { ryeFont, fellFont, fellScFont } from '@/lib/fonts/google';
+import { JsonLd } from '@/components/cv/JsonLd';
 import { SiteNav } from '@/components/nav/SiteNav';
 import { cn } from '@/lib/cn';
 import { profile } from '@/content/cv';

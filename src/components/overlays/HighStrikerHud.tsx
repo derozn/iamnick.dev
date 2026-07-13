@@ -4,7 +4,13 @@ import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { STRIKER_SWINGS, useSceneStore } from '@/store/scene';
-import { GREAT, meterValue, OK, PERFECT, resultLabel } from './highStrikerConfig';
+import {
+  GREAT,
+  meterValue,
+  OK,
+  PERFECT,
+  resultLabel,
+} from '@/components/three/game/highStrikerConfig';
 
 // NB: no @react-three/* imports — static bundle (highStrikerConfig is three-free).
 

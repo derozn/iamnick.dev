@@ -6,11 +6,11 @@ import localFont from 'next/font/local';
 export const montserratFont = localFont({
   src: [
     {
-      path: '../../../../assets/fonts/montserrat-v14-latin-regular.woff2',
+      path: '../../assets/fonts/montserrat-v14-latin-regular.woff2',
       weight: '400',
     },
     {
-      path: '../../../../assets/fonts/montserrat-v14-latin-600.woff2',
+      path: '../../assets/fonts/montserrat-v14-latin-600.woff2',
       weight: '600',
     },
   ],
@@ -18,7 +18,7 @@ export const montserratFont = localFont({
 });
 
 export const openSansFont = localFont({
-  src: '../../../../assets/fonts/open-sans-v17-latin-regular.woff2',
+  src: '../../assets/fonts/open-sans-v17-latin-regular.woff2',
   weight: '400',
   variable: '--font-open-sans',
 });
