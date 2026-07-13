@@ -5,13 +5,12 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useSceneStore } from '@/store/scene';
 import { useQualityTier } from '@/components/three/hooks/useQualityTier';
 import { initAudio } from '@/lib/audio';
+import { EASE } from '@/lib/motion';
 
 // NB: deliberately NO @react-three/* import here — this overlay is in the static
 // (non-dynamic) bundle, and importing drei/three would pull the whole 3-D chunk
 // into first-load JS, defeating the code-split. The loader is `sceneReady`-driven
 // (a Suspense signal in Scene), not a drei useProgress readout.
-
-const EASE = [0.22, 0.61, 0.27, 1] as const;
 
 /**
  * IntroOverlay — the DOM half of the Bruno-Simon-style entry sequence. The

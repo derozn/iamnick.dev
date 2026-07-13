@@ -5,8 +5,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { FocusTrap } from 'focus-trap-react';
 
 import { useSceneStore } from '@/store/scene';
-
-const EASE = [0.22, 0.61, 0.27, 1] as const;
+import { EASE } from '@/lib/motion';
 
 /**
  * BallTossHud — the DOM overlay for the ball-toss game. A sibling of

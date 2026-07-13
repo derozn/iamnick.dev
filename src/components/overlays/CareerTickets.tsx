@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 
 import { roles, type Role } from '@/content/cv';
 import { formatYearMonth } from '@/lib/formatDate';
+import { EASE } from '@/lib/motion';
 
 /**
  * CareerTickets — the Career booth as a deck of letterpress carnival tickets you
@@ -17,7 +18,6 @@ import { formatYearMonth } from '@/lib/formatDate';
  * which wraps. Purely presentational over the `roles` content model.
  */
 
-const EASE = [0.22, 0.61, 0.27, 1] as const;
 const FLEURON = '❦'; // ❦
 
 /** Newest role first — the deck opens on the current job. */

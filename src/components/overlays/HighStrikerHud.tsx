@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { FocusTrap } from 'focus-trap-react';
 
 import { STRIKER_SWINGS, useSceneStore } from '@/store/scene';
+import { EASE } from '@/lib/motion';
 import {
   GREAT,
   meterValue,
@@ -14,8 +15,6 @@ import {
 } from '@/components/three/game/highStrikerConfig';
 
 // NB: no @react-three/* imports — static bundle (highStrikerConfig is three-free).
-
-const EASE = [0.22, 0.61, 0.27, 1] as const;
 
 /**
  * HighStrikerHud — DOM overlay for the strength test (sibling of BallTossHud,

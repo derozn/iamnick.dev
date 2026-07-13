@@ -6,11 +6,10 @@ import { FocusTrap } from 'focus-trap-react';
 import { useSceneStore } from '@/store/scene';
 import { playSfx } from '@/lib/audio';
 import { TICKET_COUNT } from '@/components/three/tickets/ticketConfig';
+import { EASE } from '@/lib/motion';
 
 // NB: no @react-three/* imports — this HUD lives in the static bundle
 // (ticketConfig is deliberately three-free).
-
-const EASE = [0.22, 0.61, 0.27, 1] as const;
 
 /**
  * TicketHud — the DOM half of the golden-ticket hunt: a letterpress tally chip

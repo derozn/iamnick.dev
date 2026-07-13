@@ -8,8 +8,7 @@ import { useSceneStore } from '@/store/scene';
 import { ATTRACTIONS } from '@/components/three/synty/attractions';
 import { SectionContent } from './SectionContent';
 import { CareerTickets } from './CareerTickets';
-
-const EASE = [0.22, 0.61, 0.27, 1] as const;
+import { EASE } from '@/lib/motion';
 
 /**
  * ContentOverlay — the neon HUD panel that rises over the dimmed carnival when a

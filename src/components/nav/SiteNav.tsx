@@ -6,8 +6,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useSceneStore } from '@/store/scene';
 import { ATTRACTIONS, type Attraction } from '@/components/three/synty/attractions';
 import { MuteButton } from './MuteButton';
-
-const EASE = [0.22, 0.61, 0.27, 1] as const;
+import { EASE } from '@/lib/motion';
 
 /**
  * SiteNav — a Bruno-Simon-style burger menu (replacing the old nav-bar HUD).
