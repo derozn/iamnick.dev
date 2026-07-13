@@ -68,6 +68,19 @@ glossary-guard}.md` — register on session reload; this session ran their
   status header stale ("approved, not started" but Zara is built);
   hud-letterpress-overhaul.md "no post-processing" claim pre-dates SafePostFX.
 
+## Hotfix (2026-07-13, out-of-phase)
+
+- Nick reported the fortune teller dead when asking a question. Root cause:
+  the ANTHROPIC_API_KEY in .env.local is INVALID (Anthropic returns 401) and
+  the route's silent stream catch turned that into an empty 200 — dead air in
+  the panel. Hotfix (Phase 4's "log the catches" pulled forward): model-call
+  failure before any text now serves a canned Reading + console.error; mid-
+  reading failure logs and ends. Regression test added (12 route tests).
+- STILL OWED BY NICK: a valid ANTHROPIC_API_KEY (.env.local + Vercel) — until
+  then visitors get canned readings via the fallback, not real Zara.
+- Phase 4 note: the AI SDK rewrite must PRESERVE this fallback behaviour
+  (its done-when already includes the real-key manual smoke).
+
 ## Verified facts (carry across phases)
 
 - Reduced-motion tier renders `StaticResume` as the VISIBLE page (`clip: auto`

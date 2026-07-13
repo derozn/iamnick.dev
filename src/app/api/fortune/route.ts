@@ -66,8 +66,9 @@ const textStream = (
     async start(controller) {
       try {
         await produce((chunk) => controller.enqueue(encoder.encode(chunk)));
-      } catch {
+      } catch (err) {
         // mid-stream failure — end the reading; the panel keeps what arrived
+        console.error('[fortune] stream failed mid-reading:', err);
       }
       controller.close();
     },
@@ -129,9 +130,22 @@ export async function POST(req: Request): Promise<Response> {
   });
 
   return textStream(async (emit) => {
-    for await (const event of stream) {
-      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-        emit(event.delta.text);
+    // The SDK defers connection/auth errors into this iteration — a bad key
+    // used to surface as an empty 200 (dead air in the panel). If the model
+    // fails before a single word, serve a canned Reading instead; a failure
+    // mid-reading logs and ends (the panel keeps what arrived).
+    let emitted = false;
+    try {
+      for await (const event of stream) {
+        if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+          emit(event.delta.text);
+          emitted = true;
+        }
+      }
+    } catch (err) {
+      console.error('[fortune] model call failed:', err);
+      if (!emitted) {
+        emit(STUB_READINGS[Math.floor(messages.length / 2) % STUB_READINGS.length]);
       }
     }
   });

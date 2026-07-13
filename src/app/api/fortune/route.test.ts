@@ -111,6 +111,25 @@ describe('POST /api/fortune — model path', () => {
     expect(sent.system).toContain('Travelex');
   });
 
+  it('falls back to a canned reading when the model call fails before any text', async () => {
+    // The SDK defers auth/connection errors into stream iteration — an invalid
+    // key must serve an in-character Reading, not dead air (empty 200).
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const failing = {
+      [Symbol.asyncIterator]: () => ({
+        next: () => Promise.reject(Object.assign(new Error('invalid x-api-key'), { status: 401 })),
+      }),
+    };
+    mockStream.mockImplementationOnce(() => failing as unknown as ReturnType<typeof mockStream>);
+    const res = await post(ask());
+    expect(res.status).toBe(200);
+    const text = await res.text();
+    expect(text.length).toBeGreaterThan(0); // a full canned reading, not dead air
+    expect(text).toContain('\n'); // card-name first line, body after
+    expect(consoleError).toHaveBeenCalledWith('[fortune] model call failed:', expect.anything());
+    consoleError.mockRestore();
+  });
+
   it('rate-limits the 11th request in a minute with an in-character 429', async () => {
     for (let i = 0; i < 10; i++) expect((await post(ask())).status).toBe(200);
     const res = await post(ask());
