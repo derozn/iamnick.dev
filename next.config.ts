@@ -46,7 +46,6 @@ const withSentry = process.env.SENTRY_DSN
       silent: true,
       // Source-map upload needs SENTRY_ORG/PROJECT/AUTH_TOKEN; skipped until set.
       widenClientFileUpload: true,
-      disableLogger: true,
     })
   : nextConfig;
 
