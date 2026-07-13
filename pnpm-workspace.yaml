@@ -1,7 +1,13 @@
-# Not a real workspace — carries pnpm's build-script approvals only.
+# Not a real workspace — carries pnpm settings only.
 # Everywhere uses pnpm 11 (local + CI via packageManager; Vercel via Corepack,
-# ENABLE_EXPERIMENTAL_COREPACK=1), which reads approvals from `allowBuilds`.
-# Committed so every environment approves these native builds identically.
+# ENABLE_EXPERIMENTAL_COREPACK=1), which reads these settings here.
+# Committed so every environment behaves identically.
 allowBuilds:
   sharp: true # next/image optimization
   '@sentry/cli': true # source-map upload during build (when Sentry is configured)
+
+# varlock runtime integration: replace Next's internal env loader with varlock's
+# so .env.schema drives loading + validation + @sensitive redaction + leak
+# detection. pnpm 11 reads overrides from here (this is why it needed Corepack).
+overrides:
+  next>@next/env: npm:@varlock/nextjs-integration
