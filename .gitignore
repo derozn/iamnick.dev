@@ -33,12 +33,6 @@ pnpm-debug.log*
 # Claude Code agent worktrees / local
 .claude/worktrees/
 
-# pnpm 10/11 auto-generates this for its build-script approval prompt, but this
-# isn't a workspace — and a packages-less workspace file breaks Vercel's pnpm 9.x
-# install ("packages field missing or empty"). Build approvals live in
-# package.json -> pnpm.onlyBuiltDependencies (read by pnpm 9.x). Keep it untracked.
-pnpm-workspace.yaml
-
 # Playwright e2e (report + results are artifacts; snapshot baselines ARE committed)
 /test-results/
 /playwright-report/

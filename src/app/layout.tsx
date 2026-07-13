@@ -5,6 +5,7 @@ import { PropsWithChildren } from 'react';
 
 import { montserratFont, openSansFont } from '@/lib/fonts/local';
 import { ryeFont, fellFont, fellScFont } from '@/lib/fonts/google';
+import { Analytics } from '@vercel/analytics/next';
 import { JsonLd } from '@/components/cv/JsonLd';
 import { SiteNav } from '@/components/nav/SiteNav';
 import { cn } from '@/lib/cn';
@@ -79,6 +80,8 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <JsonLd />
         <SiteNav />
         {children}
+        {/* Privacy-friendly visit + vitals; a no-op off Vercel. */}
+        <Analytics />
       </body>
     </html>
   );

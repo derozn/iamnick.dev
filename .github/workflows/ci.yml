@@ -24,15 +24,6 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
-      # pnpm 11 reads build-script approvals from pnpm-workspace.yaml (allowBuilds
-      # since 11.x — the older onlyBuiltDependencies list errors); without it the
-      # install fails on sharp (ERR_PNPM_IGNORED_BUILDS). The repo keeps
-      # pnpm-workspace.yaml gitignored (Vercel's pnpm rejected a packages-less
-      # workspace file), so we write a settings-only one here, just for CI.
-      - name: Approve native builds (sharp)
-        run: |
-          printf 'allowBuilds:\n  sharp: true\n' > pnpm-workspace.yaml
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -70,10 +61,6 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
-
-      - name: Approve native builds (sharp)
-        run: |
-          printf 'allowBuilds:\n  sharp: true\n' > pnpm-workspace.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

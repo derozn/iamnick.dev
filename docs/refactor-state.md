@@ -27,7 +27,7 @@
 | 4 — Fortune API + a11y     | DONE 2026-07-13 (Upstash deferred; real-key smoke owed) | —   |
 | 5 — Dedup & extraction     | DONE 2026-07-13                                         | —   |
 | 6 — Tests & tooling        | DONE 2026-07-13                                         | —   |
-| 7 — Ops hardening          | pending                                                 | —   |
+| 7 — Ops hardening          | DONE 2026-07-13 (deployable; creds gated)               | —   |
 
 > Table hygiene note: prettier realigns this table's column padding, which
 > silently breaks string-replace edits. EDIT IT BY HAND (or re-pad after).
@@ -200,6 +200,33 @@ three genuine wins:
   disable — the zero-disable streak holds) to allow the `log` role.
 - Gotcha reconfirmed: `pkill -f "next start"` did NOT kill the server twice;
   kill by PID from `lsof -iTCP:3000 -t`, else e2e hits a stale build.
+
+## Phase 7 result (2026-07-13) — deployable, credentials gated
+
+- **rate-limiter-flexible + Node runtime (abc419c):** replaced the hand-rolled
+  limiter; fortune route moved Edge→`nodejs` (LLM proxy latency is the US API
+  call, not the PoP; Node removes the lib constraint). Un-rejected in the plan.
+- **Sentry (@sentry/nextjs):** `sentry.{server,edge}.config.ts` +
+  `src/instrumentation.ts` + `src/instrumentation-client.ts`, all init-gated on
+  the DSN → zero footprint until set. `next.config.ts` wraps with Sentry only
+  when `SENTRY_DSN` present at build. Fortune's swallowed-error logs now also
+  `Sentry.captureException` (no-op without a DSN). `beforeSend` strips request
+  bodies (visitor questions are user content).
+- **Renovate (`renovate.json`):** groups the R3F ecosystem + AI SDK, batches dev
+  deps, auto-merges patches. Activates on GitHub-app install.
+- **Vercel Analytics:** `<Analytics />` in `layout.tsx` — auto-activates on Vercel.
+- **DEPLOY BLOCKER FIXED:** Phase 3 removed `pnpm.onlyBuiltDependencies` and put
+  approvals in the _gitignored_ `pnpm-workspace.yaml` — CI wrote a temp copy, but
+  **Vercel had none**, so sharp/@sentry/cli builds would be skipped (broken image
+  optim). Since `packageManager` pins pnpm 11, a settings-only workspace file is
+  safe → committed `pnpm-workspace.yaml` (allowBuilds sharp + @sentry/cli),
+  un-gitignored, removed both CI temp-write steps. Clean install verified.
+- `docs/DEPLOY.md` written: deployable with zero env vars (stub Zara, inert
+  Sentry/Analytics); each var lights up a feature. NEXT_PUBLIC_SENTRY_DSN is
+  build-time (must be set before the deploy build).
+- Gate: typecheck/lint/73 tests/knip/build green; e2e boot+fortune+api green on
+  the Node runtime. Owed by Nick (all optional, non-blocking): ANTHROPIC_API_KEY,
+  Sentry DSNs, Renovate app install.
 
 ## Hotfix (2026-07-13, out-of-phase)
 

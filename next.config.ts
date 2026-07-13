@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { withSentryConfig } from '@sentry/nextjs';
 
 // varlock is adopted schema-first (refactor Phase 3): .env.schema declares the
 // env surface and `pnpm env:check` validates it (redacted output). The runtime
@@ -37,4 +38,13 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Wrap with Sentry only when a DSN is present at build (Vercel, once configured).
+// Without it the build is untouched — no Sentry footprint until credentials land.
+export default process.env.SENTRY_DSN
+  ? withSentryConfig(nextConfig, {
+      silent: true,
+      // Source-map upload needs SENTRY_ORG/PROJECT/AUTH_TOKEN; skipped until set.
+      widenClientFileUpload: true,
+      disableLogger: true,
+    })
+  : nextConfig;

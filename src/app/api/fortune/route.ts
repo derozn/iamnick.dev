@@ -1,5 +1,6 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { streamText } from 'ai';
+import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 
 import {
@@ -67,6 +68,7 @@ const textStream = (
       } catch (err) {
         // mid-stream failure — end the reading; the panel keeps what arrived
         console.error('[fortune] stream failed mid-reading:', err);
+        Sentry.captureException(err); // no-op unless SENTRY_DSN is set
       }
       controller.close();
     },
@@ -134,7 +136,10 @@ export async function POST(req: Request): Promise<Response> {
     // The AI SDK MASKS stream errors — textStream just ends (verified against
     // ai@7: an invalid key yields zero chunks and no throw). onError is the
     // only hook that sees the real failure.
-    onError: ({ error }) => console.error('[fortune] model call failed:', error),
+    onError: ({ error }) => {
+      console.error('[fortune] model call failed:', error);
+      Sentry.captureException(error); // no-op unless SENTRY_DSN is set
+    },
   });
 
   // Deliberately NOT result.toTextStreamResponse(): our wrapper preserves the
