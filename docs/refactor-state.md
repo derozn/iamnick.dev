@@ -26,7 +26,7 @@
 | 3 — Config/deps/varlock    | DONE 2026-07-13 (8eab757; varlock runtime deferred)     | —   |
 | 4 — Fortune API + a11y     | DONE 2026-07-13 (Upstash deferred; real-key smoke owed) | —   |
 | 5 — Dedup & extraction     | DONE 2026-07-13                                         | —   |
-| 6 — Tests & tooling        | pending                                                 | —   |
+| 6 — Tests & tooling        | DONE 2026-07-13                                         | —   |
 | 7 — Ops hardening          | pending                                                 | —   |
 
 > Table hygiene note: prettier realigns this table's column padding, which
@@ -174,6 +174,32 @@ three genuine wins:
   closes panels, arrow deck nav works, striker resets fresh on step-in, Escape
   exits games. Left untouched (correct as-is): AudioDirector's 3 mixer-sync
   effects, DebugBridge window bridge, all atomic render subscriptions.
+
+## Phase 6 result (2026-07-13) — committed in slices
+
+- **Unit (b4ea8ff):** 19 tests — unityTRS axis convention, pyramidPositions,
+  makeSampler (stubbed canvas), audio lifecycle (mocked Web Audio).
+- **Component (d22864e):** SiteNav, CareerTickets, ContentOverlay (jsdom). Trap
+  needs `tabbableOptions.displayCheck:'none'` under jsdom; test files exempted
+  from the cv-import ban.
+- **knip (10d7d2a):** single-package config, `ignoreExportsUsedInFile` (the
+  game-config constants + store type exports are used in-file, no deletions);
+  `pnpm validate` + CI step. Clean.
+- **E2E (this commit):** `@playwright/test` + `@axe-core/playwright`, SwiftShader
+  chromium, desktop + mobile projects, webServer builds+starts with
+  FORTUNE_STUB=1. Specs: boot smoke, content journeys, fortune stub round-trip,
+  API contract (400/403/413/200), a11y axe sweep + Escape, profiles
+  (reduced-motion→no-canvas, mobile Lite), visual (canvas programmatic
+  POI-differ gated; DOM overlay = review artifact, NOT pixel-diff — a live
+  canvas behind the panel defeats Playwright's element-stability wait, so per
+  the plan's "artifact first" staging a gated diff + CI baselines is a
+  follow-on). 26 pass / 2 skip. CI e2e job uploads the report.
+- **Real a11y fix found by the axe test:** scrollable overlay panels + the
+  fortune log were not keyboard-focusable (WCAG 2.1.1) → `tabIndex={0}` added;
+  `jsx-a11y/no-noninteractive-tabindex` configured (rule config, NOT an inline
+  disable — the zero-disable streak holds) to allow the `log` role.
+- Gotcha reconfirmed: `pkill -f "next start"` did NOT kill the server twice;
+  kill by PID from `lsof -iTCP:3000 -t`, else e2e hits a stale build.
 
 ## Hotfix (2026-07-13, out-of-phase)
 

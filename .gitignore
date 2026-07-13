@@ -38,3 +38,9 @@ pnpm-debug.log*
 # install ("packages field missing or empty"). Build approvals live in
 # package.json -> pnpm.onlyBuiltDependencies (read by pnpm 9.x). Keep it untracked.
 pnpm-workspace.yaml
+
+# Playwright e2e (report + results are artifacts; snapshot baselines ARE committed)
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

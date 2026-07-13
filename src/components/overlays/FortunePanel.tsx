@@ -137,6 +137,7 @@ export function FortunePanel() {
         role="log"
         aria-label="Readings"
         aria-live="polite"
+        tabIndex={0}
         className="mt-5 flex-1 space-y-5 overflow-y-auto pr-1"
       >
         {visible.length === 0 && !errorReading && (

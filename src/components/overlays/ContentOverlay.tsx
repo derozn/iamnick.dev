@@ -81,6 +81,9 @@ export function ContentOverlay() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.99 }}
                 transition={{ duration: 0.45, ease: EASE }}
+                // tabIndex 0: the panel scrolls, so keyboard users must be able to
+                // focus and scroll it (WCAG 2.1.1 — axe scrollable-region-focusable).
+                tabIndex={0}
                 className="relative z-10 flex max-h-[88vh] w-full max-w-md flex-col items-center overflow-y-auto px-4 py-8"
               >
                 <CareerTickets />
@@ -94,6 +97,7 @@ export function ContentOverlay() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.99 }}
                 transition={{ duration: 0.45, ease: EASE }}
+                tabIndex={0}
                 className="ticket-frame halftone relative z-10 max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-[5px] p-6 md:p-10"
               >
                 <SectionContent section={attraction.section} />

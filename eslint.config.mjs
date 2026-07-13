@@ -25,6 +25,13 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      // A scrollable `log` live region (Madame Zara's readings) must be keyboard-
+      // focusable so it can be scrolled without a pointer (WCAG 2.1.1 — axe's
+      // scrollable-region-focusable). Allow tabIndex on that role.
+      'jsx-a11y/no-noninteractive-tabindex': [
+        'error',
+        { tags: [], roles: ['tabpanel', 'log'], allowExpressionValues: true },
+      ],
     },
   },
   {
