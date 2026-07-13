@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
+import { FocusTrap } from 'focus-trap-react';
 
 import { useSceneStore } from '@/store/scene';
 import { playSfx } from '@/lib/audio';
@@ -60,53 +61,61 @@ export function TicketHud() {
 
       <AnimatePresence>
         {showModal && (
-          <motion.div
-            key="ticket-modal"
-            className="fixed inset-0 z-[48] flex items-center justify-center px-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
+          <FocusTrap
+            focusTrapOptions={{
+              initialFocus: false,
+              escapeDeactivates: false,
+              allowOutsideClick: true,
+            }}
           >
-            <button
-              type="button"
-              aria-label="Close"
-              onClick={celebrate}
-              className="absolute inset-0 cursor-default bg-background-primary/60 backdrop-blur-[2px]"
-            />
             <motion.div
-              role="dialog"
-              aria-label="Full house"
-              className="ticket-frame ticket-perf halftone relative w-[min(92vw,430px)] px-8 py-9 text-center"
-              initial={{ scale: 0.9, y: 16 }}
-              animate={{ scale: 1, y: 0 }}
-              transition={{ duration: 0.45, ease: EASE }}
-              onAnimationComplete={() => playSfx('pop')}
+              key="ticket-modal"
+              className="fixed inset-0 z-[48] flex items-center justify-center px-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
             >
-              <p className="font-fell-sc letterpress text-[13px] tracking-[0.3em] text-brass-text">
-                full house
-              </p>
-              <h2 className="font-rye letterpress mt-2 text-[34px] leading-tight text-ink">
-                You found every golden ticket!
-              </h2>
-              <p className="font-fell mt-3 text-[15px] italic text-ink/80">
-                Eight for eight — the midway holds no more secrets from you. Consider yourself an
-                honorary carny.
-              </p>
-              <div className="mt-7 flex items-center justify-center gap-3">
-                <button type="button" onClick={celebrate} className="paper-button px-5 py-2">
-                  <span className="font-rye text-[15px] text-ink">Take a bow</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={resetTickets}
-                  className="font-fell-sc text-[12px] tracking-[0.18em] text-brass-text underline-offset-4 hover:underline"
-                >
-                  tear them up &amp; hunt again
-                </button>
-              </div>
+              <button
+                type="button"
+                aria-label="Close"
+                onClick={celebrate}
+                className="absolute inset-0 cursor-default bg-background-primary/60 backdrop-blur-[2px]"
+              />
+              <motion.div
+                role="dialog"
+                aria-label="Full house"
+                className="ticket-frame ticket-perf halftone relative w-[min(92vw,430px)] px-8 py-9 text-center"
+                initial={{ scale: 0.9, y: 16 }}
+                animate={{ scale: 1, y: 0 }}
+                transition={{ duration: 0.45, ease: EASE }}
+                onAnimationComplete={() => playSfx('pop')}
+              >
+                <p className="font-fell-sc letterpress text-[13px] tracking-[0.3em] text-brass-text">
+                  full house
+                </p>
+                <h2 className="font-rye letterpress mt-2 text-[34px] leading-tight text-ink">
+                  You found every golden ticket!
+                </h2>
+                <p className="font-fell mt-3 text-[15px] italic text-ink/80">
+                  Eight for eight — the midway holds no more secrets from you. Consider yourself an
+                  honorary carny.
+                </p>
+                <div className="mt-7 flex items-center justify-center gap-3">
+                  <button type="button" onClick={celebrate} className="paper-button px-5 py-2">
+                    <span className="font-rye text-[15px] text-ink">Take a bow</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetTickets}
+                    className="font-fell-sc text-[12px] tracking-[0.18em] text-brass-text underline-offset-4 hover:underline"
+                  >
+                    tear them up &amp; hunt again
+                  </button>
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
+          </FocusTrap>
         )}
       </AnimatePresence>
     </>

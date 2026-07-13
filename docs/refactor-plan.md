@@ -169,7 +169,7 @@ One sub-PR each, in order:
    abort-on-close, `MIST_REPLY` fallback. **Honest cost:** `route.test.ts` and
    `FortunePanel.test.tsx` mocks are rewritten against the AI SDK; card-split
    rendering is unchanged.
-3. **@upstash/ratelimit + @upstash/redis**: real cross-instance sliding-window
+3. **@upstash/ratelimit + @upstash/redis** (DEFERRED 2026-07-13 — Nick to create the DB; in-memory limiter stays live meanwhile): real cross-instance sliding-window
    limiting (10/min/IP) + daily budget; falls back to the existing in-memory
    limiter when Upstash env vars are absent so dev/headless/CI need no account.
    Vars declared `@sensitive` in `.env.schema`. Requires Nick: free Upstash db.

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
+import { FocusTrap } from 'focus-trap-react';
 
 import { useSceneStore } from '@/store/scene';
 
@@ -92,102 +93,112 @@ export function BallTossHud() {
           {/* Modal cards: how-to / winner / out-of-balls */}
           <AnimatePresence>
             {modal && (
-              <motion.div
-                className="pointer-events-auto absolute inset-0 flex items-center justify-center p-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
+              <FocusTrap
+                focusTrapOptions={{
+                  initialFocus: false,
+                  escapeDeactivates: false,
+                  allowOutsideClick: true,
+                }}
               >
-                <div className="absolute inset-0 bg-background-primary/55 backdrop-blur-[2px]" />
                 <motion.div
-                  role="dialog"
-                  aria-modal="true"
-                  initial={{ opacity: 0, y: 24, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 16, scale: 0.99 }}
-                  transition={{ duration: 0.4, ease: EASE }}
-                  className="ticket-frame halftone relative z-10 w-full max-w-md rounded-[5px] p-6 text-center md:p-8"
+                  className="pointer-events-auto absolute inset-0 flex items-center justify-center p-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
                 >
-                  {phase === 'intro' && (
-                    <>
-                      <p className="font-fell-sc text-[13px] tracking-[0.22em] text-brass-text">
-                        Step right up
-                      </p>
-                      <h2 className="font-rye letterpress mt-2 text-[34px] text-ink">Ball Toss</h2>
-                      <p className="font-fell mt-4 text-[15px] leading-relaxed text-ink/90">
-                        Knock down the milk bottles. It&apos;s a slingshot:{' '}
-                        <strong>drag the ball back</strong> — further for more power, aim by pulling
-                        off to one side — then <strong>release</strong> to let it fly. You get three
-                        balls; clear the stack for a prize.
-                      </p>
-                      <button
-                        onClick={startPlaying}
-                        className="paper-button mt-6 rounded-[3px] px-6 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
-                      >
-                        Start throwing
-                      </button>
-                    </>
-                  )}
+                  <div className="absolute inset-0 bg-background-primary/55 backdrop-blur-[2px]" />
+                  <motion.div
+                    role="dialog"
+                    aria-modal="true"
+                    initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 16, scale: 0.99 }}
+                    transition={{ duration: 0.4, ease: EASE }}
+                    className="ticket-frame halftone relative z-10 w-full max-w-md rounded-[5px] p-6 text-center md:p-8"
+                  >
+                    {phase === 'intro' && (
+                      <>
+                        <p className="font-fell-sc text-[13px] tracking-[0.22em] text-brass-text">
+                          Step right up
+                        </p>
+                        <h2 className="font-rye letterpress mt-2 text-[34px] text-ink">
+                          Ball Toss
+                        </h2>
+                        <p className="font-fell mt-4 text-[15px] leading-relaxed text-ink/90">
+                          Knock down the milk bottles. It&apos;s a slingshot:{' '}
+                          <strong>drag the ball back</strong> — further for more power, aim by
+                          pulling off to one side — then <strong>release</strong> to let it fly. You
+                          get three balls; clear the stack for a prize.
+                        </p>
+                        <button
+                          onClick={startPlaying}
+                          className="paper-button mt-6 rounded-[3px] px-6 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
+                        >
+                          Start throwing
+                        </button>
+                      </>
+                    )}
 
-                  {phase === 'won' && (
-                    <>
-                      <h2 className="font-rye letterpress text-[36px] text-ink">🎉 Winner!</h2>
-                      <p className="font-fell mt-3 text-[15px] leading-relaxed text-ink/90">
-                        You knocked &apos;em all down — final score{' '}
-                        <span className="font-rye text-oxblood">{score}</span>.
-                      </p>
-                      <p className="font-fell mt-2 text-[14px] italic text-ink-soft">
-                        Prize unlocked: now go read my work →
-                      </p>
-                      <div className="mt-6 flex flex-wrap justify-center gap-3">
-                        <button
-                          onClick={seeWork}
-                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
-                        >
-                          See my work →
-                        </button>
-                        <button
-                          onClick={replay}
-                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[14px] tracking-[0.06em]"
-                        >
-                          Play again
-                        </button>
-                        <button
-                          onClick={exit}
-                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[14px] tracking-[0.06em]"
-                        >
-                          Exit
-                        </button>
-                      </div>
-                    </>
-                  )}
+                    {phase === 'won' && (
+                      <>
+                        <h2 className="font-rye letterpress text-[36px] text-ink">🎉 Winner!</h2>
+                        <p className="font-fell mt-3 text-[15px] leading-relaxed text-ink/90">
+                          You knocked &apos;em all down — final score{' '}
+                          <span className="font-rye text-oxblood">{score}</span>.
+                        </p>
+                        <p className="font-fell mt-2 text-[14px] italic text-ink-soft">
+                          Prize unlocked: now go read my work →
+                        </p>
+                        <div className="mt-6 flex flex-wrap justify-center gap-3">
+                          <button
+                            onClick={seeWork}
+                            className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
+                          >
+                            See my work →
+                          </button>
+                          <button
+                            onClick={replay}
+                            className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[14px] tracking-[0.06em]"
+                          >
+                            Play again
+                          </button>
+                          <button
+                            onClick={exit}
+                            className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[14px] tracking-[0.06em]"
+                          >
+                            Exit
+                          </button>
+                        </div>
+                      </>
+                    )}
 
-                  {phase === 'lost' && (
-                    <>
-                      <h2 className="font-rye letterpress text-[32px] text-ink">Out of balls</h2>
-                      <p className="font-fell mt-3 text-[15px] leading-relaxed text-ink/90">
-                        Final score <span className="font-rye text-oxblood">{score}</span>. So close
-                        — give it another go?
-                      </p>
-                      <div className="mt-6 flex flex-wrap justify-center gap-3">
-                        <button
-                          onClick={replay}
-                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
-                        >
-                          Play again
-                        </button>
-                        <button
-                          onClick={exit}
-                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[14px] tracking-[0.06em]"
-                        >
-                          Exit
-                        </button>
-                      </div>
-                    </>
-                  )}
+                    {phase === 'lost' && (
+                      <>
+                        <h2 className="font-rye letterpress text-[32px] text-ink">Out of balls</h2>
+                        <p className="font-fell mt-3 text-[15px] leading-relaxed text-ink/90">
+                          Final score <span className="font-rye text-oxblood">{score}</span>. So
+                          close — give it another go?
+                        </p>
+                        <div className="mt-6 flex flex-wrap justify-center gap-3">
+                          <button
+                            onClick={replay}
+                            className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
+                          >
+                            Play again
+                          </button>
+                          <button
+                            onClick={exit}
+                            className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[14px] tracking-[0.06em]"
+                          >
+                            Exit
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </motion.div>
                 </motion.div>
-              </motion.div>
+              </FocusTrap>
             )}
           </AnimatePresence>
         </motion.div>

@@ -19,15 +19,18 @@
 
 ## Phase status
 
-| Phase                      | Status                           | PR  |
-| -------------------------- | -------------------------------- | --- |
-| 1 — Dead code purge        | IN PROGRESS (started 2026-07-13) | —   |
-| 2 — Component architecture | pending                          | —   |
-| 3 — Config/deps/varlock    | pending                          | —   |
-| 4 — Fortune API + a11y     | pending                          | —   |
-| 5 — Dedup & extraction     | pending                          | —   |
-| 6 — Tests & tooling        | pending                          | —   |
-| 7 — Ops hardening          | pending                          | —   |
+| Phase                      | Status                                                  | PR  |
+| -------------------------- | ------------------------------------------------------- | --- |
+| 1 — Dead code purge        | DONE 2026-07-13 (484e26c)                               | —   |
+| 2 — Component architecture | DONE 2026-07-13 (0b6a48a)                               | —   |
+| 3 — Config/deps/varlock    | DONE 2026-07-13 (8eab757; varlock runtime deferred)     | —   |
+| 4 — Fortune API + a11y     | DONE 2026-07-13 (Upstash deferred; real-key smoke owed) | —   |
+| 5 — Dedup & extraction     | pending                                                 | —   |
+| 6 — Tests & tooling        | pending                                                 | —   |
+| 7 — Ops hardening          | pending                                                 | —   |
+
+> Table hygiene note: prettier realigns this table's column padding, which
+> silently breaks string-replace edits. EDIT IT BY HAND (or re-pad after).
 
 ## Phase 1 working state
 
@@ -88,6 +91,33 @@ glossary-guard}.md` — register on session reload; this session ran their
   committed settings-only workspace file on a Vercel preview (Nick), then
   `pnpm add -E @varlock/nextjs-integration` and wire the plugin.
 - Gate: typecheck ✓ lint ✓ 41 tests ✓ build ✓ install warning-free ✓.
+
+## Phase 4 result (2026-07-13) — Upstash sub-step DEFERRED by Nick
+
+- 4a zod (a99fa3a): BodySchema/ChatMessageSchema replace hand guards; malformed
+  Origin → 403 (try-catch); unparseable body logged. Fixtures pass unchanged.
+- 4b AI SDK (2d33090 + 0364ef2): `ai`@7 + `@ai-sdk/anthropic` replace
+  `@anthropic-ai/sdk`. Server streamText behind the same wire+wrapper. Client
+  FortunePanel on useChat + **TextStreamChatTransport** (load-bearing — v7
+  default is SSE UI-message protocol, can't parse plain text); the route's
+  {role,content}+MAX_TURNS contract preserved via prepareSendMessagesRequest,
+  so all 4 panel tests + route fixtures pass unchanged. TWO v7 gotchas found
+  against the real API: (1) the SDK MASKS stream errors — textStream ends
+  silently, only onError sees the failure; the canned fallback keys off
+  zero-chunks-emitted. (2) NOT using toTextStreamResponse() — it would drop the
+  fallback. The hotfix's dead-air fix survives the swap (re-verified live).
+- 4c focus-trap-react (this commit): FocusTrap round ContentOverlay + the three
+  HUD modals (TicketHud/BallToss/HighStriker); initialFocus:false (FortunePanel
+  self-focuses), escapeDeactivates:false (store's Escape closes). FortunePanel
+  tidy: FORTUNE_ROUTE const, OPENERS "track the CV" note, abort via
+  effect-written ref (no-ref-in-render rule). Headless: trap holds across a full
+  Tab cycle; stub Reading streams; focus restores to BODY on close.
+- Gate: typecheck ✓ lint ✓ 42 tests ✓ build ✓.
+- **OWED BY NICK:** (1) valid ANTHROPIC_API_KEY → run the real-key manual smoke
+  (one live question + one mid-stream abort on a preview) — the plan's Phase 4
+  done-when, unrunnable until the key works. (2) Upstash DB + env vars → the
+  DEFERRED 4d rate-limit swap (@upstash/ratelimit; in-memory limiter still live
+  meanwhile). Both tracked; neither blocks Phase 5.
 
 ## Hotfix (2026-07-13, out-of-phase)
 

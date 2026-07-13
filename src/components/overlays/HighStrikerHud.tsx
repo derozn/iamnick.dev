@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
+import { FocusTrap } from 'focus-trap-react';
 
 import { STRIKER_SWINGS, useSceneStore } from '@/store/scene';
 import {
@@ -161,74 +162,82 @@ export function HighStrikerHud() {
           {/* Modal cards: how-to / verdict */}
           <AnimatePresence>
             {modal && (
-              <motion.div
-                className="pointer-events-auto absolute inset-0 flex items-center justify-center p-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
+              <FocusTrap
+                focusTrapOptions={{
+                  initialFocus: false,
+                  escapeDeactivates: false,
+                  allowOutsideClick: true,
+                }}
               >
-                <div className="absolute inset-0 bg-background-primary/55 backdrop-blur-[2px]" />
                 <motion.div
-                  role="dialog"
-                  aria-modal="true"
-                  initial={{ opacity: 0, y: 24, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 16, scale: 0.99 }}
-                  transition={{ duration: 0.4, ease: EASE }}
-                  className="ticket-frame halftone relative z-10 w-full max-w-md rounded-[5px] p-6 text-center md:p-8"
+                  className="pointer-events-auto absolute inset-0 flex items-center justify-center p-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
                 >
-                  {phase === 'intro' && (
-                    <>
-                      <p className="font-fell-sc text-[13px] tracking-[0.22em] text-brass-text">
-                        Test your strength
-                      </p>
-                      <h2 className="font-rye letterpress mt-2 text-[34px] text-ink">
-                        High Striker
-                      </h2>
-                      <p className="font-fell mt-4 text-[15px] leading-relaxed text-ink/90">
-                        The needle sweeps up and down — <strong>tap anywhere</strong> when it peaks
-                        to swing the mallet. Send the puck to the top and{' '}
-                        <strong>ring the bell</strong>. Three swings.
-                      </p>
-                      <button
-                        onClick={arm}
-                        className="paper-button mt-6 rounded-[3px] px-6 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
-                      >
-                        Grab the mallet
-                      </button>
-                    </>
-                  )}
+                  <div className="absolute inset-0 bg-background-primary/55 backdrop-blur-[2px]" />
+                  <motion.div
+                    role="dialog"
+                    aria-modal="true"
+                    initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 16, scale: 0.99 }}
+                    transition={{ duration: 0.4, ease: EASE }}
+                    className="ticket-frame halftone relative z-10 w-full max-w-md rounded-[5px] p-6 text-center md:p-8"
+                  >
+                    {phase === 'intro' && (
+                      <>
+                        <p className="font-fell-sc text-[13px] tracking-[0.22em] text-brass-text">
+                          Test your strength
+                        </p>
+                        <h2 className="font-rye letterpress mt-2 text-[34px] text-ink">
+                          High Striker
+                        </h2>
+                        <p className="font-fell mt-4 text-[15px] leading-relaxed text-ink/90">
+                          The needle sweeps up and down — <strong>tap anywhere</strong> when it
+                          peaks to swing the mallet. Send the puck to the top and{' '}
+                          <strong>ring the bell</strong>. Three swings.
+                        </p>
+                        <button
+                          onClick={arm}
+                          className="paper-button mt-6 rounded-[3px] px-6 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
+                        >
+                          Grab the mallet
+                        </button>
+                      </>
+                    )}
 
-                  {phase === 'done' && (
-                    <>
-                      <h2 className="font-rye letterpress text-[32px] text-ink">
-                        {best >= PERFECT ? '🔔 DING!' : resultLabel(best)}
-                      </h2>
-                      <p className="font-fell mt-3 text-[15px] leading-relaxed text-ink/90">
-                        Best swing <span className="font-rye text-oxblood">{pct(best)}%</span>
-                        {best >= PERFECT
-                          ? ' — you rang the bell. The carny eyes you with new respect.'
-                          : ' — the bell lives to ring another day.'}
-                      </p>
-                      <div className="mt-6 flex flex-wrap justify-center gap-3">
-                        <button
-                          onClick={replay}
-                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
-                        >
-                          Play again
-                        </button>
-                        <button
-                          onClick={exit}
-                          className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[14px] tracking-[0.06em]"
-                        >
-                          Exit
-                        </button>
-                      </div>
-                    </>
-                  )}
+                    {phase === 'done' && (
+                      <>
+                        <h2 className="font-rye letterpress text-[32px] text-ink">
+                          {best >= PERFECT ? '🔔 DING!' : resultLabel(best)}
+                        </h2>
+                        <p className="font-fell mt-3 text-[15px] leading-relaxed text-ink/90">
+                          Best swing <span className="font-rye text-oxblood">{pct(best)}%</span>
+                          {best >= PERFECT
+                            ? ' — you rang the bell. The carny eyes you with new respect.'
+                            : ' — the bell lives to ring another day.'}
+                        </p>
+                        <div className="mt-6 flex flex-wrap justify-center gap-3">
+                          <button
+                            onClick={replay}
+                            className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
+                          >
+                            Play again
+                          </button>
+                          <button
+                            onClick={exit}
+                            className="paper-button rounded-[3px] px-5 py-3 font-fell-sc text-[14px] tracking-[0.06em]"
+                          >
+                            Exit
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </motion.div>
                 </motion.div>
-              </motion.div>
+              </FocusTrap>
             )}
           </AnimatePresence>
         </motion.div>
