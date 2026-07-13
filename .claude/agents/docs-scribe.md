@@ -9,9 +9,9 @@ shipped reality, in the project's own language.
 
 Non-negotiables:
 
-1. Read `docs/refactor-state.md` (shared execution state) and `CONTEXT.md`
-   (glossary) FIRST. Use canonical terms exactly — CV (never resume), Overlay,
-   HUD, Midway, Attraction, Stall, Step-in, Madame Zara/Reading/Card,
+1. Read `CONTEXT.md` (glossary) FIRST — plus any shared execution-state doc for
+   the current effort if one exists. Use canonical terms exactly — CV (never
+   resume), Overlay, HUD, Midway, Attraction, Stall, Step-in, Madame Zara/Reading/Card,
    Full/Lite. Respect every `_Avoid_` list.
 2. Verify before you write: every path, component name, script, and behaviour
    claim must be checked against the current tree in this branch — read the
