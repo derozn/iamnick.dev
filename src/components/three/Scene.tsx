@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useMemo } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { ACESFilmicToneMapping } from 'three';
 
@@ -20,6 +20,7 @@ import { GoldenTickets } from './tickets/GoldenTickets';
 import { Npcs } from './synty/Npcs';
 import { ConfettiBurst } from './effects/ConfettiBurst';
 import { type QualityTier } from './hooks/useQualityTier';
+import { useDebugGates } from './hooks/useDebugGates';
 
 interface SceneProps {
   tier: Exclude<QualityTier, 'none'>;
@@ -46,34 +47,12 @@ export default function Scene({ tier }: SceneProps) {
   // washing the letterpress dark into grey-blue. Bloom ramping in as the iris
   // finishes doubles as the "lights come alive" beat.
   const veilDone = useSceneStore((s) => s.veilDone);
-  // Debug-only bisection gates (headless verification): ?off=synty,rides,glow,
-  // lights,game,indicators unmounts pieces; ?offp=<regex> drops matching Synty
-  // prefabs. Inert in normal visits; SSR-safe (Scene is dynamic ssr:false).
-  const dbg = useMemo(() => {
-    if (typeof window === 'undefined' || !window.location.search.includes('debug=1')) {
-      return { off: new Set<string>(), offp: undefined as RegExp | undefined };
-    }
-    const q = new URLSearchParams(window.location.search);
-    const off = new Set((q.get('off') ?? '').split(',').filter(Boolean));
-    const offp = q.get('offp') ? new RegExp(q.get('offp')!) : undefined;
-    return { off, offp };
-  }, []);
-  // Bloom is ON by default for the high tier. Verified (July 2026): the historical
-  // black-frame was zero-length normals → shader NaN → mipmap-blur smear, fixed by
-  // sanitizeNormals in InstancedPrefab and confirmed headlessly (overview renders
-  // with the composer where it used to black out); the SafePostFX context-loss
-  // tripwire was end-to-end tested with a forced WEBGL_lose_context (flag persists,
-  // reload stays composer-free). ?bloom=0 forces it off for A/B comparison.
-  //
-  // Bloom is a MOUNT-TIME decision: emissive intensities are baked into materials
-  // once (applyEmissive guards re-application), so they can't follow a mid-session
-  // composer dropout. If the context is lost, SafePostFX unmounts the composer and
-  // the scene runs a touch dim until reload — the persisted flag makes the next
-  // visit tune emissives for the no-composer look from the start.
-  const bloomOn = useMemo(() => {
-    const optOut = typeof window !== 'undefined' && window.location.search.includes('bloom=0');
-    return high && !optOut && !useSceneStore.getState().postFxBlocked;
-  }, [high]);
+  // Debug bisection gates (?off/?offp) + the mount-time bloom decision (?bloom=0).
+  // Bloom is ON by default on high tier — the historical black-frame (zero-length
+  // normals → shader NaN → mipmap-blur smear) is fixed by sanitizeNormals in
+  // InstancedPrefab; SafePostFX's context-loss tripwire persists a flag so a lost
+  // context runs composer-free until reload.
+  const { dbg, bloomOn } = useDebugGates(high);
   // Atmospheric fog for depth — paired with the luminous FOG colour above and the
   // capped zoom-out, the far edge of the carnival fades into haze (not darkness),
   // while near props stay crisp because exp² fog is light up close.

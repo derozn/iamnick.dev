@@ -1,11 +1,13 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
+import { useDisposeOnUnmount } from '@/components/three/hooks/useDisposable';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useProgress } from '@react-three/drei';
 import { PlaneGeometry, ShaderMaterial } from 'three';
 
 import { useSceneStore } from '@/store/scene';
+import { NOISE_GLSL } from '@/components/three/shaders/noise';
 
 /**
  * LoaderVeil — the Bruno-Simon-style loading screen, drawn IN the canvas as a
@@ -45,21 +47,7 @@ const FRAG = /* glsl */ `
   uniform float uReveal;   // 0 holding -> 1 fully irised open (started)
   uniform float uAspect;   // canvas width / height
 
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-  }
-
-  // cheap value noise for the dissolve edge
-  float vnoise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(
-      mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
-      mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
-      u.y
-    );
-  }
+  ${NOISE_GLSL}
 
   void main() {
     // aspect-corrected coords centred on screen; 1 unit = canvas height
@@ -126,6 +114,10 @@ export function LoaderVeil() {
     [],
   );
   const geometry = useMemo(() => new PlaneGeometry(2, 2), []);
+  // The veil unmounts after every reveal (see `done` below), so without this
+  // its ShaderMaterial + PlaneGeometry leak per visit.
+  useDisposeOnUnmount(material);
+  useDisposeOnUnmount(geometry);
   const matRef = useRef<ShaderMaterial>(null);
 
   useFrame((_, delta) => {

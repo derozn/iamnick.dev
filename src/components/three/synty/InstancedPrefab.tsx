@@ -16,22 +16,10 @@ import {
 } from 'three';
 
 import { CM, unityTRS } from './conversion';
+import { applyEmissive } from './materials';
 
 const WHITE = new Color('#ffffff');
 const ZERO = new Matrix4().makeScale(0, 0, 0); // collapsed = covers no pixels = ~free
-
-/** Wire the shared Synty emissive atlas onto a material so its neon pixels glow + bloom. */
-function applyEmissive(mat: Material | Material[], tex: Texture, intensity: number) {
-  for (const m of Array.isArray(mat) ? mat : [mat]) {
-    const sm = m as MeshStandardMaterial;
-    if (!sm.emissiveMap) {
-      sm.emissive = WHITE;
-      sm.emissiveMap = tex;
-      sm.emissiveIntensity = intensity;
-      sm.needsUpdate = true;
-    }
-  }
-}
 
 /**
  * Point a material's base map at the shared atlas. With `force`, this also replaces

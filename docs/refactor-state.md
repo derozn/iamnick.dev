@@ -25,7 +25,7 @@
 | 2 — Component architecture | DONE 2026-07-13 (0b6a48a)                               | —   |
 | 3 — Config/deps/varlock    | DONE 2026-07-13 (8eab757; varlock runtime deferred)     | —   |
 | 4 — Fortune API + a11y     | DONE 2026-07-13 (Upstash deferred; real-key smoke owed) | —   |
-| 5 — Dedup & extraction     | pending                                                 | —   |
+| 5 — Dedup & extraction     | DONE 2026-07-13                                         | —   |
 | 6 — Tests & tooling        | pending                                                 | —   |
 | 7 — Ops hardening          | pending                                                 | —   |
 
@@ -118,6 +118,32 @@ glossary-guard}.md` — register on session reload; this session ran their
   done-when, unrunnable until the key works. (2) Upstash DB + env vars → the
   DEFERRED 4d rate-limit swap (@upstash/ratelimit; in-memory limiter still live
   meanwhile). Both tracked; neither blocks Phase 5.
+
+## Phase 5 result (2026-07-13)
+
+Behaviour-preserving dedup/extraction — new single homes:
+
+- `src/lib/motion.ts` (EASE ×7 overlay/nav files).
+- `synty/demoInstances.ts` (`demoData`, was cast ×4), `synty/materials.ts`
+  (`applyEmissive`, was ×2), `synty/textures.ts` (`useEmissiveAtlas`, was ×2),
+  `three/shaders/noise.ts` (`NOISE_GLSL` spliced into LoaderVeil + Atmosphere
+  shaders — verified pixel-identical), `three/shared/glowTexture.ts`
+  (`getGlowTexture` moved out of the Synty layer; 4 importers repointed),
+  `three/hooks/useDebugGates.ts` (Scene's ?off/?offp/?bloom gates).
+- Leak fix: `three/hooks/useDisposable.ts` → `useDisposeOnUnmount(resource)`,
+  applied to LoaderVeil (the real per-visit ShaderMaterial+geometry leak),
+  Atmosphere (2 materials), GoldenTickets (2 geometries + material).
+  ConfettiBurst NOT touched — its geometry/material are JSX (R3F auto-disposes).
+- **DEVIATION:** the plan's `useDisposable(() => new X(), deps)` shape is
+  IMPOSSIBLE here — the repo's custom react-hooks rule hard-errors on a
+  non-literal `useMemo` dep list. Adapted to `useDisposeOnUnmount(resource)`:
+  each site keeps its lint-legal inline `useMemo(..., [literal])` and passes the
+  result to the hook. Same dispose-on-change/unmount semantics.
+- Gate: typecheck ✓ lint (0 warnings) ✓ 42 tests ✓ build ✓; overview + loader
+  veil screenshots pixel-identical to baseline; all dedup greps return single
+  homes. Two multi-line-import insertion bugs hit and fixed (HighStrikerHud,
+  BulbGlow) — the naive "insert after last import line" heuristic lands inside
+  multi-line `import {` blocks; a lesson for Phase 6+.
 
 ## Hotfix (2026-07-13, out-of-phase)
 
