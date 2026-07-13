@@ -3,23 +3,26 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resetRateLimit } from './rateLimit';
 
 /**
- * Route-handler tests. The Anthropic SDK is mocked — the "stream" it returns
- * yields two text deltas — so these cover validation, stub mode, rate limits
- * and the streaming plumbing without spending tokens.
+ * Route-handler tests. The AI SDK is mocked — streamText returns a canned
+ * textStream — so these cover validation, stub mode, rate limits and the
+ * streaming plumbing without spending tokens.
  */
 
-const mockStream = vi.fn(() =>
-  (async function* () {
-    yield { type: 'content_block_delta', delta: { type: 'text_delta', text: 'The Ringmaster\n' } };
-    yield { type: 'content_block_delta', delta: { type: 'text_delta', text: 'He leads, dearie.' } };
+const mockStreamText = vi.fn((_opts: unknown) => ({
+  textStream: (async function* () {
+    yield 'The Ringmaster\n';
+    yield 'He leads, dearie.';
   })(),
-);
+}));
 
-// A real class — the route `new`s the client, and arrow-fn mocks can't be constructed.
-vi.mock('@anthropic-ai/sdk', () => ({
-  default: class MockAnthropic {
-    messages = { stream: mockStream };
-  },
+vi.mock('ai', () => ({
+  streamText: (opts: unknown) => mockStreamText(opts),
+}));
+
+// createAnthropic({apiKey}) returns a provider fn; the route calls it with the
+// model id. Echo the id back so tests can assert on it.
+vi.mock('@ai-sdk/anthropic', () => ({
+  createAnthropic: () => (modelId: string) => ({ modelId }),
 }));
 
 import { POST } from './route';
@@ -43,7 +46,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllEnvs();
-  mockStream.mockClear();
+  mockStreamText.mockClear();
 });
 
 describe('POST /api/fortune — validation', () => {
@@ -103,13 +106,15 @@ describe('POST /api/fortune — model path', () => {
     const res = await post({ messages: long });
     expect(res.status).toBe(200);
     expect(await res.text()).toBe('The Ringmaster\nHe leads, dearie.');
-    const sent = mockStream.mock.calls[0][0] as unknown as {
+    const sent = mockStreamText.mock.calls[0][0] as unknown as {
       messages: unknown[];
       system: string;
-      model: string;
+      model: { modelId: string };
+      maxOutputTokens: number;
     };
     expect(sent.messages).toHaveLength(12);
-    expect(sent.model).toBe('claude-haiku-4-5-20251001');
+    expect(sent.model.modelId).toBe('claude-haiku-4-5-20251001');
+    expect(sent.maxOutputTokens).toBeGreaterThan(0);
     // Grounding + guardrails ride in the system prompt.
     expect(sent.system).toContain('Madame Zara');
     expect(sent.system).toContain('<cv>');
@@ -117,15 +122,22 @@ describe('POST /api/fortune — model path', () => {
   });
 
   it('falls back to a canned reading when the model call fails before any text', async () => {
-    // The SDK defers auth/connection errors into stream iteration — an invalid
-    // key must serve an in-character Reading, not dead air (empty 200).
+    // The AI SDK MASKS stream errors — textStream ends silently and only the
+    // onError callback sees the failure (verified against ai@7 with a real
+    // invalid key). An empty stream must serve an in-character Reading, not
+    // dead air (empty 200).
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const failing = {
-      [Symbol.asyncIterator]: () => ({
-        next: () => Promise.reject(Object.assign(new Error('invalid x-api-key'), { status: 401 })),
-      }),
-    };
-    mockStream.mockImplementationOnce(() => failing as unknown as ReturnType<typeof mockStream>);
+    mockStreamText.mockImplementationOnce((opts: unknown) => {
+      const { onError } = opts as { onError: (e: { error: unknown }) => void };
+      onError({ error: Object.assign(new Error('invalid x-api-key'), { status: 401 }) });
+      return {
+        textStream: {
+          [Symbol.asyncIterator]: () => ({
+            next: () => Promise.resolve({ done: true as const, value: undefined }),
+          }),
+        },
+      } as unknown as ReturnType<typeof mockStreamText>;
+    });
     const res = await post(ask());
     expect(res.status).toBe(200);
     const text = await res.text();
@@ -150,13 +162,13 @@ describe('POST /api/fortune — stub mode', () => {
     expect(res.status).toBe(200);
     const text = await res.text();
     expect(text.split('\n')[0]).toBe('The Lantern');
-    expect(mockStream).not.toHaveBeenCalled();
+    expect(mockStreamText).not.toHaveBeenCalled();
   });
 
   it('honours FORTUNE_STUB=1 even with a key present', async () => {
     vi.stubEnv('FORTUNE_STUB', '1');
     const res = await post(ask());
     expect(res.status).toBe(200);
-    expect(mockStream).not.toHaveBeenCalled();
+    expect(mockStreamText).not.toHaveBeenCalled();
   });
 });

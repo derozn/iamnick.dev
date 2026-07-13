@@ -1,4 +1,5 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { createAnthropic } from '@ai-sdk/anthropic';
+import { streamText } from 'ai';
 import { z } from 'zod';
 
 import {
@@ -121,32 +122,31 @@ export async function POST(req: Request): Promise<Response> {
   if (verdict === 'rate-limited') return cannedStream(RATE_LIMIT_READING, 429);
   if (verdict === 'budget-exhausted') return cannedStream(BUDGET_READING, 429);
 
-  const client = new Anthropic({ apiKey });
-  const stream = client.messages.stream({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: MAX_TOKENS,
+  const anthropic = createAnthropic({ apiKey });
+  const result = streamText({
+    model: anthropic('claude-haiku-4-5-20251001'),
+    maxOutputTokens: MAX_TOKENS,
     system: buildSystemPrompt(),
     messages,
+    // The AI SDK MASKS stream errors — textStream just ends (verified against
+    // ai@7: an invalid key yields zero chunks and no throw). onError is the
+    // only hook that sees the real failure.
+    onError: ({ error }) => console.error('[fortune] model call failed:', error),
   });
 
+  // Deliberately NOT result.toTextStreamResponse(): our wrapper preserves the
+  // canned-fallback contract. A model that fails before a single word (bad
+  // key, network) must serve a canned Reading, not dead air; a failure
+  // mid-reading ends the stream and the panel keeps what arrived. Zara never
+  // legitimately replies with nothing, so empty === failed.
   return textStream(async (emit) => {
-    // The SDK defers connection/auth errors into this iteration — a bad key
-    // used to surface as an empty 200 (dead air in the panel). If the model
-    // fails before a single word, serve a canned Reading instead; a failure
-    // mid-reading logs and ends (the panel keeps what arrived).
     let emitted = false;
-    try {
-      for await (const event of stream) {
-        if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-          emit(event.delta.text);
-          emitted = true;
-        }
-      }
-    } catch (err) {
-      console.error('[fortune] model call failed:', err);
-      if (!emitted) {
-        emit(STUB_READINGS[Math.floor(messages.length / 2) % STUB_READINGS.length]);
-      }
+    for await (const text of result.textStream) {
+      emit(text);
+      emitted = true;
+    }
+    if (!emitted) {
+      emit(STUB_READINGS[Math.floor(messages.length / 2) % STUB_READINGS.length]);
     }
   });
 }
