@@ -263,7 +263,10 @@ rejected: threshold noise on a 3D-heavy site). **Evaluate a real visual
 regression service** (Chromatic, Percy, Argos, Lost Pixel) once the Phase 6
 suite exists — a service with a consistent rendering environment could make
 canvas diffs meaningful where local swiftshader can't; adopt only if it
-demonstrably beats the artifact-screenshot + real-GPU workflow. Content bugs (bloom NaN
+demonstrably beats the artifact-screenshot + real-GPU workflow. **TanStack
+Hotkeys** (considered 2026-07-13, deferred — alpha, and the 2 trivial bindings
+don't justify it; revisit as the `useKeyDown` upgrade path if a command palette,
+richer shortcuts, or a shortcut-help panel land). Content bugs (bloom NaN
 verification, ferris wheel spin, NPC tuning) are not standards work.
 
 ## Constraints
