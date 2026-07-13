@@ -9,6 +9,7 @@ import { ATTRACTIONS } from '@/components/three/synty/attractions';
 import { SectionContent } from './SectionContent';
 import { CareerTickets } from './CareerTickets';
 import { EASE } from '@/lib/motion';
+import { useKeyDown } from '@/hooks/useKeyDown';
 
 /**
  * ContentOverlay — the neon HUD panel that rises over the dimmed carnival when a
@@ -26,19 +27,19 @@ export function ContentOverlay() {
   // than the neon HUD card — first step of the HUD overhaul.
   const isCareer = attraction?.section === 'work';
 
+  useKeyDown((e) => {
+    if (e.key === 'Escape') close();
+  }, isOpen);
+
+  // Lock body scroll while open so the camera holds at the attraction.
   useEffect(() => {
     if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-    };
-    document.addEventListener('keydown', onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
-      document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prev;
     };
-  }, [isOpen, close]);
+  }, [isOpen]);
 
   return (
     <AnimatePresence>

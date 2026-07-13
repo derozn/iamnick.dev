@@ -145,6 +145,36 @@ Behaviour-preserving dedup/extraction — new single homes:
   BulbGlow) — the naive "insert after last import line" heuristic lands inside
   multi-line `import {` blocks; a lesson for Phase 6+.
 
+## React efficiency pass (2026-07-13, Nick-requested, post-Phase-5)
+
+Nick flagged "multiple useEffects / useSceneStore per component" and "rarely use
+useEffect". Audited all 11 DOM components against the vercel-react-best-practices
+skill. **Honest finding: the components already largely follow best practices** —
+atomic zustand selectors are the RECOMMENDED pattern (not a smell), and the
+effects genuinely sync with external systems (DOM listeners, focus, body-scroll
+lock, rAF, the audio mixer), which is the correct use of useEffect per React's
+own "You Might Not Need an Effect". No derive-in-effect or event-as-state
+violations existed. Actions look like extra subscriptions but are STABLE
+identities in zustand → subscribing costs zero re-renders, so mass-converting
+them to getState() would be churn for no gain (skill agrees). Applied only the
+three genuine wins:
+
+- **Shared `src/hooks/useKeyDown.ts`** (stable handler-ref pattern): replaced 4
+  duplicated raw `keydown` effects (HighStrikerHud, BallTossHud, SiteNav Escape;
+  CareerTickets arrows) + split ContentOverlay's combined Escape+scroll-lock into
+  the hook + a dedicated scroll-lock effect. Zero raw keydown listeners remain in
+  components.
+- **Striker reset moved into the `stepIn` store action** (FIX-RESET): deleted
+  HighStrikerHud's reset-on-active effect; `stepIn('high-striker')` now resets the
+  slice atomically via a shared `FRESH_STRIKER` const. Also dropped the now-dead
+  `resetStriker` subscription.
+- **FortunePanel stopRef collapsed**: `stop` is session-stable, so the unmount
+  cleanup calls it directly on a `[stop]` dep — one effect instead of two.
+- Gate: typecheck/lint/42 tests/build green; headless smoke confirmed Escape
+  closes panels, arrow deck nav works, striker resets fresh on step-in, Escape
+  exits games. Left untouched (correct as-is): AudioDirector's 3 mixer-sync
+  effects, DebugBridge window bridge, all atomic render subscriptions.
+
 ## Hotfix (2026-07-13, out-of-phase)
 
 - Nick reported the fortune teller dead when asking a question. Root cause:

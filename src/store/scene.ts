@@ -46,6 +46,16 @@ export type StrikerPhase = 'intro' | 'armed' | 'struck' | 'result' | 'done';
 /** Swings the visitor gets per high-striker round. */
 export const STRIKER_SWINGS = 3;
 
+/** The high-striker slice reset to its pre-play state — the fresh round the
+ *  visitor gets on step-in and on "reset". */
+const FRESH_STRIKER = {
+  strikerPhase: 'intro',
+  strikerArmedAt: 0,
+  strikerPower: 0,
+  strikerAttemptsLeft: STRIKER_SWINGS,
+  strikerBest: 0,
+} as const;
+
 /** localStorage key: this device dropped the GL context with the composer on. */
 const POSTFX_BLOCKED_KEY = 'iamnick:postfx-blocked';
 /** localStorage key: visitor muted the carnival audio. */
@@ -250,7 +260,14 @@ export const useSceneStore = create<SceneState>()((set) => ({
   focus: (attraction) => set({ focusedAttraction: attraction }),
   open: (attraction) => set({ mode: 'viewing', activeAttraction: attraction }),
   close: () => set({ mode: 'travelling', activeAttraction: null, focusedAttraction: null }),
-  stepIn: (stall) => set({ mode: 'playing', activeStall: stall }),
+  // Stepping into the high-striker gives a fresh round atomically (no HUD effect
+  // reaching back to reset it once it sees `activeStall` change).
+  stepIn: (stall) =>
+    set(
+      stall === 'high-striker'
+        ? { mode: 'playing', activeStall: stall, ...FRESH_STRIKER }
+        : { mode: 'playing', activeStall: stall },
+    ),
   // Also clear focusedAttraction so IsoControls releases the booth and the iso
   // camera eases back to the overview (otherwise it stays parked at the stall).
   exit: () => set({ mode: 'travelling', activeStall: null, focusedAttraction: null }),
@@ -269,14 +286,7 @@ export const useSceneStore = create<SceneState>()((set) => ({
   strikerBest: 0,
   strikerRound: 0,
   setStriker: (patch) => set(patch),
-  resetStriker: () =>
-    set({
-      strikerPhase: 'intro',
-      strikerArmedAt: 0,
-      strikerPower: 0,
-      strikerAttemptsLeft: STRIKER_SWINGS,
-      strikerBest: 0,
-    }),
+  resetStriker: () => set({ ...FRESH_STRIKER }),
   replayStriker: () =>
     set((s) => ({
       strikerPhase: 'armed',

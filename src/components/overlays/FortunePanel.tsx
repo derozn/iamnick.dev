@@ -83,17 +83,13 @@ export function FortunePanel() {
   const { messages, sendMessage, stop, status, error, clearError } = useChat({ transport });
   const streaming = status === 'submitted' || status === 'streaming';
 
-  // Focus the wager — er, the question — on open; abort any in-flight reading
-  // on close. `stop` rides in a ref (written in an effect — never in render)
-  // so the unmount cleanup always calls the latest one without re-running.
-  const stopRef = useRef(stop);
-  useEffect(() => {
-    stopRef.current = stop;
-  }, [stop]);
+  // Focus the question on open; abort any in-flight reading on close. `stop` is
+  // stable across a session, so depending on it here is safe and lets the
+  // cleanup call the current one directly (no ref intermediary).
   useEffect(() => {
     inputRef.current?.focus();
-    return () => void stopRef.current();
-  }, []);
+    return () => void stop();
+  }, [stop]);
 
   // Hand the quill back once the cards have spoken.
   useEffect(() => {

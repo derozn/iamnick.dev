@@ -1,11 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 
 import { roles, type Role } from '@/content/cv';
 import { formatYearMonth } from '@/lib/formatDate';
 import { EASE } from '@/lib/motion';
+import { useKeyDown } from '@/hooks/useKeyDown';
 
 /**
  * CareerTickets — the Career booth as a deck of letterpress carnival tickets you
@@ -59,14 +60,10 @@ export function CareerTickets() {
   );
 
   // ← / → shuffle the deck while the booth is open.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') go(1);
-      else if (e.key === 'ArrowLeft') go(-1);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [go]);
+  useKeyDown((e) => {
+    if (e.key === 'ArrowRight') go(1);
+    else if (e.key === 'ArrowLeft') go(-1);
+  });
 
   const role = DECK[index];
   const dates = `${formatYearMonth(role.start)} – ${formatYearMonth(role.end)}`;

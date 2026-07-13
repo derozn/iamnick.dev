@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { FocusTrap } from 'focus-trap-react';
 
 import { useSceneStore } from '@/store/scene';
 import { EASE } from '@/lib/motion';
+import { useKeyDown } from '@/hooks/useKeyDown';
 
 /**
  * BallTossHud — the DOM overlay for the ball-toss game. A sibling of
@@ -27,14 +27,9 @@ export function BallTossHud() {
   const replay = useSceneStore((s) => s.replayBallToss);
   const focus = useSceneStore((s) => s.focus);
 
-  useEffect(() => {
-    if (!active) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') exit();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [active, exit]);
+  useKeyDown((e) => {
+    if (e.key === 'Escape') exit();
+  }, active);
 
   const startPlaying = () => setBallToss({ ballTossPhase: 'aiming' });
   const seeWork = () => {

@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { useSceneStore } from '@/store/scene';
 import { ATTRACTIONS, type Attraction } from '@/components/three/synty/attractions';
 import { MuteButton } from './MuteButton';
 import { EASE } from '@/lib/motion';
+import { useKeyDown } from '@/hooks/useKeyDown';
 
 /**
  * SiteNav — a Bruno-Simon-style burger menu (replacing the old nav-bar HUD).
@@ -31,14 +32,9 @@ export function SiteNav() {
   // the burger to avoid overlapping it.
   const hidden = mode === 'viewing' || mode === 'playing';
 
-  useEffect(() => {
-    if (!menuOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [menuOpen]);
+  useKeyDown((e) => {
+    if (e.key === 'Escape') setMenuOpen(false);
+  }, menuOpen);
 
   const select = (a: Attraction) => {
     setMenuOpen(false);

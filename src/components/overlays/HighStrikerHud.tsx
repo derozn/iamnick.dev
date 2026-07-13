@@ -6,6 +6,7 @@ import { FocusTrap } from 'focus-trap-react';
 
 import { STRIKER_SWINGS, useSceneStore } from '@/store/scene';
 import { EASE } from '@/lib/motion';
+import { useKeyDown } from '@/hooks/useKeyDown';
 import {
   GREAT,
   meterValue,
@@ -35,23 +36,12 @@ export function HighStrikerHud() {
   const exit = useSceneStore((s) => s.exit);
   const setStriker = useSceneStore((s) => s.setStriker);
   const replay = useSceneStore((s) => s.replayStriker);
-  const resetStriker = useSceneStore((s) => s.resetStriker);
 
   const needle = useRef<HTMLDivElement>(null);
 
-  // fresh round each step-in
-  useEffect(() => {
-    if (active) resetStriker();
-  }, [active, resetStriker]);
-
-  useEffect(() => {
-    if (!active) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') exit();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [active, exit]);
+  useKeyDown((e) => {
+    if (e.key === 'Escape') exit();
+  }, active);
 
   // The needle loop — writes style directly (no React re-renders at 60fps).
   useEffect(() => {
