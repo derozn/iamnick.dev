@@ -24,6 +24,8 @@
     "lint:fix": "eslint . --fix && prettier --write .",
     "test": "vitest",
     "test:ci": "vitest run",
+    "knip": "knip",
+    "validate": "pnpm typecheck && pnpm lint && pnpm test:ci && pnpm knip && pnpm build",
     "prepare": "husky",
     "env:check": "varlock load"
   },
@@ -69,6 +71,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
+    "knip": "^6.26.0",
     "lint-staged": "^17.0.8",
     "prettier": "^3.9.4",
     "tailwindcss": "^4.3.2",

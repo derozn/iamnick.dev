@@ -48,5 +48,8 @@ jobs:
       - name: Test
         run: pnpm test:ci
 
+      - name: Knip (dead code / unused deps)
+        run: pnpm knip
+
       - name: Build
         run: pnpm build
