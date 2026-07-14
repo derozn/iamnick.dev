@@ -13,6 +13,7 @@ import { Indicators } from './synty/Indicators';
 import { DynamicLights } from './synty/DynamicLights';
 import { BallTossGame } from './game/BallTossGame';
 import { HighStrikerGame } from './game/HighStrikerGame';
+import { DoodleWall } from './game/DoodleWall';
 import { SafePostFX } from './effects/SafePostFX';
 import { LoaderVeil } from './intro/LoaderVeil';
 import { Atmosphere } from './synty/Atmosphere';
@@ -99,6 +100,8 @@ export default function Scene({ tier }: SceneProps) {
         {!dbg.off.has('glow') && <BulbGlow bloomOn={bloomOn} />}
         {!dbg.off.has('game') && <BallTossGame />}
         {!dbg.off.has('game') && <HighStrikerGame />}
+        {/* Scenery, not gated on mode: the tile board shows while travelling. */}
+        {!dbg.off.has('game') && <DoodleWall bloomOn={bloomOn} />}
         {!dbg.off.has('tickets') && <GoldenTickets bloomOn={bloomOn} />}
         <ConfettiBurst />
         {/* A child of Suspense: it only mounts once all the GLBs/textures above

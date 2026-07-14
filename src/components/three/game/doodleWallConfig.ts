@@ -62,11 +62,11 @@ export const BOARD_DEPTH = 0.06;
 
 /**
  * Board centre in three world space + yaw (radians about Y). The stall prefab
- * sits at three (-4, 33) yaw 135° (sceneAdditions); the board hangs at its back
- * wall, facing SW down the Midway toward the iso camera. Iterated visually via
- * headless screenshots — these two are THE placement knobs.
+ * sits at three (-12.5, 31.5) yaw 135° (sceneAdditions); the board hangs at its
+ * back wall, facing SW down the Midway toward the iso camera. Iterated visually
+ * via headless screenshots — these two are THE placement knobs.
  */
-export const BOARD_CENTER: readonly [number, number, number] = [-3.55, 1.72, 33.45];
+export const BOARD_CENTER: readonly [number, number, number] = [-12.08, 1.72, 31.92];
 /** Yaw so the board's face (+z of its group) points SW, matching the stall. */
 export const BOARD_YAW = -Math.PI * 0.75;
 
