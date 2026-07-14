@@ -22,8 +22,12 @@ export function TicketHud() {
   const celebrate = useSceneStore((s) => s.celebrateTickets);
   const resetTickets = useSceneStore((s) => s.resetTickets);
   const started = useSceneStore((s) => s.started);
+  const playing = useSceneStore((s) => s.mode === 'playing');
 
-  const showChip = started && found > 0;
+  // Hide the tally while a game owns the screen — the high striker's stats hug
+  // the same bottom edge and the two collided on mobile (same pattern as
+  // SiteNav's burger: game chrome wins, the chip fades back on exit).
+  const showChip = started && !playing && found > 0;
   const showModal = started && found >= TICKET_COUNT && !celebrated;
 
   return (
