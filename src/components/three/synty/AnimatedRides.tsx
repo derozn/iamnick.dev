@@ -53,7 +53,14 @@ function Ride({
     const c = scene.clone(true);
     c.traverse((o) => {
       const m = o as Mesh;
-      if (m.isMesh && m.material) applyEmissive(m.material, emissive, emissiveIntensity);
+      if (!m.isMesh || !m.material) return;
+      // Only materials in the shared-atlas UV space may take the emissive atlas.
+      // The carousel + swing chairs carry a second 'WoodFloor' material with its
+      // OWN texture/UV layout — its UVs land on the emissive atlas's lit swatch
+      // strip, painting glowing rainbow rectangles across the floor.
+      for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
+        if (mat.name.includes('HorrorCarnival')) applyEmissive(mat, emissive, emissiveIntensity);
+      }
     });
     return c;
   }, [scene, emissive, emissiveIntensity]);
