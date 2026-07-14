@@ -24,14 +24,32 @@ Two stages, each its own PR:
 2. **Stage 2 — moderation:** `/admin` queue (Supabase Auth, Google OAuth, **hard
    allow-list of Nick's account only**), approve/reject route, daily keepalive cron.
 
-**Before any feature code:** the `/grill-with-docs` session (§5) must close the open
-parameters. Its outcomes land in `doodleWallConfig.ts` and §5 of this doc.
+Stage 1 progress: backend half ✅ done (contracts in §2.1); scene + overlay half is next
+(§8 steps 4–5). All tuning parameters were fixed in the 2026-07-14 grill session (§5).
 
-## 1. Current state (verified 2026-07-14)
+## 1. Current state (verified 2026-07-14, post-backend-slice)
 
-- **Nothing of the doodle wall exists yet.** No route, no component, no store slice, no
-  attraction entry. `src/app/api/` contains only `fortune/`; `src/lib/` is flat utilities
-  plus `fonts/`.
+- **Data + backend slice is DONE** (commits `58bf8ad`, `6d758dc`, `d28b50d`; gate green —
+  typecheck/lint/test:ci 111 tests/build, keyless):
+  - Domain layer `src/lib/doodle-wall/`: `types.ts`, `constants.ts` (server truths — see
+    §2.1), `ports.ts`, `png.ts` (hand-parsed PNG validator), `submitterHash.ts`,
+    `tileService.ts`, `fakes.ts` (in-memory adapters + programmatic PNG builder + 24
+    seeded approved tiles), colocated tests.
+  - Thin routes: `src/app/api/tiles/route.ts` (POST, + sibling `rateLimit.ts`, burst
+    2/min/IP) and `src/app/api/wall/route.ts` (GET), mirroring fortune conventions.
+  - Supabase adapters (dormant until provisioning): `src/lib/supabase/` —
+    `serverClient.ts`, `tileRepository.ts`, `tileImageStore.ts`, `tileAdapters.ts`
+    (selection factory + `resetTileAdapters()` + `DEV_SUBMITTER_HASH_SECRET`).
+    supabase-js confined to that folder (grep-verified). Dep: `@supabase/supabase-js
+^2.110.2`.
+  - Migration `supabase/migrations/20260714115029_doodle_wall.sql`: tiles table, partial
+    index (`created_at desc where status='approved'`), `(submitter_hash, created_at)`
+    index, RLS anon insert-pending-only / select-approved-only, `tiles` bucket
+    public-read with 128KB + image/png limits at bucket level.
+  - `.env.schema`: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
+    `SUBMITTER_HASH_SECRET` — all `@sensitive @optional`; absent env = stub mode.
+- **Nothing scene/overlay-side exists yet.** No `doodleWallConfig.ts`, no
+  `DoodleWall.tsx`, no `DoodleWallHud.tsx`, no store slice, no attraction entry.
 - **Binding decisions already made:** ADR-0001 (Supabase; pre-moderation queue; bounded
   recent-approved wall; no realtime; per-session/IP rate-limiting; keepalive cron; admin
   hard allow-list). Reaffirmed by Nick 2026-07-14 over a Vercel-native alternative.
@@ -67,6 +85,23 @@ src/lib/supabase/             adapter: server/service-role clients + port implem
 schema/query design) for any Supabase work; `security-best-practices` for any API surface;
 the relevant `r3f-*` skill for canvas work; `building-components` for the drawing overlay.
 
+### 2.1 Landed contracts (next slices build against these — do not renegotiate)
+
+**Server truths** (`src/lib/doodle-wall/constants.ts` — re-export from
+`doodleWallConfig.ts`, never redefine): `STORED_TILE_SIZE` 256, `DRAWING_CANVAS_SIZE`
+512, `TILE_MAX_BYTES` 131072, `WALL_TILE_COUNT` 48, `SCENE_TILE_COUNT` 24,
+`SUBMIT_BURST_PER_MINUTE` 2, `SUBMIT_DAILY_CAP` 10.
+
+**`POST /api/tiles`** — body `{ "image": "<base64 PNG, no data: prefix>" }`, raw request
+ceiling 204800 bytes. 201 → `{ id, status: 'pending', createdAt }` (ISO). Errors as
+`{ error }` JSON: 400 `invalid-request` | `invalid-image`, 413 `too-large`, 429
+`rate-limited` (burst AND daily cap share this token), 403 `bad-origin`.
+
+**`GET /api/wall`** — 200 → `{ tiles: [{ id, imageUrl, createdAt }] }`, newest first,
+≤48, `Cache-Control: public, s-maxage=60, stale-while-revalidate=300`. In stub mode
+`imageUrl` is a `data:image/png;base64,` URI; with Supabase it is a Storage public URL —
+**consumers must handle both**.
+
 ## 3. Feature spec (v1)
 
 - **Wall (scenery):** a grid of the most-recent approved tiles rendered on the stall in the
@@ -84,22 +119,22 @@ the relevant `r3f-*` skill for canvas work; `building-components` for the drawin
 
 ## 4. File map
 
-| Piece                              | Path                                                                             | Stage |
-| ---------------------------------- | -------------------------------------------------------------------------------- | ----- |
-| SQL migration (tiles, RLS, bucket) | `supabase/migrations/…`                                                          | 1     |
-| Domain: types, ports, service      | `src/lib/doodle-wall/`                                                           | 1     |
-| Supabase clients + adapters        | `src/lib/supabase/`                                                              | 1     |
-| Submit route (thin)                | `src/app/api/tiles/route.ts`                                                     | 1     |
-| Wall route (thin, cacheable)       | `src/app/api/wall/route.ts`                                                      | 1     |
-| Tuning config (three-free) + tests | `src/components/three/game/doodleWallConfig.ts`                                  | 1     |
-| In-scene stall + tile grid         | `src/components/three/game/DoodleWall.tsx`                                       | 1     |
-| Drawing overlay                    | `src/components/overlays/DoodleWallHud.tsx`                                      | 1     |
-| Store slice                        | `src/store/scene.ts` (extend)                                                    | 1     |
-| Attraction entry                   | `src/components/three/synty/attractions.ts` (extend)                             | 1     |
-| Env vars                           | `.env.schema` (`SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) | 1     |
-| Admin queue page                   | `src/app/admin/page.tsx`                                                         | 2     |
-| Approve/reject route               | `src/app/api/admin/tiles/[id]/route.ts`                                          | 2     |
-| Keepalive route + cron             | `src/app/api/keepalive/route.ts` + Vercel cron                                   | 2     |
+| Piece                              | Path                                                                          | Stage | Status  |
+| ---------------------------------- | ----------------------------------------------------------------------------- | ----- | ------- |
+| SQL migration (tiles, RLS, bucket) | `supabase/migrations/20260714115029_doodle_wall.sql`                          | 1     | ✅ done |
+| Domain: types, ports, service      | `src/lib/doodle-wall/`                                                        | 1     | ✅ done |
+| Supabase clients + adapters        | `src/lib/supabase/` (dormant until provisioning)                              | 1     | ✅ done |
+| Submit route (thin) + rate limiter | `src/app/api/tiles/route.ts` + `rateLimit.ts`                                 | 1     | ✅ done |
+| Wall route (thin, cacheable)       | `src/app/api/wall/route.ts`                                                   | 1     | ✅ done |
+| Env vars (4, all optional)         | `.env.schema` (SUPABASE_URL/ANON_KEY/SERVICE_ROLE_KEY, SUBMITTER_HASH_SECRET) | 1     | ✅ done |
+| Tuning config (three-free) + tests | `src/components/three/game/doodleWallConfig.ts`                               | 1     | next    |
+| In-scene stall + tile grid         | `src/components/three/game/DoodleWall.tsx`                                    | 1     | next    |
+| Drawing overlay                    | `src/components/overlays/DoodleWallHud.tsx`                                   | 1     | next    |
+| Store slice                        | `src/store/scene.ts` (extend)                                                 | 1     | next    |
+| Attraction entry                   | `src/components/three/synty/attractions.ts` (extend)                          | 1     | next    |
+| Admin queue page                   | `src/app/admin/page.tsx`                                                      | 2     | —       |
+| Approve/reject route               | `src/app/api/admin/tiles/[id]/route.ts`                                       | 2     | —       |
+| Keepalive route + cron             | `src/app/api/keepalive/route.ts` + Vercel cron                                | 2     | —       |
 
 ## 5. Decisions
 
@@ -133,6 +168,13 @@ the relevant `r3f-*` skill for canvas work; `building-components` for the drawin
   line per tile. Exact placement/offsets iterated visually; final look judged on Nick's
   Mac — grill session, Nick, 2026-07-14.
 
+**Backend-slice deviations (accepted, now canon):**
+
+- Routes return JSON `{ error }` bodies rather than fortune's plain text.
+- No zod length cap on the base64 field — the raw request ceiling (204800B) + the
+  service byte cap own size enforcement.
+- Fake-adapter seed PNGs are generated programmatically, not embedded fixtures.
+
 **Open:**
 
 - Admin queue UX details (batch approve, preview size) — resolve at Stage 2 start.
@@ -141,19 +183,21 @@ the relevant `r3f-*` skill for canvas work; `building-components` for the drawin
 
 **Needs Nick (human gates):**
 
-- Provision the Supabase project and set the three env secrets (local + Vercel) before
-  Stage 1 goes live. Until then everything runs against a stub/fake adapter.
+- **Provisioning gate (before real Supabase goes live):** create the Supabase project →
+  run the migration (it also creates the `tiles` bucket) → set the four env vars (local
+  - Vercel). Until then everything runs in stub mode. Note: Supabase env present but
+    `SUBMITTER_HASH_SECRET` missing throws at request time — by design.
 - Stage 2 admin allow-list uses Nick's actual Google identity — collect it at Stage 2
   start; never widen to "any Google login" (ADR-0001).
 - Final look/feel judgement on his Mac (real GPU).
 
 ## 6. How to verify
 
-- **Gate (every slice):** `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build`.
-- **Domain:** unit tests for `tileService` against in-memory fakes (pending-forced-on-
-  submit, bounded wall query, size cap). Config helpers in `doodleWallConfig.test.ts`.
-- **Routes:** handler tests — rate-limit rejects flooding, invalid payload 400s, wall
-  returns approved only.
+- **Gate (every slice):** `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build`
+  (currently 111 tests, keyless).
+- **Domain + routes:** ✅ covered — `tileService`/`png`/`submitterHash` unit tests
+  against fakes; route handler tests (rate-limit, 400s, approved-only wall). Config
+  helpers go in `doodleWallConfig.test.ts` (scene slice).
 - **Scene:** headless Playwright + swiftshader screenshots (recipe and iso-camera maths in
   `ball-toss-game-handoff.md` §6; drive state via `?debug=1` + `window.__sceneStore`).
   Check the wall grid renders and the overlay opens on step-in, on Full and Lite.
@@ -174,16 +218,21 @@ the relevant `r3f-*` skill for canvas work; `building-components` for the drawin
   modules only (`doodleWallConfig.ts` must stay three-free).
 - Tile PNGs are user content: treat as untrusted (validate server-side, cap dimensions and
   bytes, re-encode or content-type-pin on serve; no SVG).
+- `pnpm knip` flags `DRAWING_CANVAS_SIZE`/`SCENE_TILE_COUNT` until the scene/overlay
+  slice consumes them — expected, resolves itself.
+- `GET /api/wall` `imageUrl` is a data URI in stub mode, an https Storage URL with
+  Supabase — scene textures and overlay `<img>`s must handle both.
+- Nick's dev server usually holds port 3000 — smoke servers go on a spare port (backend
+  slice used 3100).
 - Commit messages end `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
 
 ## 8. Build order
 
 1. ~~Grill session closes §5 open decisions~~ ✅ done 2026-07-14; outcomes in §5.
-2. Domain layer + fake adapters + unit tests (no Supabase needed). Server truths (tile
-   dims, byte cap, wall/scene bounds, rate limits) live in `src/lib/doodle-wall/` and are
-   re-exported by `doodleWallConfig.ts` for scene/overlay use — one source, both sides
-   three-free.
-3. Routes (thin) against the fake adapter; stub mode akin to `FORTUNE_STUB`.
+2. ~~Domain layer + fake adapters + unit tests~~ ✅ done (`58bf8ad`); server truths in
+   `src/lib/doodle-wall/constants.ts`, to be re-exported by `doodleWallConfig.ts`.
+3. ~~Routes (thin) against the fake adapter; stub mode; Supabase adapters dormant~~ ✅
+   done (`6d758dc`); contracts in §2.1.
 4. Scene: attraction entry + stall + wall grid fed by `/api/wall` (stub data).
 5. Overlay: drawing surface + submit flow + store slice.
 6. Swap in real Supabase adapter behind the ports once Nick provisions (gate).
@@ -192,7 +241,10 @@ the relevant `r3f-*` skill for canvas work; `building-components` for the drawin
 
 ## 9. What just happened
 
-2026-07-14 — Plan approved (`~/.claude/plans/i-want-to-do-effervescent-parasol.md`);
-`feature/doodle-wall` branched from a clean master (`9360f16`); `carnival-context` agent
-created; this doc seeded. Grill session then closed every open parameter (§5) and synced
-`open-questions.md`. Next: Stage 1, backend slice first (§8 step 2–3), then scene slice.
+2026-07-14 — **Stage 1 data + backend slice landed** (`58bf8ad` domain layer, `6d758dc`
+routes/adapters/migration/env, `d28b50d` comment reword). Gate green (111 tests,
+keyless); supabase-js confinement grep-verified; smoke-tested on port 3100. Route
+contracts and server truths recorded in §2.1; accepted deviations in §5. Earlier the
+same day: branch cut from `9360f16`, `carnival-context` agent created, doc seeded, grill
+session closed all open parameters. Next: the scene + overlay slice (§8 steps 4–5), then
+the Supabase provisioning gate (Needs Nick).
