@@ -41,11 +41,12 @@ export const EXTRA_INSTANCES: Record<string, number[][]> = {
   SM_Prop_Lamp_Post_02: EXTRA_LAMPS.map(([x, z, yaw]) => at(x, z, yaw ?? 0)),
   // the Ball Toss booth — a stall (facing SW, toward the iso camera) in an open spot
   SM_Prop_Stall_02: [at(13, -12, 45, 0.1)],
-  // the doodle wall's stall — the end of the Midway (past contact / the ferris
-  // wheel), on the grass beside the north dirt road, board facing SW toward the
+  // the doodle wall's stall — the end of the Midway, on the grass at the
+  // north-east fence line (past the big top), facing SW back down the street at
   // iso camera. A distinct variant from ball-toss's Stall_02. The tile board
-  // itself is drawn by <DoodleWall> (doodleWallConfig.BOARD_CENTER tracks this).
-  SM_Prop_Stall_03: [at(-12.5, 31.5, 135, 0.1)],
+  // itself is drawn by <DoodleWall> riding above the roofline
+  // (doodleWallConfig.BOARD_CENTER tracks this position).
+  SM_Prop_Stall_03: [at(12.5, 36.8, 135, 0.1)],
   // NB no separate milk-bottle rack: the game's bottle pyramid rests directly on
   // the stall counter (ballTossConfig.STACK_ANCHOR). The rack prop used to float
   // at y=1.0 behind the counter reading as "a random table in the air".

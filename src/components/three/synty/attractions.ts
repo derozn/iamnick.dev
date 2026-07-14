@@ -129,16 +129,20 @@ export const ATTRACTIONS: Attraction[] = [
     // The communal doodle wall at the end of the Midway (past contact, per
     // CONTEXT.md's order) — a stall variant distinct from ball-toss's Stall_02.
     // The focus target is the tile board's centre (drawn by <DoodleWall> at
-    // doodleWallConfig.BOARD_CENTER); the camera stands on the board's SW
-    // normal, close enough that the ~2.9 m board fills the view (fov 34° →
-    // 0.61·d vertical: d ≈ 4.5 shows the 2 m board plus the stall's roofline).
+    // doodleWallConfig.BOARD_CENTER, riding above the stall roofline so the
+    // awning can't hide it), far enough back that the ~2.9 × 2 m board plus
+    // its bulb string fills the view (fov 34° → 0.61·d vertical: d ≈ 6.5).
+    // Dead-on from the board's SW normal the camera clips the big top's roof
+    // edge, so the facing is swung ~30° south to approach through the gap
+    // between the big top and the barricades (same trick as the fortune
+    // wagon). Verified by headless screenshot.
     id: 'doodle-wall',
     title: 'Doodle Wall',
     section: 'game:doodle-wall',
     prefab: 'SM_Prop_Stall_03',
-    transform: [-12.5, 0.1, -31.5, 0, 0.92388, 0, 0.38268, 1, 1, 1],
-    position: [-12.08, 1.72, 31.92],
-    facing: [-0.707, 0, -0.707],
-    focusDist: 4.5,
+    transform: [12.5, 0.1, -36.8, 0, 0.92388, 0, 0.38268, 1, 1, 1],
+    position: [12.5, 3.35, 36.8],
+    facing: [-0.35, 0, -0.94],
+    focusDist: 6.5,
   },
 ];
