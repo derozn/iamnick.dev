@@ -133,9 +133,8 @@ final judge for grading changes.
 
 ## What just happened
 
-**Refactor Phase 2 — component architecture** (branch
-`chore/standards-refactor`, see `docs/refactor-plan.md` +
-`docs/refactor-state.md` for live status). Components moved into role-based
+**Refactor Phase 2 — component architecture** (see `docs/refactor-plan.md` for
+the full plan; all phases have since merged to master). Components moved into role-based
 folders: `components/content/` → `overlays/`, the three game HUDs left the
 three tree for `overlays/` (configs stayed canvas-side), `cv/` was created for
 the server-only CV document — `StaticResume` renamed `StaticCv` (component and
