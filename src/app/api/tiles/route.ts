@@ -61,8 +61,16 @@ export async function POST(req: Request): Promise<Response> {
     }
   }
 
+  // Refuse by declared size before buffering anything; the header is only a
+  // claim, so the buffered body is re-measured after. Buffer.byteLength, not
+  // String#length — length counts UTF-16 code units, and a multibyte-padded
+  // body can be ~3× the byte cap while passing a code-unit check.
+  const declared = Number(req.headers.get('content-length'));
+  if (declared > MAX_BODY_BYTES) return Response.json({ error: 'too-large' }, { status: 413 });
   const raw = await req.text();
-  if (raw.length > MAX_BODY_BYTES) return Response.json({ error: 'too-large' }, { status: 413 });
+  if (Buffer.byteLength(raw) > MAX_BODY_BYTES) {
+    return Response.json({ error: 'too-large' }, { status: 413 });
+  }
   let body: unknown;
   try {
     body = JSON.parse(raw);

@@ -38,12 +38,12 @@ import {
  * as an <img> grid, and the drawing surface — a 512×512 <canvas> exported as a
  * 256×256 PNG and POSTed to /api/tiles into the pre-moderation queue.
  *
- * Active two ways:
- *  - step-in: `mode === 'playing' && activeStall === 'doodle-wall'` (Full AND
- *    Lite — no quality gate, unlike ball-toss);
- *  - the `#doodle-wall` link from StaticCv — the overlay is the wall's home on
- *    the no-canvas tier (reduced motion / no WebGL), so it opens straight into
- *    the wall view without the scene.
+ * Two entry paths, one open-channel: the store. A scene step-in sets
+ * `mode === 'playing' && activeStall === 'doodle-wall'` directly (Full AND
+ * Lite — no quality gate, unlike ball-toss); the `#doodle-wall` link from
+ * StaticCv (the wall's home on the no-canvas tier) is routed through
+ * `stepIn()` too, so everything keyed on `mode` — SiteNav's burger, the
+ * ticket tally — yields the chrome exactly as it does for the other stalls.
  *
  * Per-stroke state lives in refs (stroke list + a baked base past UNDO_DEPTH);
  * only summaries touch React state / the store. Tools per the 2026-07-14 grill:
@@ -60,7 +60,7 @@ interface Stroke {
   pts: number[];
 }
 
-type ErrorKind = 'rate-limited' | 'failed';
+type ErrorKind = 'rate-limited' | 'too-large' | 'rejected' | 'failed';
 
 const CANVAS = DRAWING_CANVAS_SIZE;
 
@@ -130,14 +130,20 @@ export function DoodleWallHud() {
   const exit = useSceneStore((s) => s.exit);
 
   // The wall's no-canvas home: StaticCv links here with #doodle-wall, so
-  // reduced-motion / no-WebGL visitors reach the wall without the scene.
+  // reduced-motion / no-WebGL visitors reach the wall without the scene. The
+  // hash is funnelled through stepIn() rather than opening the overlay on its
+  // own channel — mode-keyed chrome (burger, ticket tally) must never sit on
+  // top of the wall, and only `mode` can tell it so.
   const linkOpen = useSyncExternalStore(subscribeToHash, readHashOpen, readHashOpenServer);
   useEffect(() => {
-    // No scene to step in from — a link visit opens straight into the wall view.
-    if (linkOpen) useSceneStore.getState().setDoodleWallPhase('drawing');
+    if (!linkOpen) return;
+    const store = useSceneStore.getState();
+    store.stepIn('doodle-wall');
+    // A link visit has no fly-in to wait for — skip the intro, straight to the wall.
+    store.setDoodleWallPhase('drawing');
   }, [linkOpen]);
 
-  const active = storeActive || linkOpen;
+  const active = storeActive;
   const panelUp = active && phase !== 'intro';
 
   const exitAll = useCallback(() => {
@@ -241,16 +247,18 @@ function WallView({
   const strokesRef = useRef<Stroke[]>([]);
   const bakedRef = useRef<ImageData | null>(null);
   const liveStrokeRef = useRef<Stroke | null>(null);
+  /** The one pointer allowed to draw — a second touch (palm) must not steal the stroke. */
+  const activePointerRef = useRef<number | null>(null);
   const [inkIndex, setInkIndex] = useState(0);
   const [brushIndex, setBrushIndex] = useState(1);
   const [strokeCount, setStrokeCount] = useState(0);
   const [dirty, setDirty] = useState(false);
   const [errorKind, setErrorKind] = useState<ErrorKind>('failed');
 
-  const getCtx = useCallback(
-    () => canvasRef.current?.getContext('2d', { willReadFrequently: true }) ?? null,
-    [],
-  );
+  // No willReadFrequently: the visible canvas is never read back (bakes read
+  // from the offscreen canvas), and the flag would force CPU rasterisation of
+  // the hottest path here — the per-pointermove stroke segment.
+  const getCtx = useCallback(() => canvasRef.current?.getContext('2d') ?? null, []);
 
   // Paint the tile ground once on mount (external system, no state involved).
   useEffect(() => {
@@ -271,6 +279,7 @@ function WallView({
     strokesRef.current = [];
     bakedRef.current = null;
     liveStrokeRef.current = null;
+    activePointerRef.current = null;
     redraw();
     setStrokeCount(0);
     setDirty(false);
@@ -286,6 +295,11 @@ function WallView({
 
   const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (useSceneStore.getState().doodleWallPhase !== 'drawing') return;
+    // One stroke, one pointer: ignore secondary touches (palm) and non-primary
+    // buttons — otherwise a second pointerdown orphans the live stroke, leaving
+    // painted pixels the stroke list (and so undo/redraw) knows nothing about.
+    if (e.button !== 0 || activePointerRef.current !== null) return;
+    activePointerRef.current = e.pointerId;
     e.currentTarget.setPointerCapture(e.pointerId);
     const [x, y] = toCanvasXY(e);
     const stroke: Stroke = {
@@ -299,6 +313,7 @@ function WallView({
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (e.pointerId !== activePointerRef.current) return;
     const stroke = liveStrokeRef.current;
     if (!stroke) return;
     const [x, y] = toCanvasXY(e);
@@ -319,7 +334,9 @@ function WallView({
     }
   };
 
-  const onPointerEnd = () => {
+  const onPointerEnd = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (e.pointerId !== activePointerRef.current) return;
+    activePointerRef.current = null;
     const stroke = liveStrokeRef.current;
     if (!stroke) return;
     liveStrokeRef.current = null;
@@ -375,14 +392,30 @@ function WallView({
       const wait = SUBMIT_FEEDBACK_MIN_MS - (performance.now() - started);
       if (wait > 0) await new Promise((r) => setTimeout(r, wait));
 
+      // The visitor may have exited (and even re-stepped-in — stepIn resets the
+      // phase to 'intro') while the fetch was in flight; a stale continuation
+      // must not clobber the fresh visit.
+      if (useSceneStore.getState().doodleWallPhase !== 'submitting') return;
+
       if (res.status === 201) {
         setPhase('submitted');
         return;
       }
-      setErrorKind(res.status === 429 ? 'rate-limited' : 'failed');
+      // Distinguish the deterministic rejections from transient failures —
+      // "Try again" on an identical payload can never fix a 400/403/413.
+      setErrorKind(
+        res.status === 429
+          ? 'rate-limited'
+          : res.status === 413
+            ? 'too-large'
+            : res.status === 400 || res.status === 403
+              ? 'rejected'
+              : 'failed',
+      );
       setPhase('error');
-    } catch {
-      setErrorKind('failed');
+    } catch (err) {
+      if (useSceneStore.getState().doodleWallPhase !== 'submitting') return;
+      setErrorKind(err instanceof Error && err.message === 'too-large' ? 'too-large' : 'failed');
       setPhase('error');
     }
   };
@@ -561,6 +594,39 @@ function WallView({
               He takes {SUBMIT_BURST_PER_MINUTE} tiles a minute — and {SUBMIT_DAILY_CAP} a day —
               from any one visitor. Catch your breath, admire the wall, and try again in a little
               while. Your drawing is safe.
+            </p>
+            <button
+              onClick={() => setPhase('drawing')}
+              className="paper-button mt-6 rounded-[3px] px-5 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
+            >
+              Back to the wall
+            </button>
+          </CardShell>
+        )}
+
+        {phase === 'error' && errorKind === 'too-large' && (
+          <CardShell>
+            <h2 className="font-rye letterpress text-[30px] text-ink">Too much ink for one tile</h2>
+            <p className="font-fell mt-3 text-[15px] leading-relaxed text-ink/90">
+              Your drawing is so detailed it won&apos;t fit through the carny&apos;s hatch. Undo a
+              few strokes — or Clear and go bolder with a broader brush — and hand it over again.
+            </p>
+            <button
+              onClick={() => setPhase('drawing')}
+              className="paper-button mt-6 rounded-[3px] px-5 py-3 font-fell-sc text-[15px] tracking-[0.06em]"
+            >
+              Back to the tile
+            </button>
+          </CardShell>
+        )}
+
+        {phase === 'error' && errorKind === 'rejected' && (
+          <CardShell>
+            <h2 className="font-rye letterpress text-[30px] text-ink">The carny turned it away</h2>
+            <p className="font-fell mt-3 text-[15px] leading-relaxed text-ink/90">
+              Something about the hand-over wasn&apos;t right, and trying the same tile again
+              won&apos;t change his mind. Your drawing is still on the surface — a fresh attempt
+              from the wall usually sorts it.
             </p>
             <button
               onClick={() => setPhase('drawing')}

@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { STORED_TILE_SIZE, SUBMIT_DAILY_CAP, TILE_MAX_BYTES, WALL_TILE_COUNT } from './constants';
 import { readPngDimensions } from './png';
 import type { TileImageStore, TileRepository } from './ports';
-import type { Tile } from './types';
+import type { Tile, WallTile } from './types';
 
 /**
  * The doodle wall's submit and wall rules, pure of HTTP and of Supabase.
@@ -16,8 +16,11 @@ export type SubmitTileResult =
 
 export interface TileService {
   submitTile(input: { imageBytes: Uint8Array; submitterHash: string }): Promise<SubmitTileResult>;
-  /** Most-recent approved tiles, newest first, bounded at WALL_TILE_COUNT. */
-  getWall(): Promise<Tile[]>;
+  /**
+   * Most-recent approved tiles, newest first, bounded at WALL_TILE_COUNT —
+   * already projected to the public WallTile shape.
+   */
+  getWall(): Promise<WallTile[]>;
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -46,6 +49,10 @@ export function createTileService(deps: {
 
       // Durable daily cap, counted through the repository so it survives
       // serverless instance churn (unlike the route's in-memory burst guard).
+      // Count-then-insert is deliberately non-atomic: parallel submits at the
+      // boundary can land a few rows past the cap. Accepted — this is a spam
+      // bound feeding a pre-moderation queue, not a security boundary, and a
+      // transactional guard would need an RPC for no visitor-facing gain.
       const since = new Date(Date.now() - DAY_MS).toISOString();
       const submittedToday = await repository.countSubmittedSince(submitterHash, since);
       if (submittedToday >= SUBMIT_DAILY_CAP) return { ok: false, reason: 'daily-cap' };
@@ -61,12 +68,23 @@ export function createTileService(deps: {
         submitterHash,
         createdAt: new Date().toISOString(),
       };
-      await repository.insert(tile);
+      try {
+        await repository.insert(tile);
+      } catch (err) {
+        // Compensate: the upload preceded the failed insert, and nothing else
+        // references the image. Best-effort — the insert failure is the one
+        // worth surfacing.
+        await imageStore.remove(stored.path).catch(() => undefined);
+        throw err;
+      }
       return { ok: true, tile };
     },
 
     async getWall() {
-      return repository.recentApproved(WALL_TILE_COUNT);
+      // Public projection at the domain boundary: submitterHash and imagePath
+      // must never depend on each consumer remembering to strip them.
+      const tiles = await repository.recentApproved(WALL_TILE_COUNT);
+      return tiles.map(({ id, imageUrl, createdAt }) => ({ id, imageUrl, createdAt }));
     },
   };
 }

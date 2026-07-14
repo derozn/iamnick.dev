@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { WALL_TILE_COUNT } from '@/lib/doodle-wall/constants';
 import { seedApprovedTiles } from '@/lib/doodle-wall/fakes';
+import type { WallTile } from '@/lib/doodle-wall/types';
 import { getTileAdapters, resetTileAdapters } from '@/lib/supabase/tileAdapters';
 
 import { GET } from './route';
@@ -10,12 +11,6 @@ import { GET } from './route';
  * Route-handler tests, keyless (stub mode) and offline: the factory wires
  * the in-memory fakes because no SUPABASE_* env is set.
  */
-
-interface WallTile {
-  id: string;
-  imageUrl: string;
-  createdAt: string;
-}
 
 const getWall = async () => {
   const res = await GET();

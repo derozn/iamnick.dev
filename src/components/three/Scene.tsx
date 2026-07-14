@@ -100,8 +100,11 @@ export default function Scene({ tier }: SceneProps) {
         {!dbg.off.has('glow') && <BulbGlow bloomOn={bloomOn} />}
         {!dbg.off.has('game') && <BallTossGame />}
         {!dbg.off.has('game') && <HighStrikerGame />}
-        {/* Scenery, not gated on mode: the tile board shows while travelling. */}
-        {!dbg.off.has('game') && <DoodleWall bloomOn={bloomOn} />}
+        {/* Scenery, not gated on mode: the tile board shows while travelling.
+            Own bisection key — ?off=game means "remove the game sims", and the
+            board (runtime texture fetches + additive halos) must be isolatable
+            on its own during a bloom/flicker hunt. */}
+        {!dbg.off.has('doodle') && <DoodleWall bloomOn={bloomOn} />}
         {!dbg.off.has('tickets') && <GoldenTickets bloomOn={bloomOn} />}
         <ConfettiBurst />
         {/* A child of Suspense: it only mounts once all the GLBs/textures above

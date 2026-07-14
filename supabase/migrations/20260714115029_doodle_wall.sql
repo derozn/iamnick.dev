@@ -4,8 +4,11 @@
 --
 -- RLS here is the backstop: the API routes run with the service-role key
 -- (bypassing RLS) and tileService enforces every rule below first. The
--- policies exist so a leaked anon key still cannot read the queue or
--- promote a tile.
+-- policies exist so a leaked (or, from Stage 2, browser-shipped) anon key
+-- cannot read the queue, promote a tile — or write at all. There is NO anon
+-- insert policy: every legitimate write goes through the service role, so an
+-- anon insert grant would only hand queue-flooding to anon-key holders,
+-- bypassing tileService's PNG/size/daily-cap checks.
 
 -- One row per visitor contribution (a tile, CONTEXT.md).
 create table public.tiles (
@@ -30,14 +33,6 @@ create index tiles_submitter_window_idx on public.tiles (submitter_hash, created
 
 alter table public.tiles enable row level security;
 
--- Anon may insert only into the pre-moderation queue — a submission can
--- never arrive pre-approved.
-create policy "anon submits tiles as pending only"
-  on public.tiles
-  for insert
-  to anon
-  with check (status = 'pending');
-
 -- Anon may read only approved tiles; the queue is invisible publicly.
 create policy "anon reads approved tiles only"
   on public.tiles
@@ -45,7 +40,8 @@ create policy "anon reads approved tiles only"
   to anon
   using (status = 'approved');
 
--- No anon update/delete policies: status changes are admin-only (Stage 2).
+-- No anon insert/update/delete policies: submissions go through the server
+-- (service role) only; status changes are admin-only (Stage 2).
 
 -- Storage bucket for tile PNGs: public read, no public write. The bucket
 -- itself pins the content type and the 128 KB tile cap (defence in depth —

@@ -87,7 +87,10 @@ export function StaticCv() {
         </p>
       </section>
 
-      <section aria-labelledby="resume-doodle-wall">
+      {/* id="doodle-wall": the link target must exist in server-rendered DOM
+          (no-JS, reader mode, pre-hydration) — the hash lands here; once
+          hydrated, DoodleWallHud's hash listener opens the overlay too. */}
+      <section id="doodle-wall" aria-labelledby="resume-doodle-wall">
         <h2 id="resume-doodle-wall">Doodle wall</h2>
         <p>
           Visitors to the carnival leave a drawing behind — a wall of tiles, one per visitor.{' '}

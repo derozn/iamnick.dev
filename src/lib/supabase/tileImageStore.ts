@@ -27,4 +27,9 @@ export class SupabaseTileImageStore implements TileImageStore {
     const { data } = this.client.storage.from(TILES_BUCKET).getPublicUrl(path);
     return { path, url: data.publicUrl };
   }
+
+  async remove(path: string): Promise<void> {
+    const { error } = await this.client.storage.from(TILES_BUCKET).remove([path]);
+    if (error) throw new Error(`[doodle-wall] tile image removal failed: ${error.message}`);
+  }
 }

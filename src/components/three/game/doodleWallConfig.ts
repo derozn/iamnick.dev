@@ -30,12 +30,10 @@ export {
 };
 
 /** One approved tile as `GET /api/wall` serves it (`imageUrl` is a data URI in
- *  stub mode, an https Storage URL once Supabase is live — handle both). */
-export interface WallTile {
-  id: string;
-  imageUrl: string;
-  createdAt: string;
-}
+ *  stub mode, an https Storage URL once Supabase is live — handle both). The
+ *  shape is owned by the domain layer; re-exported here so overlays and the
+ *  scene name one contract without importing from lib directly. */
+export type { WallTile } from '@/lib/doodle-wall/types';
 
 /* --- In-scene board: a fixed 6×4 grid of the newest approved tiles --- */
 

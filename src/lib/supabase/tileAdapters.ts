@@ -40,6 +40,15 @@ export function getTileAdapters(): TileAdapters {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !anonKey || !serviceRoleKey) {
+    // A HALF-configured environment is a misconfiguration, not stub mode:
+    // silently serving fakes after provisioning (a rotated-out key, a renamed
+    // var) would 201 visitors' tiles into per-instance memory and lose them.
+    // Fully keyless stays legal — that is pre-provisioning stub mode.
+    if ((url || anonKey || serviceRoleKey) && process.env.VERCEL_ENV === 'production') {
+      throw new Error(
+        '[doodle-wall] partial Supabase env in production — set all of SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY or none',
+      );
+    }
     // Stub mode — module-level singletons so the seeded wall and submitted
     // tiles persist across requests within an instance.
     fakes ??= {

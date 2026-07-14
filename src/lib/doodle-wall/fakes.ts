@@ -186,4 +186,9 @@ export class InMemoryTileImageStore implements TileImageStore {
     // A data URI stands in for the Storage public URL — renderable anywhere.
     return Promise.resolve({ path, url: pngDataUri(bytes) });
   }
+
+  remove(path: string): Promise<void> {
+    this.images.delete(path);
+    return Promise.resolve();
+  }
 }

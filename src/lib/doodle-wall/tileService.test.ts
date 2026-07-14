@@ -100,13 +100,17 @@ describe('tileService.submitTile — daily cap', () => {
 });
 
 describe('tileService.getWall', () => {
-  it('returns only approved tiles, newest first', async () => {
+  it('returns only approved tiles, newest first, projected to public fields', async () => {
     repository = new InMemoryTileRepository(seedApprovedTiles());
     service = createTileService({ repository, imageStore: new InMemoryTileImageStore() });
     await submit(); // pending — must never surface
     const wall = await service.getWall();
     expect(wall).toHaveLength(seedApprovedTiles().length);
-    expect(wall.every((tile) => tile.status === 'approved')).toBe(true);
+    // The projection happens at the domain boundary: no status, and — the
+    // fields that must never leave the server — no submitterHash, no imagePath.
+    for (const tile of wall) {
+      expect(Object.keys(tile).sort()).toEqual(['createdAt', 'id', 'imageUrl']);
+    }
     const createdAts = wall.map((tile) => tile.createdAt);
     expect(createdAts).toEqual([...createdAts].sort().reverse());
   });

@@ -22,4 +22,9 @@ export interface TileRepository {
 export interface TileImageStore {
   /** Persist validated PNG bytes; returns the storage path + public URL. */
   store(bytes: Uint8Array): Promise<{ path: string; url: string }>;
+  /**
+   * Delete a stored image — the compensation path when the row insert fails
+   * after the upload, so the bucket never accretes PNGs no row references.
+   */
+  remove(path: string): Promise<void>;
 }

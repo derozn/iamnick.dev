@@ -19,3 +19,14 @@ export interface Tile {
   /** ISO 8601 timestamp — string, so tiles serialise as-is. */
   createdAt: string;
 }
+
+/**
+ * The public projection of a Tile — the only tile shape that leaves the
+ * server (GET /api/wall). No imagePath, no submitterHash: the projection is
+ * applied at the domain boundary (tileService.getWall), not per consumer.
+ */
+export interface WallTile {
+  id: string;
+  imageUrl: string;
+  createdAt: string;
+}

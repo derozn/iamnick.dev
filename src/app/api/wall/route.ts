@@ -17,9 +17,8 @@ const CACHE_CONTROL = 'public, s-maxage=60, stale-while-revalidate=300';
 
 export async function GET(): Promise<Response> {
   const service = createTileService(getTileAdapters());
+  // getWall already returns the public WallTile projection — private fields
+  // are stripped at the domain boundary, not here.
   const tiles = await service.getWall();
-  return Response.json(
-    { tiles: tiles.map(({ id, imageUrl, createdAt }) => ({ id, imageUrl, createdAt })) },
-    { headers: { 'Cache-Control': CACHE_CONTROL } },
-  );
+  return Response.json({ tiles }, { headers: { 'Cache-Control': CACHE_CONTROL } });
 }
