@@ -17,11 +17,14 @@
 
 Two stages, each its own PR:
 
-1. **Stage 1 — visitor path:** ✅ **code-complete at `c43bf60`**, close-out chain done
-   (glossary-guard → /code-review high → docs-scribe → this absorb). **Next: raise the
-   PR.** Real Supabase stays dormant until Nick provisions (§5 Needs Nick).
+1. **Stage 1 — visitor path:** ✅ **complete — [PR #65](https://github.com/derozn/iamnick.dev/pull/65)
+   is OPEN** (head `4860738`). Close-out chain done (glossary-guard → /code-review high →
+   docs-scribe → absorb), plus Nick's board-only revision (§5). **Blocked on Nick:** PR
+   review (real-GPU look pass + carny copy sign-off), then merge. Real Supabase stays
+   dormant until he provisions (§5 Needs Nick).
 2. **Stage 2 — moderation:** `/admin` queue (Supabase Auth, Google OAuth, **hard
    allow-list of Nick's account only**), approve/reject route, daily keepalive cron.
+   **Do not start** until Stage 1 merges and Nick supplies his Google identity.
 
 ## 1. Current state (verified 2026-07-14, post-close-out, `c43bf60`)
 
@@ -41,13 +44,16 @@ Two stages, each its own PR:
   bucket-level limits. `.env.schema`: 4 vars, all `@sensitive @optional`; absent env =
   stub mode, **partial Supabase env in production throws** (tripwire in the adapter
   factory).
-- **Scene** (`f06f27a`, `20ecc3c`, `bc376a7`): `three/game/doodleWallConfig.ts`
-  (three-free; re-exports server truths and `WallTile`; own tests) and
-  `three/game/DoodleWall.tsx` — stall + 6×4 tile-grid board at the end of the Midway
-  (past contact), board riding above the stall roofline, bulb string via `BulbGlow`,
-  fed by `GET /api/wall`. Attraction entry `doodle-wall` (section `game:doodle-wall`)
-  in `synty/attractions.ts`. Own bisection key `?off=doodle` (`?off=game` again means
-  only the game sims).
+- **Scene** (`f06f27a`, `20ecc3c`, `bc376a7`, revised `4860738`):
+  `three/game/doodleWallConfig.ts` (three-free; re-exports server truths and
+  `WallTile`; own tests) and `three/game/DoodleWall.tsx` — a **freestanding**
+  bulb-strung 6×4 tile-grid board on poles in the NE fence corner at three
+  **(17.5, 39)**, fed by `GET /api/wall`. **No stall prefab** — the Stall_03 first
+  placed at (12.5, 36.8) sat inside the big tree canopy there and read as "inside a
+  tent" (Nick). Attraction entry `doodle-wall` (section `game:doodle-wall`) in
+  `synty/attractions.ts`; `Attraction.prefab` is now optional (unconsumed metadata) and
+  absent for this entry. Own bisection key `?off=doodle` (`?off=game` again means only
+  the game sims).
 - **Overlay + store** (`c600659`, `c902fa5`): `overlays/DoodleWallHud.tsx` — step-in
   overlay showing the approved wall (`<img>` grid) plus the 512→256 drawing surface
   (palette / 3 brushes / undo 20 / clear) and submit. Store slice in `src/store/scene.ts`:
@@ -152,7 +158,12 @@ no-canvas tier; wall bound 48 / scene 24 (6×4), age-out = falling out of the qu
 and PNGs retained; 512→256 tile, server rejects wrong dimensions or >128KB; fixed
 near-black ground + ~6 neon inks, 3 brushes, undo 20, clear, no eraser/text; burst
 2/min/IP in-memory + durable daily cap 10 via `submitter_hash` = HMAC-SHA256(IP, env
-secret); Synty stall variant distinct from ball-toss with `BulbGlow` bulb string.
+secret).
+
+**Revised (Nick, 2026-07-14, after seeing the build):** the grill's "Synty stall +
+bulb-strung board" is superseded — **no stall prefab at all**. The doodle wall is the
+freestanding bulb-strung board alone, on its own poles (`4860738`). It is still a
+_stall_ in the glossary sense (a steppable game); it just has no Synty stall structure.
 
 **Backend-slice deviations (canon):** JSON `{ error }` bodies; no zod length cap on the
 base64 field (raw ceiling + service byte cap own size); fake-adapter seed PNGs generated
@@ -224,9 +235,10 @@ programmatically.
 - **Domain + routes + config:** ✅ covered by colocated unit tests against fakes.
 - **Scene/overlay headless:** recipe in `ball-toss-game-handoff.md` §6 (Playwright +
   swiftshader, `?debug=1` + `window.__sceneStore`; `?off=doodle` isolates the wall).
-  Builder screenshots predate the review fixes — a headless re-verify of the
-  `#doodle-wall` hash entry and the new error cards is **optional but recommended**
-  before the PR (behaviour changed since those shots).
+  ✅ Re-verified at `4860738`: fly-in frames the freestanding board (grid + bulbs +
+  fence behind) and the board reads from the travelling view past the big top
+  (scripts: `/tmp/shot/doodle-board.mjs`, `doodle-area.mjs` — uncommitted rig). Still
+  unexercised visually: the new error cards and the `#doodle-wall` hash entry.
 - **End-to-end (Supabase staging, after provisioning):** draw → submit → row `pending`
   and NOT on the wall → approve → tile appears on next `/api/wall` load.
   Non-allow-listed Google account denied `/admin` (Stage 2).
@@ -259,21 +271,27 @@ programmatically.
 5. ~~Overlay: drawing surface + submit flow + store slice~~ ✅ (`c600659`, `c902fa5`).
 6. ~~Close-out: glossary-guard → /code-review (high) → docs-scribe → absorb~~ ✅
    (`5a2df8d`, `c43bf60`; docs-scribe + this absorb 2026-07-14).
-7. **Raise the Stage 1 PR** (target `master`). Optional first: headless re-verify of
-   hash entry + error cards (§6).
-8. Swap in real Supabase behind the ports once Nick provisions (gate) + his real-GPU
-   look pass.
-9. Stage 2: admin + keepalive, same shape (brief from this doc; contracts in §2.1).
+7. ~~Raise the Stage 1 PR~~ ✅ **PR #65 open** (docs sync `b4bc279`; board-only
+   revision `4860738` pushed to it).
+8. **← YOU ARE HERE. Blocked on Nick:** PR #65 review (real-GPU look pass on the
+   freestanding board + carny copy sign-off) → merge → provisioning gate (§5).
+9. Stage 2: admin + keepalive, same shape (brief from this doc; contracts in §2.1;
+   needs Nick's Google identity for the allow-list before any code).
 
 ## 9. What just happened
 
-2026-07-14 (later) — **Stage 1 scene + overlay slice landed and the close-out chain
-ran.** Scene slice: `f06f27a` (config), `c600659` (store slice), `20ecc3c` (stall +
-board), `c902fa5` (step-in overlay), `bc376a7` (final placement — board rides the
-roofline at the Midway's end). Close-out: glossary-guard `5a2df8d` ('slot' reworded,
-**the carny** added to `CONTEXT.md`, HUD enumeration updated; one advisory parked —
-`resume-*` → `cv-*` sweep, §5); /code-review high `c43bf60` (12 confirmed findings
-fixed, §5; 8 verified cleanup findings deliberately parked, §5). Gate green at
-`c43bf60`: typecheck / lint / test:ci 120 / build. docs-scribe sync ran with this
-absorb. Next: the Stage 1 PR (§8 step 7), then the provisioning gate and Nick's
-real-GPU pass (Needs Nick).
+2026-07-14 (latest) — **PR #65 raised, then Nick's board-only revision landed on it.**
+After the close-out chain (`5a2df8d` glossary, `c43bf60` twelve review fixes,
+`b4bc279` docs sync) the Stage 1 PR went up. Nick then flagged the wall sitting "in
+the middle of a tent": the culprit was the big tree canopy (`SM_Env_Leaves_01` at
+three ≈(11.6, 35.4)) swallowing the stall placement at (12.5, 36.8). Fix `4860738`:
+stall prefab removed entirely (Nick's call — board only), the bulb-strung board now
+freestanding on poles at three **(17.5, 39)** in the NE fence corner,
+`Attraction.prefab` made optional. Verified by headless fly-in + travelling
+screenshots; gate green (120 tests). **Everything is now waiting on Nick** (§8 step 8):
+PR #65 review/merge, then provisioning, then Stage 2.
+
+For a NEW session picking this up: read `CONTEXT.md`, then this doc top to bottom —
+§2.1 has the frozen contracts, §5 the canon decisions + parked follow-ons, §8 the next
+action. The `carnival-context` agent (`.claude/agents/carnival-context.md`) briefs
+builders from this doc and absorbs outcomes back into it — keep that loop.
