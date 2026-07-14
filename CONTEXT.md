@@ -45,7 +45,7 @@ Any DOM UI layered over the canvas — content panels, the intro veil, HUDs. The
 _Avoid_: modal (only some overlays are modal), popup, layer
 
 **HUD**:
-An in-game or status overlay — the ball-toss and high-striker game panels and the golden-ticket tally. A subset of overlays; the `Hud` suffix and `hud-*` styling are reserved for these.
+An in-game or status overlay — the ball-toss, high-striker and doodle wall game panels and the golden-ticket tally. A subset of overlays; the `Hud` suffix and `hud-*` styling are reserved for these.
 _Avoid_: game UI, scoreboard, widget
 
 **Ball-toss**:
@@ -75,3 +75,7 @@ _Avoid_: cell, square, slot, post
 **Pre-moderation queue**:
 The holding area every submitted tile enters. Nick reviews and approves/rejects each one; unapproved tiles are never shown publicly.
 _Avoid_: review board, moderation inbox
+
+**The carny**:
+The unseen stallholder persona the doodle wall's copy hands a submitted tile to ("your tile is with the carny") — the in-world face of the pre-moderation queue. Purely narrative; the actual moderator is Nick.
+_Avoid_: moderator (in visitor-facing copy), attendant, admin (as a character)

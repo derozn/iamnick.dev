@@ -46,6 +46,17 @@ export type StrikerPhase = 'intro' | 'armed' | 'struck' | 'result' | 'done';
 /** Swings the visitor gets per high-striker round. */
 export const STRIKER_SWINGS = 3;
 
+/**
+ * Doodle-wall phase — drives the step-in overlay. Per-stroke drawing state
+ * lives in refs inside `<DoodleWallHud>`; only this summary reaches the store.
+ *   - `intro`      — just stepped in; the how-it-works card.
+ *   - `drawing`    — the wall + drawing surface are up; inks/brushes live.
+ *   - `submitting` — the tile is on its way to the pre-moderation queue.
+ *   - `submitted`  — accepted: "your tile is with the carny" confirmation.
+ *   - `error`      — the submit failed (rate-limited or otherwise); retry offered.
+ */
+export type DoodleWallPhase = 'intro' | 'drawing' | 'submitting' | 'submitted' | 'error';
+
 /** The high-striker slice reset to its pre-play state — the fresh round the
  *  visitor gets on step-in and on "reset". */
 const FRESH_STRIKER = {
@@ -173,6 +184,11 @@ export interface SceneState {
   /** Merge a partial summary update from the sim (score / balls / phase). */
   setBallToss: (patch: Partial<BallTossSlice>) => void;
 
+  /* --- Doodle-wall slice (summary only; strokes live in overlay refs) --- */
+  /** Current phase of the doodle-wall visit (drives the step-in overlay). */
+  doodleWallPhase: DoodleWallPhase;
+  setDoodleWallPhase: (phase: DoodleWallPhase) => void;
+
   /* --- High-striker game slice (summary only; the puck sim runs in refs) --- */
   strikerPhase: StrikerPhase;
   /** performance.now() when the meter armed — the needle is derived from this. */
@@ -260,13 +276,15 @@ export const useSceneStore = create<SceneState>()((set) => ({
   focus: (attraction) => set({ focusedAttraction: attraction }),
   open: (attraction) => set({ mode: 'viewing', activeAttraction: attraction }),
   close: () => set({ mode: 'travelling', activeAttraction: null, focusedAttraction: null }),
-  // Stepping into the high-striker gives a fresh round atomically (no HUD effect
+  // Stepping into a stall gives a fresh round/visit atomically (no HUD effect
   // reaching back to reset it once it sees `activeStall` change).
   stepIn: (stall) =>
     set(
       stall === 'high-striker'
         ? { mode: 'playing', activeStall: stall, ...FRESH_STRIKER }
-        : { mode: 'playing', activeStall: stall },
+        : stall === 'doodle-wall'
+          ? { mode: 'playing', activeStall: stall, doodleWallPhase: 'intro' }
+          : { mode: 'playing', activeStall: stall },
     ),
   // Also clear focusedAttraction so IsoControls releases the booth and the iso
   // camera eases back to the overview (otherwise it stays parked at the stall).
@@ -278,6 +296,9 @@ export const useSceneStore = create<SceneState>()((set) => ({
   ballTossRound: 0,
   resetBallToss: () =>
     set({ ballTossScore: 0, ballTossBallsLeft: BALL_TOSS_BALLS, ballTossPhase: 'intro' }),
+
+  doodleWallPhase: 'intro',
+  setDoodleWallPhase: (doodleWallPhase) => set({ doodleWallPhase }),
 
   strikerPhase: 'intro',
   strikerArmedAt: 0,
