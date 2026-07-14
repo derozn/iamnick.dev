@@ -74,7 +74,7 @@ function bulbPositions(): [number, number][] {
 }
 
 /** One approved tile as a textured plane. Until its PNG arrives (or if it never
- *  does) the slot shows the tile-ground colour, same as an empty frame. */
+ *  does) the frame shows the tile-ground colour, same as an empty frame. */
 function TilePlane({
   url,
   geometry,
@@ -107,7 +107,7 @@ function TilePlane({
       },
       undefined,
       () => {
-        /* failed tile → the slot stays as tile-ground; scenery degrades quietly */
+        /* failed tile → its frame stays as tile-ground; scenery degrades quietly */
       },
     );
     return () => {
@@ -144,7 +144,7 @@ export function DoodleWall({ bloomOn = false }: { bloomOn?: boolean }) {
     };
   }, []);
 
-  // Shared geometry + materials for the 24 slots (one program, one plane).
+  // Shared geometry + materials for the 24 grid positions (one program, one plane).
   const shared = useMemo(
     () => ({
       tileGeom: new PlaneGeometry(TILE_SIZE, TILE_SIZE),
@@ -211,7 +211,7 @@ export function DoodleWall({ bloomOn = false }: { bloomOn?: boolean }) {
         </mesh>
       ))}
 
-      {/* The 6×4 grid — newest tile top-left, empty slots keep their frame. */}
+      {/* The 6×4 grid — newest tile top-left; positions without a tile keep an empty frame. */}
       {Array.from({ length: SCENE_TILE_COUNT }, (_, i) => {
         const { x, y } = tileGridPosition(i);
         const tile = tiles[i];
