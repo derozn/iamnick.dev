@@ -33,23 +33,68 @@ No character controller / collision.
 
 ## Doodle wall backend (Supabase) — ADR-0001
 
-**Storage & data**
+Stage 1 (the visitor path) is **shipped** as a hexagonal slice: routes →
+domain service/ports → adapters. Stage 2 (admin moderation + keepalive) is
+not built, and the Supabase project is not yet provisioned — both routes run
+in **stub mode** against in-memory fakes until it is.
 
-- Supabase **Storage** bucket holds each tile's small PNG (~256×256).
-- Supabase **Postgres** `tiles` table: `id`, `image_path`, `status` (`pending | approved | rejected`), `created_at`, `submitter_hash` (for rate-limit), maybe `approved_at`. Bounded display = query most-recent N `approved`.
-- **RLS:** public can `insert` (status forced `pending`) and `select` only `approved`; only the admin (Nick's Google identity) can update status.
+**Layout (shipped)**
 
-**Endpoints (Next.js Route Handlers, `app/api/...`)**
+- **Routes** (`src/app/api/`) — thin HTTP adapters over the service:
+  - `POST /api/tiles` (`api/tiles/route.ts`) — body `{ image: <base64 PNG> }`
+    (zod, unknown keys stripped); same-site Origin check, raw-body ceiling,
+    in-memory burst guard (`api/tiles/rateLimit.ts`, 2/min per IP), then
+    `tileService.submitTile`. 201 `{ id, status: 'pending', createdAt }`.
+  - `GET /api/wall` (`api/wall/route.ts`) — the newest ≤48 approved tiles,
+    CDN-cacheable (`s-maxage=60`), already projected to the public `WallTile`
+    shape (`{ id, imageUrl, createdAt }` — no `imagePath`, no
+    `submitterHash`; the projection is applied at the domain boundary).
+- **Domain** (`src/lib/doodle-wall/`) — pure of HTTP and of Supabase:
+  `tileService.ts` (every acceptance rule: PNG signature + exact 256×256 via
+  `png.ts`, 128 KB byte cap, forced-`pending` status, durable daily cap of 10
+  per submitter hash counted through the repository), `ports.ts`
+  (`TileRepository`, `TileImageStore` — the latter with `remove()` as the
+  compensation path when the row insert fails after the upload), `types.ts`
+  (`Tile` + the public `WallTile` projection), `constants.ts` (the server
+  truths — re-exported by `three/game/doodleWallConfig.ts` so scene and
+  overlay can never drift from what the server accepts), `submitterHash.ts`
+  (HMAC-SHA256 of the IP under a server secret — no raw IPs at rest) and
+  `fakes.ts` (in-memory adapters plus a programmatic PNG builder seeding the
+  stub wall and test fixtures).
+- **Adapters** (`src/lib/supabase/`) — dormant until provisioning.
+  `tileAdapters.ts` is the single selection point (akin to `FORTUNE_STUB`):
+  with any of the three Supabase vars absent both routes use the fakes; a
+  **partially** set env in production throws rather than silently serving
+  fakes. `serverClient.ts` builds the service-role client (server-only —
+  only this folder may import `@supabase/supabase-js`);
+  `tileRepository.ts` / `tileImageStore.ts` implement the ports.
+- **Env** (`.env.schema`): `SUPABASE_URL`, `SUPABASE_ANON_KEY` (unused by
+  this slice — declared for Stage 2 admin auth, but still gates stub mode),
+  `SUPABASE_SERVICE_ROLE_KEY`, and `SUBMITTER_HASH_SECRET` (required once the
+  Supabase env is set; a fixed dev constant stands in for stub mode only).
 
-- `POST /api/tiles` — accepts a drawing, stores PNG + `pending` row; rate-limited per `submitter_hash`/IP.
-- `GET /api/wall` — returns the most-recent N approved tiles (cacheable).
+**Storage & data** (`supabase/migrations/20260714115029_doodle_wall.sql` —
+reviewed-only, applied at provisioning, never run in CI)
+
+- `public.tiles`: `id`, `image_path`, `status`
+  (`pending | approved | rejected`), `submitter_hash`, `created_at`,
+  `approved_at` (null until Stage 2 approves). Partial index for the wall
+  query; a `(submitter_hash, created_at)` index for the daily-cap count.
+- Storage bucket `tiles`: public read; content type (`image/png`) and the
+  128 KB cap pinned on the bucket as defence in depth.
+- **RLS is the backstop, not the write path:** anon may `select` approved
+  tiles only, and there is **no anon insert policy** — every write goes
+  through the service role (which bypasses RLS), so a leaked anon key can
+  neither read the queue nor flood it past `tileService`'s checks. The
+  service enforces every rule first.
+
+**Stage 2 (not built)**
+
 - `POST /api/admin/tiles/:id` — approve/reject; **auth-gated to Nick's Google account** (allow-list his email, not "any Google login").
-
-**Admin view:** a protected `/admin` route using Supabase Auth (Google OAuth) showing the pending queue with one-tap approve/reject (phone-friendly).
+- **Admin view:** a protected `/admin` route using Supabase Auth (Google OAuth) showing the pending queue with one-tap approve/reject (phone-friendly).
+- **Keepalive:** Supabase free projects pause after ~1 week idle → a free daily cron (GitHub Action or Vercel cron) pings the DB so the wall is never asleep.
 
 **No realtime** — new approved tiles appear on next load/poll.
-
-**Keepalive:** Supabase free projects pause after ~1 week idle → a free daily cron (GitHub Action or Vercel cron) pings the DB so the wall is never asleep.
 
 ## Quality tiers / profiles
 
@@ -68,13 +113,13 @@ Extend `useQualityTier` (`high|low|none`) → **Full** (high), **Lite** (low), *
 src/
   app/
     page.tsx                  # carnival home (Midway + DOM content)
-    blog/page.tsx             # blog index
-    blog/[slug]/page.tsx      # post (SSG, no canvas)
-    admin/page.tsx            # moderation queue (Supabase Google OAuth)
-    api/tiles/route.ts        # submit tile
-    api/wall/route.ts         # fetch approved wall
-    api/admin/tiles/[id]/route.ts  # approve/reject (auth)
-    rss.xml/route.ts          # RSS feed
+    blog/page.tsx             # blog index (future)
+    blog/[slug]/page.tsx      # post (SSG, no canvas) (future)
+    admin/page.tsx            # moderation queue (Supabase Google OAuth) (Stage 2, not built)
+    api/tiles/route.ts        # submit tile (shipped; rateLimit.ts alongside)
+    api/wall/route.ts         # fetch approved wall (shipped)
+    api/admin/tiles/[id]/route.ts  # approve/reject (auth) (Stage 2, not built)
+    rss.xml/route.ts          # RSS feed (future)
   components/                 # role-based folders (see Component conventions below)
     three/                    # canvas-side scene: Scene, MidwayCanvas, synty/ (Unity→three
                               #   translation layer), game/ + tickets/ (sims + configs),
@@ -85,14 +130,21 @@ src/
     nav/                      # global nav: SiteNav, MuteButton
     ui/                       # (reserved) shared primitives — none exist yet
     blog/                     # blog reading components (future)
-    doodle/                   # drawing UI (canvas), tile, wall (future)
+                              # (doodle wall UI has no folder of its own: the board is
+                              #   three/game/DoodleWall.tsx, the step-in overlay is
+                              #   overlays/DoodleWallHud.tsx — role-based, as above)
   content/
     cv.ts                     # home content (existing)
     blog/*.mdx                # blog posts
   lib/
     fonts/                    # next/font setup: local.ts (Montserrat, Open Sans),
                               #   google.ts (Rye, IM Fell — letterpress HUD faces)
-    supabase/                 # client/server helpers (future)
+    doodle-wall/              # doodle wall domain: tileService, ports, types,
+                              #   constants, png, submitterHash, fakes
+    supabase/                 # doodle wall adapters: tileAdapters (selection +
+                              #   stub gate), serverClient, tileRepository, tileImageStore
+supabase/
+  migrations/*.sql            # reviewed-only DDL, applied at provisioning (not in CI)
 public/
   models/synty/*.glb          # converted neutral Synty assets
   models/npcs/*.glb           # NPC rigs (character + baked animation)
@@ -129,4 +181,4 @@ three/`, with Overlay/HUD/CV meaning what `CONTEXT.md` defines. Placing a
 
 ## Degradation contract (ADR-0003)
 
-If WebGL is unavailable or `prefers-reduced-motion: reduce`: no canvas mounts; the page renders the full styled, readable DOM (header, all roles, projects, contact). The doodle wall still shows approved tiles as images; drawing may be hidden in reduced-motion. Nothing essential is lost.
+If WebGL is unavailable or `prefers-reduced-motion: reduce`: no canvas mounts; the page renders the full styled, readable DOM (header, all roles, projects, contact). The doodle wall stays fully usable: `StaticCv`'s `#doodle-wall` link opens the same `DoodleWallHud` overlay (wall view + drawing surface, tiles as plain `<img>`s) — the hash is routed through `stepIn()`, no canvas required. Nothing essential is lost.

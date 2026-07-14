@@ -5,8 +5,10 @@
  * drift from what the server accepts. All numbers were fixed in the
  * 2026-07-14 grill session (ADR-0001) — do not retune here.
  *
- * Some constants (DRAWING_CANVAS_SIZE, SCENE_TILE_COUNT) have no consumer
- * until the scene/overlay slice lands; knip noise on them is expected.
+ * The migration (supabase/migrations/…_doodle_wall.sql) hard-codes two of
+ * these where SQL cannot import TS: the bucket file_size_limit mirrors
+ * TILE_MAX_BYTES and the status check mirrors TileStatus — retuning either
+ * needs a migration too.
  */
 
 /** Stored tile PNGs are exactly STORED_TILE_SIZE × STORED_TILE_SIZE pixels. */
