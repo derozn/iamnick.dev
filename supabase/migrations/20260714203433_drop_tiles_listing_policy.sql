@@ -1,0 +1,12 @@
+-- Security follow-up (advisor 0025_public_bucket_allows_listing, flagged at
+-- provisioning): drop the broad SELECT policy on storage.objects for the
+-- tiles bucket.
+--
+-- The bucket is public, so tile PNGs are served by object URL without any
+-- storage.objects policy — the policy's only real effect was letting anon
+-- LIST the bucket's contents. Tile PNGs are uploaded at submit time, before
+-- moderation, so listing would enumerate pending/rejected tiles that never
+-- passed review. Approved tiles remain reachable exactly as before, via the
+-- public URLs that GET /api/wall hands out; nothing reads the bucket with
+-- the anon key (all server access is service role, which bypasses RLS).
+drop policy "public read of tile images" on storage.objects;
