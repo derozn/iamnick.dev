@@ -9,7 +9,7 @@
  * until the scene/overlay slice lands; knip noise on them is expected.
  */
 
-/** Stored tile PNGs are exactly this many pixels square. */
+/** Stored tile PNGs are exactly STORED_TILE_SIZE × STORED_TILE_SIZE pixels. */
 export const STORED_TILE_SIZE = 256;
 
 /** The drawing overlay's canvas edge — draws at 512, exports at 256. */
