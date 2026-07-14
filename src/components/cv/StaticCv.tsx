@@ -87,6 +87,16 @@ export function StaticCv() {
         </p>
       </section>
 
+      <section aria-labelledby="resume-doodle-wall">
+        <h2 id="resume-doodle-wall">Doodle wall</h2>
+        <p>
+          Visitors to the carnival leave a drawing behind — a wall of tiles, one per visitor.{' '}
+          {/* The overlay is the wall's home when the 3-D scene doesn't mount
+              (reduced motion / no WebGL): this link opens it directly. */}
+          <a href="#doodle-wall">Open the doodle wall</a> to see the latest tiles and draw your own.
+        </p>
+      </section>
+
       <section aria-labelledby="resume-contact">
         <h2 id="resume-contact">Contact</h2>
         <ul>

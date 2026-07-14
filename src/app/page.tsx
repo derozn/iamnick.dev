@@ -7,6 +7,7 @@ import { AudioDirector } from '@/components/overlays/AudioDirector';
 import { TicketHud } from '@/components/overlays/TicketHud';
 import { BallTossHud } from '@/components/overlays/BallTossHud';
 import { HighStrikerHud } from '@/components/overlays/HighStrikerHud';
+import { DoodleWallHud } from '@/components/overlays/DoodleWallHud';
 
 /**
  * Homepage — the isometric, explorable Dark Carnival.
@@ -38,6 +39,10 @@ export default function Homepage() {
 
       {/* DOM overlay for the high-striker game (gauge / swings / verdict) */}
       <HighStrikerHud />
+
+      {/* Step-in overlay for the doodle wall (approved tiles + drawing surface);
+          also the wall's home for no-canvas visitors via StaticCv's #doodle-wall link */}
+      <DoodleWallHud />
 
       {/* Golden-ticket hunt tally + full-house modal */}
       <TicketHud />
