@@ -17,11 +17,10 @@
 
 ## Doodle wall
 
-- **Tile size** (≈256×256?), **how many** approved tiles shown on the wall (50? 100?), and **age-out rule**.
-- **Drawing tools** — brush sizes, colour palette (neon palette only, to stay on-theme?), undo, clear.
-- **Rate-limit values** (submissions per session/IP per day) and the `submitter_hash` basis.
-- **Tile frame** visual (neon polaroid? bulb-framed?).
-- Admin queue UX details (batch approve, preview size).
+- ~~Tile size, wall bound + age-out, drawing tools, rate-limit values + `submitter_hash`
+  basis, tile frame visual, display surface~~ ✅ **Resolved** (grill session 2026-07-14) —
+  decisions recorded in `doodle-wall-handoff.md` §5.
+- Admin queue UX details (batch approve, preview size) — resolve at Stage 2.
 
 ## Blog
 
