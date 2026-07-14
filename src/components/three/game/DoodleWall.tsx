@@ -202,14 +202,22 @@ export function DoodleWall({ bloomOn = false }: { bloomOn?: boolean }) {
         <meshStandardMaterial color="#2a2333" />
       </mesh>
 
-      {/* Support poles down into the stall roof — the board rides above the
-          awning (a lit sign carrying the wall), not floating. */}
-      {[-1, 1].map((side) => (
-        <mesh key={side} position={[side * (BOARD_W / 2 - 0.3), -BOARD_H / 2 - 0.55, -0.02]}>
-          <cylinderGeometry args={[0.035, 0.035, 1.4, 8]} />
-          <meshStandardMaterial color="#241d2c" />
-        </mesh>
-      ))}
+      {/* Support poles to the ground — the board is freestanding (no stall
+          prefab), a lit signboard planted at the end of the Midway. Pole
+          length runs from the board's bottom edge into the ground (the small
+          overshoot buries the ends so slopes can't leave them floating). */}
+      {[-1, 1].map((side) => {
+        const poleLen = BOARD_CENTER[1] - BOARD_H / 2 + 0.15;
+        return (
+          <mesh
+            key={side}
+            position={[side * (BOARD_W / 2 - 0.3), -BOARD_H / 2 - poleLen / 2 + 0.05, -0.02]}
+          >
+            <cylinderGeometry args={[0.045, 0.045, poleLen, 8]} />
+            <meshStandardMaterial color="#241d2c" />
+          </mesh>
+        );
+      })}
 
       {/* The 6×4 grid — newest tile top-left; positions without a tile keep an empty frame. */}
       {Array.from({ length: SCENE_TILE_COUNT }, (_, i) => {

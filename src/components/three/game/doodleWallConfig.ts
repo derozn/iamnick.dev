@@ -59,15 +59,19 @@ export const BOARD_H = GRID_ROWS * TILE_PITCH - TILE_GAP + 2 * BOARD_MARGIN;
 export const BOARD_DEPTH = 0.06;
 
 /**
- * Board centre in three world space + yaw (radians about Y). The stall prefab
- * sits at three (12.5, 36.8) yaw 135° (sceneAdditions); the board rides ABOVE
- * the stall's roofline like a big lit sign (the awning hides anything lower
- * from the iso camera), facing SW down the Midway. Iterated visually via
- * headless screenshots — these two are THE placement knobs.
+ * Board centre in three world space + yaw (radians about Y). The board is
+ * FREESTANDING (no stall prefab — Nick, 2026-07-14): a lit signboard on two
+ * poles in the NE fence corner at the end of the Midway. The first spot,
+ * (12.5, 36.8), sat inside the big tree canopy there (SM_Env_Leaves_01 at
+ * three ≈(11.6, 35.4)) and read as "inside a tent" — this corner is the
+ * clearest ground past the big top (verified against demo-instances).
+ * Standing height: the bottom edge clears the ground by ~1 m so the whole
+ * grid reads from the iso camera. Iterated visually via headless
+ * screenshots — these two are THE placement knobs.
  */
-export const BOARD_CENTER: readonly [number, number, number] = [12.5, 3.35, 36.8];
-/** Yaw so the board's face (+z of its group) points SW, matching the stall. */
-export const BOARD_YAW = -Math.PI * 0.75;
+export const BOARD_CENTER: readonly [number, number, number] = [17.5, 2.0, 39.0];
+/** Yaw so the board's face (+z of its group) points S-SW, back down the street. */
+export const BOARD_YAW = -Math.PI + 0.2;
 
 /** Practical bulb spacing along the board's edge (metres). */
 export const BULB_SPACING = 0.34;

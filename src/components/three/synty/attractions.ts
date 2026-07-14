@@ -11,8 +11,9 @@ export interface Attraction {
   id: string;
   title: string;
   section: string;
-  /** GLB key of the structure (for an optional focus highlight). */
-  prefab: string;
+  /** GLB key of the structure (for an optional focus highlight). Absent for
+   *  attractions drawn by our own components (the doodle wall board). */
+  prefab?: string;
   /** Unity TRS [px,py,pz, qx,qy,qz,qw, sx,sy,sz] of the instance. */
   transform: number[];
   /** World centre — indicator anchor + camera focus target. */
@@ -127,22 +128,21 @@ export const ATTRACTIONS: Attraction[] = [
   },
   {
     // The communal doodle wall at the end of the Midway (past contact, per
-    // CONTEXT.md's order) — a stall variant distinct from ball-toss's Stall_02.
-    // The focus target is the tile board's centre (drawn by <DoodleWall> at
-    // doodleWallConfig.BOARD_CENTER, riding above the stall roofline so the
-    // awning can't hide it), far enough back that the ~2.9 × 2 m board plus
-    // its bulb string fills the view (fov 34° → 0.61·d vertical: d ≈ 6.5).
-    // Dead-on from the board's SW normal the camera clips the big top's roof
-    // edge, so the facing is swung ~30° south to approach through the gap
-    // between the big top and the barricades (same trick as the fortune
-    // wagon). Verified by headless screenshot.
+    // CONTEXT.md's order) — a FREESTANDING bulb-strung tile board on poles
+    // in the NE fence corner, drawn entirely by <DoodleWall> (no stall
+    // prefab; the first placement sat inside the big tree canopy there —
+    // Nick, 2026-07-14). The focus target is the board's centre
+    // (doodleWallConfig.BOARD_CENTER), far enough back that the ~2.9 × 2 m
+    // board plus its bulb string fills the view (fov 34° → 0.61·d vertical:
+    // d ≈ 5.5). The facing is swung south of the board's normal so the
+    // camera approaches through the gap between the tree and the fence
+    // rather than through the canopy.
     id: 'doodle-wall',
     title: 'Doodle Wall',
     section: 'game:doodle-wall',
-    prefab: 'SM_Prop_Stall_03',
-    transform: [12.5, 0.1, -36.8, 0, 0.92388, 0, 0.38268, 1, 1, 1],
-    position: [12.5, 3.35, 36.8],
-    facing: [-0.35, 0, -0.94],
-    focusDist: 6.5,
+    transform: [17.5, 0.1, -39.0, 0, 0.995, 0, -0.0998, 1, 1, 1],
+    position: [17.5, 2.0, 39.0],
+    facing: [-0.2, 0, -0.98],
+    focusDist: 5.5,
   },
 ];
