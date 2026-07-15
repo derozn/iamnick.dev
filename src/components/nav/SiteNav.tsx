@@ -25,12 +25,14 @@ const ITEMS: Attraction[] = ATTRACTIONS.filter((a) => a.id !== 'intro');
 export function SiteNav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const mode = useSceneStore((s) => s.mode);
+  const started = useSceneStore((s) => s.started);
   const open = useSceneStore((s) => s.open);
   const focus = useSceneStore((s) => s.focus);
 
-  // While a content panel / game is up it owns the top-right (its own ✕), so hide
-  // the burger to avoid overlapping it.
-  const hidden = mode === 'viewing' || mode === 'playing';
+  // Before entry the intro owns the whole screen (same rule as MuteButton); while
+  // a content panel / game is up it owns the top-right (its own ✕). Hide the
+  // burger in both cases to avoid overlapping them.
+  const hidden = !started || mode === 'viewing' || mode === 'playing';
 
   useKeyDown((e) => {
     if (e.key === 'Escape') setMenuOpen(false);

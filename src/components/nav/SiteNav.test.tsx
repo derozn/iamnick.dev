@@ -7,7 +7,12 @@ import { useSceneStore } from '@/store/scene';
 import { ATTRACTIONS } from '@/components/three/synty/attractions';
 
 const reset = () =>
-  useSceneStore.setState({ mode: 'travelling', activeAttraction: null, focusedAttraction: null });
+  useSceneStore.setState({
+    started: true,
+    mode: 'travelling',
+    activeAttraction: null,
+    focusedAttraction: null,
+  });
 
 beforeEach(reset);
 afterEach(reset);
@@ -50,6 +55,12 @@ describe('SiteNav', () => {
 
   it('hides the burger while a panel or game owns the top-right', () => {
     useSceneStore.setState({ mode: 'viewing', activeAttraction: 'work' });
+    render(<SiteNav />);
+    expect(screen.queryByRole('button', { name: /menu/i })).not.toBeInTheDocument();
+  });
+
+  it('hides the burger until the visitor has entered (intro owns the screen)', () => {
+    useSceneStore.setState({ started: false });
     render(<SiteNav />);
     expect(screen.queryByRole('button', { name: /menu/i })).not.toBeInTheDocument();
   });

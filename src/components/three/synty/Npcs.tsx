@@ -155,9 +155,13 @@ const PLACED = NPCS.filter((n) => available.has(n.file));
  * as broken, so mobile keeps the static crowd above.
  *
  * Each path is a closed Catmull-Rom loop of three-space [x, z] waypoints. These
- * are hand-routed through what LOOKS like open ground — **tune the waypoints if
- * a walker clips a tent or ride** (they're the obvious knob, like the NPC specs
- * above). `speed` is m/s; `phase` [0,1) staggers where each starts on its loop.
+ * are hand-routed through open ground — **tune the waypoints if a walker clips
+ * a tent or ride** (they're the obvious knob, like the NPC specs above), then
+ * verify with `node scripts/walker-clearance.mjs`, which samples each loop
+ * against every solid prop instance (the spline bulges outside its waypoint
+ * polygon, so eyeballing the waypoints alone is not enough — that's how the
+ * originals ended up inside a barricade line). `speed` is m/s; `phase` [0,1)
+ * staggers where each starts on its loop.
  */
 const WALK_FILE = 'SM_Chr_Visitor_Male_01__Walking';
 const WALK_SPEED = 1.15;
@@ -170,29 +174,34 @@ interface WalkerSpec {
 
 /** Attraction-derived baseline; the scene map overrides it once authored. */
 const WALKERS_BASELINE: WalkerSpec[] = [
-  // promenade on the open approach between the entrance arch and the first stalls
+  // promenade on the west verge of the entrance approach — the pocket between
+  // the arch, the bush line and the bouncy-castle barricade ring (clearance-
+  // checked; the old loop ran through the z≈-18 barricade line and the castle)
   {
     path: [
-      [4, -24],
-      [6, -19],
-      [1, -16],
-      [-4, -18],
-      [-5, -23],
-      [-1, -26],
+      [-0.9, -28.8],
+      [-3.5, -28.0],
+      [-5.0, -26.3],
+      [-3.0, -25.2],
+      [-1.1, -25.9],
     ],
     speed: WALK_SPEED,
     phase: 0,
   },
-  // a wander across the open ground south-west of the plaza (clear of the rides)
+  // an idle meander on the open patch north of the SW-plaza clutter — the
+  // plaza itself is split by a barricade fence at x≈-14.2 and strewn with hay
+  // bales / bins / a bear trap, so the only clean cell is this one; slow so
+  // the small circuit reads as loitering, not laps
   {
     path: [
-      [-14, 16],
-      [-10, 20],
-      [-14, 24],
-      [-19, 22],
-      [-19, 17],
+      [-15.7, 24.8],
+      [-16.8, 25.2],
+      [-17.5, 25.4],
+      [-16.9, 26.5],
+      [-15.8, 26.5],
+      [-15.4, 25.6],
     ],
-    speed: WALK_SPEED * 0.9,
+    speed: 0.7,
     phase: 0.5,
   },
 ];
