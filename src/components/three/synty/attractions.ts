@@ -22,6 +22,10 @@ export interface Attraction {
   facing: V3;
   /** How far in front of the opening the camera stops when focused. */
   focusDist: number;
+  /** World width (m) that must stay in frame when focused. On narrow (portrait)
+   *  viewports the horizontal fov shrinks, so the camera backs off beyond
+   *  focusDist until this width fits. Absent = focusDist is used as-is. */
+  frameWidth?: number;
 }
 
 export const ATTRACTIONS: Attraction[] = [
@@ -144,5 +148,9 @@ export const ATTRACTIONS: Attraction[] = [
     position: [17.5, 2.0, 39.0],
     facing: [-0.2, 0, -0.98],
     focusDist: 5.5,
+    // board is ~2.93 m wide (doodleWallConfig.BOARD_W) + pole/bulb margin —
+    // portrait phones can't fit that at 5.5 m with fov 34, so the fly-in
+    // backs off until it does (Nick, 2026-07-15: wall cropped on mobile).
+    frameWidth: 3.6,
   },
 ];

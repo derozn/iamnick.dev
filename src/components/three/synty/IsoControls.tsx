@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Vector3 } from 'three';
+import { Vector3, type PerspectiveCamera } from 'three';
 import { damp3 } from 'maath/easing';
 
 import { useSceneStore } from '@/store/scene';
@@ -42,6 +42,13 @@ const clampTarget = (v: Vector3) => {
   v.z = clamp(v.z, -40, 40);
 };
 
+// Distance at which a world width w spans the full horizontal fov. The h-fov
+// shrinks with the viewport aspect (portrait phones), so this grows as the
+// screen narrows — used to back the camera off beyond a shot's authored
+// distance when the framing wouldn't fit otherwise.
+const fitWidthDist = (w: number, cam: PerspectiveCamera) =>
+  w / (2 * Math.tan((cam.fov * Math.PI) / 360) * cam.aspect);
+
 // Intro (Bruno-Simon style): before the visitor clicks "start", the camera holds a
 // tight, framed vignette of the entrance — the natural start point — then expands
 // to the overview on start. This also masks the scene's load time.
@@ -51,6 +58,11 @@ const OVERVIEW_TARGET = new Vector3(-2, 1.5, -10);
 const INTRO_LOOK = new Vector3(-1.77, 2.8, -30.7); // the carnival entrance sign
 const INTRO_DIR = new Vector3(0, 0.16, -1).normalize(); // front-on, a touch above
 const INTRO_D = 19; // camera distance from the sign (pulled back so the lights aren't blown out up close)
+// World width the intro vignette must keep in frame on narrow viewports. At the
+// desktop aspect the shot at INTRO_D already shows this much, so landscape is
+// unchanged; portrait pulls back until the sign still reads inside the iris.
+// Tuned by headless portrait screenshot (fog haze caps how far back is usable).
+const INTRO_FRAME_W = 11.6;
 
 export function IsoControls() {
   const { camera, gl, invalidate } = useThree();
@@ -198,15 +210,23 @@ export function IsoControls() {
     const f = focusedRef.current;
     const a = f ? ATTRACTIONS.find((x) => x.id === f) : undefined;
     if (a) {
-      // near eye-level, looking into the opening (out of iso, first-person feel)
+      // near eye-level, looking into the opening (out of iso, first-person feel).
+      // If the attraction declares a frameWidth, back off beyond focusDist on
+      // narrow viewports until that width fits the horizontal fov.
+      const d = a.frameWidth
+        ? Math.max(a.focusDist, fitWidthDist(a.frameWidth, camera as PerspectiveCamera))
+        : a.focusDist;
       WANT_LOOK.set(a.position[0], a.position[1], a.position[2]);
       WANT_POS.copy(WANT_LOOK)
-        .addScaledVector(FACE.set(a.facing[0], a.facing[1], a.facing[2]).normalize(), a.focusDist)
-        .add(RISE.set(0, a.focusDist * 0.16, 0));
+        .addScaledVector(FACE.set(a.facing[0], a.facing[1], a.facing[2]).normalize(), d)
+        .add(RISE.set(0, d * 0.16, 0));
     } else if (!useSceneStore.getState().started) {
-      // Intro: head-on at the entrance sign (front view, not the iso angle).
+      // Intro: head-on at the entrance sign (front view, not the iso angle). The
+      // iris disc is vmin-sized, so on portrait its world-space window narrows
+      // with the aspect — pull the camera back to keep the sign framed inside it.
+      const d = Math.max(INTRO_D, fitWidthDist(INTRO_FRAME_W, camera as PerspectiveCamera));
       WANT_LOOK.copy(INTRO_LOOK);
-      WANT_POS.copy(INTRO_LOOK).addScaledVector(INTRO_DIR, INTRO_D);
+      WANT_POS.copy(INTRO_LOOK).addScaledVector(INTRO_DIR, d);
     } else {
       const dd = wantDist.current - dist.current;
       dist.current += dd * (1 - Math.exp(-dt / 0.28));

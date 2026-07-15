@@ -140,10 +140,10 @@ export function IntroOverlay() {
               animate={{ y: [0, -7, 0] }}
               transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <span
-                className="font-rye absolute whitespace-nowrap text-[17px] leading-none tracking-wide sm:text-[22px]"
-                style={{ left: '21vmin', top: '-36vmin' }}
-              >
+              {/* Below sm the text is fixed-px but the 21vmin offset is % of the
+                  narrow width, so the desktop layout runs off the right edge —
+                  centre the prompt above the disc instead. */}
+              <span className="font-rye absolute left-0 top-[-36vmin] -translate-x-1/2 whitespace-nowrap text-[17px] leading-none tracking-wide sm:left-[21vmin] sm:top-[-36vmin] sm:translate-x-0 sm:text-[22px]">
                 click to enter
               </span>
               {/* curved arrow: tip at bottom-left lands on the rim (~23vmin from
@@ -156,8 +156,8 @@ export function IntroOverlay() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 aria-hidden
-                className="absolute"
-                style={{ left: '15.6vmin', top: '-26.8vmin', width: '14vmin', height: 'auto' }}
+                className="absolute left-[1vmin] top-[-32vmin] w-[9vmin] sm:left-[15.6vmin] sm:top-[-26.8vmin] sm:w-[14vmin]"
+                style={{ height: 'auto' }}
               >
                 <path d="M94 10 C 70 6, 28 20, 8 72" />
                 <path d="M8 72 l 22 -4" />

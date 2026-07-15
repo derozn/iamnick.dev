@@ -10,7 +10,8 @@
 > back in. Read `CONTEXT.md` first — its language is law.
 >
 > Stage 1 merged from `feature/doodle-wall`; live fix branch:
-> `fix/doodle-wall-e2e-provisioning`. PRs target `master`.
+> `fix/mobile-framing-and-npc-paths` (carries the e2e fix `6cc67f9` + the
+> mobile framing fix). PRs target `master`.
 
 ---
 
@@ -23,14 +24,15 @@ Two stages, each its own PR:
    Supabase provisioned and migrated, all four env vars set (`.env.local` + Vercel),
    and the real-Supabase end-to-end check passed locally (§6). One fix outstanding:
    the e2e surfaced a varlock leak-scan bug that would have 500'd `GET /api/wall` on
-   the first approved tile in production — fixed on
-   `fix/doodle-wall-e2e-provisioning`, **PR to follow** (§5, §7).
+   the first approved tile in production — fixed (`6cc67f9`), now riding
+   `fix/mobile-framing-and-npc-paths` together with the mobile framing fix,
+   **PR to follow** (§1, §5, §7).
 2. **Stage 2 — moderation:** `/admin` queue (Supabase Auth, Google OAuth, **hard
    allow-list of Nick's account only**), approve/reject route, daily keepalive cron.
    **Do not start** until the e2e-fix PR is merged, Nick has done his real-GPU look
    pass on the board, and Nick supplies his Google identity.
 
-## 1. Current state (verified 2026-07-14, post-e2e, master `cbcd832`)
+## 1. Current state (verified 2026-07-15, master `cbcd832`)
 
 **Stage 1 is merged, provisioned, and live-verified end to end.** Gate green at
 `c43bf60` (typecheck / lint / test:ci, 120 tests keyless / build); CI green on both
@@ -87,11 +89,23 @@ list` shows local/remote in sync. Verified on the remote: `public.tiles` exists 
   using the **legacy JWT-format keys** (§5 provisioning canon). Both routes leave
   stub mode wherever the env is present; the end-to-end check confirmed real mode
   locally (§6).
-- **E2e-fix branch (`fix/doodle-wall-e2e-provisioning`, uncommitted at absorb time,
-  PR to follow):** `SUPABASE_URL` flipped to `@sensitive=false` in `.env.schema` —
-  without it varlock's runtime leak scan 500s `GET /api/wall` the moment any approved
-  tile exists (§7). Same branch gitignores `supabase/.temp/` and `.mcp.json`
-  (Nick's ask).
+- **Live fix branch (`fix/mobile-framing-and-npc-paths`, PR to follow):** carries
+  the e2e fix as commit `6cc67f9` — `SUPABASE_URL` flipped to `@sensitive=false` in
+  `.env.schema`; without it varlock's runtime leak scan 500s `GET /api/wall` the
+  moment any approved tile exists (§7). Same commit gitignores `supabase/.temp/`
+  and `.mcp.json` (Nick's ask).
+- **Mobile framing fix (same branch, 2026-07-15, uncommitted at absorb time):**
+  Nick reported the board cropped on phones during the fly-in. `Attraction`
+  (`synty/attractions.ts`) gained an optional `frameWidth` — a world width (m)
+  that must stay in frame when focused; `IsoControls` backs the camera off beyond
+  `focusDist` on narrow viewports until that width fits the horizontal fov (fov 34
+  is fixed, so portrait aspect shrinks the h-fov). The `doodle-wall` entry declares
+  `frameWidth: 3.6` (BOARD_W 2.93 + pole/bulb margin). Verified by headless
+  portrait (390×844) screenshot: full 6×4 grid, bulbs and both poles in frame
+  during the fly-in; desktop framing unchanged (5.5 m still governs where the
+  width already fits). No other attraction declares one. The branch also carries
+  non-doodle-wall mobile fixes (intro camera aspect compensation, burger gated on
+  `started`, NPC walker re-routes + `scripts/walker-clearance.mjs`).
 - Supabase MCP server configured in `.mcp.json` (now gitignored), pointed at the
   project ref; not yet OAuth-connected in-session — the CLI is the working path.
 
@@ -192,6 +206,13 @@ bulb-strung board" is superseded — **no stall prefab at all**. The doodle wall
 freestanding bulb-strung board alone, on its own poles (`4860738`). It is still a
 _stall_ in the glossary sense (a steppable game); it just has no Synty stall structure.
 
+**Mobile framing (Nick's report, 2026-07-15):** the fly-in must show the whole
+board on portrait phones. Mechanism: per-attraction optional `frameWidth` in
+`synty/attractions.ts`, honoured by `IsoControls` — back off beyond `focusDist`
+until that world width fits the horizontal fov. `doodle-wall` declares 3.6 m;
+attractions that declare none are untouched. Tune `frameWidth`, not `focusDist`,
+if the board's margins change.
+
 **Backend-slice deviations (canon):** JSON `{ error }` bodies; no zod length cap on the
 base64 field (raw ceiling + service byte cap own size); fake-adapter seed PNGs generated
 programmatically.
@@ -266,11 +287,13 @@ programmatically.
 
 **Needs Nick (human gates):**
 
-- **Merge the e2e-fix PR** (from `fix/doodle-wall-e2e-provisioning`; PR to follow) —
-  without it production 500s `GET /api/wall` on the first approved tile.
-- **Real-GPU look pass** on the freestanding board (outstanding since `4860738`) —
-  headless swiftshader can't judge colour/glow; also eyeball the error cards and the
-  `#doodle-wall` hash entry, still unexercised visually (§6).
+- **Merge the fix PR** (from `fix/mobile-framing-and-npc-paths`, carrying the e2e
+  fix `6cc67f9` + the mobile framing fix; PR to follow) — without it production
+  500s `GET /api/wall` on the first approved tile and crops the board on phones.
+- **Real-GPU look pass** on the freestanding board (outstanding since `4860738`,
+  now including the mobile fly-in framing on a real phone) — headless swiftshader
+  can't judge colour/glow; also eyeball the error cards and the `#doodle-wall`
+  hash entry, still unexercised visually (§6).
 - Stage 2 admin allow-list uses Nick's actual Google identity — collect it at Stage 2
   start; never widen to "any Google login" (ADR-0001).
 
@@ -283,8 +306,11 @@ programmatically.
   swiftshader, `?debug=1` + `window.__sceneStore`; `?off=doodle` isolates the wall).
   ✅ Re-verified at `4860738`: fly-in frames the freestanding board (grid + bulbs +
   fence behind) and the board reads from the travelling view past the big top
-  (scripts: `/tmp/shot/doodle-board.mjs`, `doodle-area.mjs` — uncommitted rig). Still
-  unexercised visually: the new error cards and the `#doodle-wall` hash entry.
+  (scripts: `/tmp/shot/doodle-board.mjs`, `doodle-area.mjs` — uncommitted rig).
+  Framing changes need a **portrait shot too** (390×844 viewport): the whole 6×4
+  grid, bulbs and both poles must sit in frame during the fly-in — ✅ verified
+  2026-07-15 with `frameWidth: 3.6`, desktop unchanged. Still unexercised
+  visually: the new error cards and the `#doodle-wall` hash entry.
 - **Remote schema/policies:** `supabase migration list` — local/remote in sync;
   `supabase db advisors --linked` — "No issues found" (both verified 2026-07-14).
 - **End-to-end (real Supabase):** ✅ **PASSED 2026-07-14** (prod build, port 3001,
@@ -340,15 +366,28 @@ programmatically.
     Nick, `.env.local` + Vercel, legacy JWT keys (§5); ~~stub→real end-to-end
     check~~ ✅ **PASSED** (§6) — and found + fixed the varlock `SUPABASE_URL` bug
     en route (§7).
-11. **← YOU ARE HERE. Blocked on Nick:** (a) merge the e2e-fix PR (from
-    `fix/doodle-wall-e2e-provisioning`) → (b) real-GPU look pass on the board
-    (outstanding since `4860738`).
+11. **← YOU ARE HERE. Blocked on Nick:** (a) merge the fix PR (from
+    `fix/mobile-framing-and-npc-paths` — e2e fix + mobile framing) → (b) real-GPU
+    look pass on the board, desktop and mobile (outstanding since `4860738`).
 12. Stage 2: admin + keepalive, same shape (brief from this doc; contracts in §2.1;
     needs Nick's Google identity for the allow-list before any code).
 
 ## 9. What just happened
 
-2026-07-14 (latest) — **Stage 1 live-verified end to end against the real Supabase
+2026-07-15 (latest) — **mobile framing fixed** on `fix/mobile-framing-and-npc-paths`
+(cut from the e2e fix, which it carries as `6cc67f9`; one PR to follow with both).
+Nick reported the board cropped on phones during the fly-in ("needs zooming out
+when camera pans in"). Fix: optional `frameWidth` on `Attraction`
+(`synty/attractions.ts`) — a world width that must stay in frame when focused —
+honoured by `IsoControls`, which backs the camera off beyond `focusDist` on narrow
+viewports until the width fits the horizontal fov; `doodle-wall` declares 3.6 m.
+Headless portrait (390×844) screenshot verified the full 6×4 grid, bulbs and both
+poles in frame; desktop framing unchanged; no other attraction declares a
+`frameWidth`. The branch also carries mobile fixes outside doodle-wall scope
+(intro camera, burger gating, NPC walker re-routes). Nick's real-GPU look pass
+(§5) now covers the mobile look too.
+
+2026-07-14 — **Stage 1 live-verified end to end against the real Supabase
 project.** PR #66 (storage-listing policy drop) merged to master (`cbcd832`); Nick set
 all four env vars in `.env.local` and Vercel — with the legacy JWT-format keys (canon
 note §5). The full real-mode chain then passed locally (prod build, port 3001):
@@ -359,11 +398,10 @@ reject → wall empty again; the rejected test tile is retained by design (ids i
 The e2e also **found a bug production would have hit on the first approved tile**:
 `SUPABASE_URL` marked `@sensitive` made varlock's runtime leak scan 500
 `GET /api/wall` because every `imageUrl` embeds the project URL. Fixed
-(`@sensitive=false`, Sentry-DSN precedent) on `fix/doodle-wall-e2e-provisioning` —
-uncommitted at absorb time, PR to follow — alongside gitignoring `supabase/.temp/`
-and `.mcp.json` (Nick's ask). **Remaining before Stage 2** (§8 step 11): merge that
-PR, Nick's real-GPU look pass (outstanding since `4860738`), and Nick's Google
-identity for the admin allow-list.
+(`@sensitive=false`, Sentry-DSN precedent) as `6cc67f9`, alongside gitignoring
+`supabase/.temp/` and `.mcp.json` (Nick's ask). **Remaining before Stage 2**
+(§8 step 11): merge the fix PR, Nick's real-GPU look pass (outstanding since
+`4860738`), and Nick's Google identity for the admin allow-list.
 
 Earlier the same day: PR #65 merged (`12d4a39`); Supabase provisioned via the CLI
 (project **iamnick**, ref `hzwjezozoxlopyfgmxoc`, Central EU Frankfurt; migrations
