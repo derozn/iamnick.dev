@@ -9,7 +9,8 @@
 > (`.claude/agents/carnival-context.md`). Builders are briefed from it; outcomes are folded
 > back in. Read `CONTEXT.md` first — its language is law.
 >
-> Branch: `feature/doodle-wall`. PRs target `master`.
+> Stage 1 merged from `feature/doodle-wall`; live fix branch:
+> `fix/doodle-wall-e2e-provisioning`. PRs target `master`.
 
 ---
 
@@ -17,21 +18,23 @@
 
 Two stages, each its own PR:
 
-1. **Stage 1 — visitor path:** ✅ **complete — [PR #65](https://github.com/derozn/iamnick.dev/pull/65)
-   MERGED to master** (`12d4a39`, 2026-07-14). Supabase is **provisioned and migrated**
-   (§1) but the routes still run stub mode: the four env vars are unset. **Blocked on
-   Nick:** merge the small storage-listing PR (§5), set the four env vars (`.env.local`
-   - Vercel, all four together), then the stub→real end-to-end check (§6).
+1. **Stage 1 — visitor path:** ✅ **complete and LIVE-VERIFIED end to end**
+   (2026-07-14). PR #65 merged (`12d4a39`), storage-listing PR #66 merged (`cbcd832`),
+   Supabase provisioned and migrated, all four env vars set (`.env.local` + Vercel),
+   and the real-Supabase end-to-end check passed locally (§6). One fix outstanding:
+   the e2e surfaced a varlock leak-scan bug that would have 500'd `GET /api/wall` on
+   the first approved tile in production — fixed on
+   `fix/doodle-wall-e2e-provisioning`, **PR to follow** (§5, §7).
 2. **Stage 2 — moderation:** `/admin` queue (Supabase Auth, Google OAuth, **hard
    allow-list of Nick's account only**), approve/reject route, daily keepalive cron.
-   **Do not start** until the env vars are set, the end-to-end check passes, and Nick
-   supplies his Google identity.
+   **Do not start** until the e2e-fix PR is merged, Nick has done his real-GPU look
+   pass on the board, and Nick supplies his Google identity.
 
-## 1. Current state (verified 2026-07-14, post-merge + provisioning, master `12d4a39`)
+## 1. Current state (verified 2026-07-14, post-e2e, master `cbcd832`)
 
-**Stage 1 is merged and the Supabase project exists.** Gate green at `c43bf60`
-(typecheck / lint / test:ci, 120 tests keyless / build); CI green on the PR through
-merge.
+**Stage 1 is merged, provisioned, and live-verified end to end.** Gate green at
+`c43bf60` (typecheck / lint / test:ci, 120 tests keyless / build); CI green on both
+PRs through merge; the real-Supabase end-to-end check passed locally (§6).
 
 - **Backend** (`58bf8ad`, `6d758dc`): domain layer `src/lib/doodle-wall/` (`types.ts` —
   now also home of the public `WallTile` shape — `constants.ts`, `ports.ts`, `png.ts`,
@@ -73,21 +76,24 @@ merge.
 list` shows local/remote in sync. Verified on the remote: `public.tiles` exists with
   RLS enabled and exactly one policy ("anon reads approved tiles only", SELECT to
   anon); `tiles` bucket public, 131072 file-size limit, image/png only.
-- **Storage-listing fix (security follow-up, applied remotely):**
+- **Storage-listing fix (security follow-up): ✅ merged as PR #66 (`cbcd832`).**
   `supabase/migrations/20260714203433_drop_tiles_listing_policy.sql` drops the
-  "public read of tile images" SELECT policy on `storage.objects`. Advisor
-  `0025_public_bucket_allows_listing`: on a public bucket that policy's only effect
-  was letting anon LIST the bucket — enumerating pending/rejected tile PNGs (uploaded
-  before the pre-moderation queue's verdict). Public object URLs are unaffected
-  (public buckets serve by URL without any `storage.objects` policy; all server access
-  is service role). `supabase db advisors --linked` now reports "No issues found". In
-  the repo the migration sits on `fix/doodle-wall-storage-listing` (uncommitted at
-  absorb time) — a small PR is the next step.
-- **Still stub mode everywhere:** the four env vars are unset (local and Vercel), so
-  both routes serve fakes. The stub→real end-to-end check (§6) has not run. Key
-  formats when Nick sets them: §5 provisioning canon.
-- Supabase MCP server configured in `.mcp.json` (untracked), pointed at the project
-  ref; not yet OAuth-connected in-session — the CLI is the working path.
+  "public read of tile images" SELECT policy on `storage.objects` (advisor
+  `0025_public_bucket_allows_listing`: on a public bucket its only effect was letting
+  anon LIST — enumerating pending/rejected tile PNGs). Applied remotely, advisors
+  clean, and **verified live by the e2e**: an anon bucket-listing attempt returned
+  `[]` while the object itself served fine by public URL.
+- **Real mode is live:** Nick set all four env vars in `.env.local` AND Vercel —
+  using the **legacy JWT-format keys** (§5 provisioning canon). Both routes leave
+  stub mode wherever the env is present; the end-to-end check confirmed real mode
+  locally (§6).
+- **E2e-fix branch (`fix/doodle-wall-e2e-provisioning`, uncommitted at absorb time,
+  PR to follow):** `SUPABASE_URL` flipped to `@sensitive=false` in `.env.schema` —
+  without it varlock's runtime leak scan 500s `GET /api/wall` the moment any approved
+  tile exists (§7). Same branch gitignores `supabase/.temp/` and `.mcp.json`
+  (Nick's ask).
+- Supabase MCP server configured in `.mcp.json` (now gitignored), pointed at the
+  project ref; not yet OAuth-connected in-session — the CLI is the working path.
 
 ## 2. Architecture (binding)
 
@@ -152,23 +158,23 @@ with Supabase it is a Storage public URL — **consumers must handle both**.
 
 ## 4. File map
 
-| Piece                              | Path                                                                          | Stage | Status                          |
-| ---------------------------------- | ----------------------------------------------------------------------------- | ----- | ------------------------------- |
-| SQL migration (tiles, RLS, bucket) | `supabase/migrations/20260714115029_doodle_wall.sql`                          | 1     | ✅ done + applied remotely      |
-| Storage-listing fix migration      | `supabase/migrations/20260714203433_drop_tiles_listing_policy.sql`            | 1     | ✅ applied remotely; PR pending |
-| Domain: types, ports, service      | `src/lib/doodle-wall/`                                                        | 1     | ✅ done                         |
-| Supabase clients + adapters        | `src/lib/supabase/` (dormant until provisioning)                              | 1     | ✅ done                         |
-| Submit route (thin) + rate limiter | `src/app/api/tiles/route.ts` + `rateLimit.ts`                                 | 1     | ✅ done                         |
-| Wall route (thin, cacheable)       | `src/app/api/wall/route.ts`                                                   | 1     | ✅ done                         |
-| Env vars (4, all optional)         | `.env.schema` (SUPABASE_URL/ANON_KEY/SERVICE_ROLE_KEY, SUBMITTER_HASH_SECRET) | 1     | ✅ done                         |
-| Tuning config (three-free) + tests | `src/components/three/game/doodleWallConfig.ts`                               | 1     | ✅ done                         |
-| In-scene stall + tile grid         | `src/components/three/game/DoodleWall.tsx`                                    | 1     | ✅ done                         |
-| Drawing overlay                    | `src/components/overlays/DoodleWallHud.tsx`                                   | 1     | ✅ done                         |
-| Store slice                        | `src/store/scene.ts` (`doodleWallPhase`)                                      | 1     | ✅ done                         |
-| Attraction entry                   | `src/components/three/synty/attractions.ts` (`doodle-wall`)                   | 1     | ✅ done                         |
-| Admin queue page                   | `src/app/admin/page.tsx`                                                      | 2     | —                               |
-| Approve/reject route               | `src/app/api/admin/tiles/[id]/route.ts`                                       | 2     | —                               |
-| Keepalive route + cron             | `src/app/api/keepalive/route.ts` + Vercel cron                                | 2     | —                               |
+| Piece                              | Path                                                                          | Stage | Status                                           |
+| ---------------------------------- | ----------------------------------------------------------------------------- | ----- | ------------------------------------------------ |
+| SQL migration (tiles, RLS, bucket) | `supabase/migrations/20260714115029_doodle_wall.sql`                          | 1     | ✅ done + applied remotely                       |
+| Storage-listing fix migration      | `supabase/migrations/20260714203433_drop_tiles_listing_policy.sql`            | 1     | ✅ merged (PR #66, `cbcd832`)                    |
+| Domain: types, ports, service      | `src/lib/doodle-wall/`                                                        | 1     | ✅ done                                          |
+| Supabase clients + adapters        | `src/lib/supabase/` (dormant until provisioning)                              | 1     | ✅ done                                          |
+| Submit route (thin) + rate limiter | `src/app/api/tiles/route.ts` + `rateLimit.ts`                                 | 1     | ✅ done                                          |
+| Wall route (thin, cacheable)       | `src/app/api/wall/route.ts`                                                   | 1     | ✅ done                                          |
+| Env vars (4, all optional)         | `.env.schema` (SUPABASE_URL/ANON_KEY/SERVICE_ROLE_KEY, SUBMITTER_HASH_SECRET) | 1     | ✅ set live; URL-sensitivity fix PR pending (§5) |
+| Tuning config (three-free) + tests | `src/components/three/game/doodleWallConfig.ts`                               | 1     | ✅ done                                          |
+| In-scene stall + tile grid         | `src/components/three/game/DoodleWall.tsx`                                    | 1     | ✅ done                                          |
+| Drawing overlay                    | `src/components/overlays/DoodleWallHud.tsx`                                   | 1     | ✅ done                                          |
+| Store slice                        | `src/store/scene.ts` (`doodleWallPhase`)                                      | 1     | ✅ done                                          |
+| Attraction entry                   | `src/components/three/synty/attractions.ts` (`doodle-wall`)                   | 1     | ✅ done                                          |
+| Admin queue page                   | `src/app/admin/page.tsx`                                                      | 2     | —                                                |
+| Approve/reject route               | `src/app/api/admin/tiles/[id]/route.ts`                                       | 2     | —                                                |
+| Keepalive route + cron             | `src/app/api/keepalive/route.ts` + Vercel cron                                | 2     | —                                                |
 
 ## 5. Decisions
 
@@ -239,9 +245,20 @@ programmatically.
   flag serves approved-tile URLs by object URL; there is no listing; all writes are
   service-role only. Do not add storage policies back "for completeness"
   (`20260714203433_drop_tiles_listing_policy.sql` has the reasoning).
-- The project uses the **new-format Supabase API keys**: `SUPABASE_SERVICE_ROLE_KEY`
-  takes a **secret key** (`sb_secret_...`), `SUPABASE_ANON_KEY` takes a **publishable
-  key** (`sb_publishable_...`). The anon/publishable key is unused until Stage 2.
+- **API keys as deployed:** Nick set `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY`
+  with the **legacy JWT-format keys** (values start `ey…`) — fully supported and
+  verified working by the e2e. A later swap to the new-format keys (`sb_secret_...` /
+  `sb_publishable_...`) needs **no code change**; the adapters are format-agnostic.
+  The anon key is unused until Stage 2.
+- `SUPABASE_URL` is `@sensitive=false` in `.env.schema` (e2e fix, branch
+  `fix/doodle-wall-e2e-provisioning`): every Storage public URL that `GET /api/wall`
+  returns embeds the project URL, so marking it sensitive made varlock's runtime leak
+  scan 500 the route as soon as any tile was approved. Same reasoning as the Sentry
+  DSN precedent already in `.env.schema`; Stage 2 ships the URL to the browser anyway.
+- The rejected e2e test tile stays in the project (canon: rows and PNGs retained) —
+  row `315595ae-efe4-477f-929f-8f0f3362e61e`, image
+  `973052c3-1ed7-45b1-98e4-30cb8dbd219a.png`, status `rejected`. Not a stray; do not
+  clean it up.
 
 **Open:**
 
@@ -249,13 +266,11 @@ programmatically.
 
 **Needs Nick (human gates):**
 
-- **Merge the storage-listing PR** (from `fix/doodle-wall-storage-listing`) — the
-  migration is already live on the hosted project; the PR brings the repo in line.
-- **Env vars (the remaining provisioning step):** set the four vars in `.env.local`
-  and Vercel — **all four together** (partial env in production throws). Key formats
-  per the provisioning canon above. Project creation and migrations are done (§1).
-- **Stub→real end-to-end check** once the env lands (§6) — draw → submit → `pending`
-  row, tile NOT on the wall.
+- **Merge the e2e-fix PR** (from `fix/doodle-wall-e2e-provisioning`; PR to follow) —
+  without it production 500s `GET /api/wall` on the first approved tile.
+- **Real-GPU look pass** on the freestanding board (outstanding since `4860738`) —
+  headless swiftshader can't judge colour/glow; also eyeball the error cards and the
+  `#doodle-wall` hash entry, still unexercised visually (§6).
 - Stage 2 admin allow-list uses Nick's actual Google identity — collect it at Stage 2
   start; never widen to "any Google login" (ADR-0001).
 
@@ -272,10 +287,15 @@ programmatically.
   unexercised visually: the new error cards and the `#doodle-wall` hash entry.
 - **Remote schema/policies:** `supabase migration list` — local/remote in sync;
   `supabase db advisors --linked` — "No issues found" (both verified 2026-07-14).
-- **End-to-end (real Supabase — unblocked once Nick sets the four env vars):** draw →
-  submit → row `pending` and NOT on the wall → approve (SQL by hand until Stage 2) →
-  tile appears on next `/api/wall` load. Non-allow-listed Google account denied
-  `/admin` (Stage 2).
+- **End-to-end (real Supabase):** ✅ **PASSED 2026-07-14** (prod build, port 3001,
+  real env). Full chain: `GET /api/wall` → `{"tiles":[]}` (real mode, not stub seeds)
+  → `POST /api/tiles` with a 256×256 test PNG → 201 `pending` → wall still empty
+  (pending invisible) → remote row verified (`pending`, `submitter_hash` set) → tile
+  PNG fetched anonymously by its Storage public URL (200, byte-identical) → anon
+  bucket-listing returned `[]` (listing-policy drop live) → SQL approve → wall served
+  it with the real Storage URL → SQL reject → wall empty again. Test tile retained by
+  design (ids in §5). Still to come at Stage 2: non-allow-listed Google account
+  denied `/admin`.
 - **Degradation:** WebGL off → `StaticCv` link → overlay with `<img>` tiles.
 
 ## 7. Gotchas (inherited — details in `ball-toss-game-handoff.md` §7)
@@ -292,6 +312,13 @@ programmatically.
   and bytes; no SVG).
 - `GET /api/wall` `imageUrl` is a data URI in stub mode, an https Storage URL with
   Supabase — scene textures and overlay `<img>`s must handle both.
+- **varlock leak scan vs public env values:** any env value that legitimately appears
+  in a response body or the client bundle must be `@sensitive=false` in `.env.schema`,
+  or varlock's runtime leak scan (patched `Response.json`) 500s the route the moment
+  the value shows up. Found live by the e2e: `SUPABASE_URL` sits inside every approved
+  tile's `imageUrl`, so a sensitive URL killed `GET /api/wall` on the first approved
+  tile. Check this for every future var — the Stage 2 anon/publishable key ships to
+  the client and needs the same treatment when it does.
 - Bisection keys: `?off=doodle` unmounts the wall; `?off=game` covers only the game sims.
 - Nick's dev server usually holds port 3000 — smoke servers go on a spare port.
 - Commit messages end `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
@@ -308,33 +335,42 @@ programmatically.
 7. ~~Raise the Stage 1 PR~~ ✅ **PR #65 open** (docs sync `b4bc279`; board-only
    revision `4860738` pushed to it).
 8. ~~PR #65 review + merge~~ ✅ **merged to master** (`12d4a39`, 2026-07-14).
-9. ~~Provision Supabase: project + migrations~~ ✅ 2026-07-14 via the CLI (§1);
-   includes the storage-listing fix, applied remotely, PR pending.
-10. **← YOU ARE HERE. Blocked on Nick:** (a) merge the storage-listing PR →
-    (b) set the four env vars in `.env.local` + Vercel (all four together; key
-    formats §5) → (c) stub→real end-to-end check (§6).
-11. Stage 2: admin + keepalive, same shape (brief from this doc; contracts in §2.1;
+9. ~~Provision Supabase: project + migrations~~ ✅ 2026-07-14 via the CLI (§1).
+10. ~~Storage-listing PR~~ ✅ merged as PR #66 (`cbcd832`); ~~env vars~~ ✅ set by
+    Nick, `.env.local` + Vercel, legacy JWT keys (§5); ~~stub→real end-to-end
+    check~~ ✅ **PASSED** (§6) — and found + fixed the varlock `SUPABASE_URL` bug
+    en route (§7).
+11. **← YOU ARE HERE. Blocked on Nick:** (a) merge the e2e-fix PR (from
+    `fix/doodle-wall-e2e-provisioning`) → (b) real-GPU look pass on the board
+    (outstanding since `4860738`).
+12. Stage 2: admin + keepalive, same shape (brief from this doc; contracts in §2.1;
     needs Nick's Google identity for the allow-list before any code).
 
 ## 9. What just happened
 
-2026-07-14 (latest) — **PR #65 merged to master (`12d4a39`), then Supabase was
-provisioned in the same session via the CLI.** Project **iamnick** created (ref
-`hzwjezozoxlopyfgmxoc`, Central EU Frankfurt); `supabase link` + `db push` applied the
-Stage 1 migration, local/remote in sync, and the remote state was verified (RLS on,
-single approved-only SELECT policy, bucket limits correct). The advisors run then
-flagged `0025_public_bucket_allows_listing`: the migration's `storage.objects` SELECT
-policy did nothing on a public bucket except let anon LIST it — enumerating
-pending/rejected tile PNGs uploaded ahead of moderation. Follow-up migration
-`20260714203433_drop_tiles_listing_policy.sql` drops it; applied remotely (advisors
-now clean), small PR from `fix/doodle-wall-storage-listing` pending. `.mcp.json` now
-carries a Supabase MCP server config (untracked, not yet OAuth-connected — CLI is the
-working path). **Waiting on Nick** (§8 step 10): merge the storage-listing PR, set the
-four env vars, run the end-to-end check; then Stage 2 (Google identity first).
+2026-07-14 (latest) — **Stage 1 live-verified end to end against the real Supabase
+project.** PR #66 (storage-listing policy drop) merged to master (`cbcd832`); Nick set
+all four env vars in `.env.local` and Vercel — with the legacy JWT-format keys (canon
+note §5). The full real-mode chain then passed locally (prod build, port 3001):
+submit → `pending` and invisible → remote row + `submitter_hash` verified → PNG
+served anonymously by public URL, byte-identical → anon listing returns `[]` (the
+#66 drop verified live) → SQL approve → on the wall with a real Storage URL → SQL
+reject → wall empty again; the rejected test tile is retained by design (ids in §5).
+The e2e also **found a bug production would have hit on the first approved tile**:
+`SUPABASE_URL` marked `@sensitive` made varlock's runtime leak scan 500
+`GET /api/wall` because every `imageUrl` embeds the project URL. Fixed
+(`@sensitive=false`, Sentry-DSN precedent) on `fix/doodle-wall-e2e-provisioning` —
+uncommitted at absorb time, PR to follow — alongside gitignoring `supabase/.temp/`
+and `.mcp.json` (Nick's ask). **Remaining before Stage 2** (§8 step 11): merge that
+PR, Nick's real-GPU look pass (outstanding since `4860738`), and Nick's Google
+identity for the admin allow-list.
 
-Earlier the same day: the close-out chain (`5a2df8d`, `c43bf60`, `b4bc279`) and
-Nick's board-only revision (`4860738` — stall prefab dropped, freestanding board at
-three (17.5, 39), `Attraction.prefab` optional) landed on the PR before merge.
+Earlier the same day: PR #65 merged (`12d4a39`); Supabase provisioned via the CLI
+(project **iamnick**, ref `hzwjezozoxlopyfgmxoc`, Central EU Frankfurt; migrations
+applied and remote state verified, advisors clean after the listing-policy drop);
+and before merge, the close-out chain (`5a2df8d`, `c43bf60`, `b4bc279`) and Nick's
+board-only revision (`4860738` — stall prefab dropped, freestanding board at three
+(17.5, 39)).
 
 For a NEW session picking this up: read `CONTEXT.md`, then this doc top to bottom —
 §2.1 has the frozen contracts, §5 the canon decisions + parked follow-ons, §8 the next
