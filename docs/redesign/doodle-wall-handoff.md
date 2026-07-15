@@ -9,9 +9,9 @@
 > (`.claude/agents/carnival-context.md`). Builders are briefed from it; outcomes are folded
 > back in. Read `CONTEXT.md` first — its language is law.
 >
-> Stage 1 merged from `feature/doodle-wall`; live fix branch:
-> `fix/mobile-framing-and-npc-paths` (carries the e2e fix `6cc67f9` + the
-> mobile framing fix). PRs target `master`.
+> Stage 1 merged and live (PRs #65–#68). Stage 2 built on
+> `feature/doodle-wall-moderation` (working tree; PR to follow). PRs target
+> `master`.
 
 ---
 
@@ -19,95 +19,104 @@
 
 Two stages, each its own PR:
 
-1. **Stage 1 — visitor path:** ✅ **complete and LIVE-VERIFIED end to end**
-   (2026-07-14). PR #65 merged (`12d4a39`), storage-listing PR #66 merged (`cbcd832`),
-   Supabase provisioned and migrated, all four env vars set (`.env.local` + Vercel),
-   and the real-Supabase end-to-end check passed locally (§6). One fix outstanding:
-   the e2e surfaced a varlock leak-scan bug that would have 500'd `GET /api/wall` on
-   the first approved tile in production — fixed (`6cc67f9`), now riding
-   `fix/mobile-framing-and-npc-paths` together with the mobile framing fix,
-   **PR to follow** (§1, §5, §7).
-2. **Stage 2 — moderation:** `/admin` queue (Supabase Auth, Google OAuth, **hard
-   allow-list of Nick's account only**), approve/reject route, daily keepalive cron.
-   **Do not start** until the e2e-fix PR is merged, Nick has done his real-GPU look
-   pass on the board, and Nick supplies his Google identity.
+1. **Stage 1 — visitor path:** ✅ **complete, LIVE-VERIFIED end to end, and fully
+   merged.** PR #65 (`12d4a39`), storage-listing PR #66 (`cbcd832`), e2e varlock
+   fix PR #67 (`0e60a41`) and mobile-framing PR #68 (`4631df6`) all on master;
+   Supabase provisioned, all four env vars set, real-Supabase e2e passed (§6).
+2. **Stage 2 — moderation:** ✅ **BUILT** (2026-07-15) on
+   `feature/doodle-wall-moderation` (working tree, **PR to follow**): `/admin` —
+   the carny's counter — over the pre-moderation queue (Supabase Auth, Google
+   OAuth, hard allow-list `nick@iamnick.dev` only), verdict route, daily
+   keepalive cron. Gate green, 149 tests, close-out chain done. `/admin` stays
+   in its "unconfigured" state until Nick does the Google OAuth config —
+   **§5 Needs Nick is the gate.**
 
-## 1. Current state (verified 2026-07-15, master `cbcd832`)
+## 1. Current state (verified 2026-07-15, `feature/doodle-wall-moderation` over master `4631df6`)
 
-**Stage 1 is merged, provisioned, and live-verified end to end.** Gate green at
-`c43bf60` (typecheck / lint / test:ci, 120 tests keyless / build); CI green on both
-PRs through merge; the real-Supabase end-to-end check passed locally (§6).
+**Stage 1 is merged, provisioned, and live-verified end to end. Stage 2
+(moderation) is BUILT** — staged/working-tree on this branch, gate green
+(typecheck / lint / test:ci with 149 tests keyless / build), close-out chain
+done, **PR to follow**. `/admin` renders its "unconfigured" state until Nick
+does the Google OAuth config (§5 Needs Nick).
 
-- **Backend** (`58bf8ad`, `6d758dc`): domain layer `src/lib/doodle-wall/` (`types.ts` —
-  now also home of the public `WallTile` shape — `constants.ts`, `ports.ts`, `png.ts`,
-  `submitterHash.ts`, `tileService.ts`, `fakes.ts`, colocated tests); thin routes
+**Stage 1 (all merged to master):**
+
+- **Backend:** domain layer `src/lib/doodle-wall/` (`types.ts` — home of the public
+  `WallTile` shape — `constants.ts`, `ports.ts`, `png.ts`, `submitterHash.ts`,
+  `tileService.ts`, `fakes.ts`, colocated tests); thin routes
   `src/app/api/tiles/route.ts` (+ sibling `rateLimit.ts`, burst 2/min/IP) and
-  `src/app/api/wall/route.ts`; Supabase adapters in `src/lib/supabase/` (dormant until
-  the env vars are set; supabase-js confined there, grep-verified; `TileImageStore` now has
-  `remove()` for insert-failure compensation). Migration
-  `supabase/migrations/20260714115029_doodle_wall.sql`: tiles table + indexes, RLS
-  **select-approved-only — the anon INSERT policy was dropped** (every legitimate write
-  goes through the service role), `tiles` bucket public-read with 128KB + image/png
-  bucket-level limits. `.env.schema`: 4 vars, all `@sensitive @optional`; absent env =
-  stub mode, **partial Supabase env in production throws** (tripwire in the adapter
-  factory).
-- **Scene** (`f06f27a`, `20ecc3c`, `bc376a7`, revised `4860738`):
-  `three/game/doodleWallConfig.ts` (three-free; re-exports server truths and
-  `WallTile`; own tests) and `three/game/DoodleWall.tsx` — a **freestanding**
-  bulb-strung 6×4 tile-grid board on poles in the NE fence corner at three
-  **(17.5, 39)**, fed by `GET /api/wall`. **No stall prefab** — the Stall_03 first
-  placed at (12.5, 36.8) sat inside the big tree canopy there and read as "inside a
-  tent" (Nick). Attraction entry `doodle-wall` (section `game:doodle-wall`) in
-  `synty/attractions.ts`; `Attraction.prefab` is now optional (unconsumed metadata) and
-  absent for this entry. Own bisection key `?off=doodle` (`?off=game` again means only
-  the game sims).
-- **Overlay + store** (`c600659`, `c902fa5`): `overlays/DoodleWallHud.tsx` — step-in
-  overlay showing the approved wall (`<img>` grid) plus the 512→256 drawing surface
-  (palette / 3 brushes / undo 20 / clear) and submit. Store slice in `src/store/scene.ts`:
-  `doodleWallPhase` (`intro | drawing | submitting | submitted | error`) +
-  `setDoodleWallPhase`; `stepIn('doodle-wall')` resets the phase atomically.
-  `#doodle-wall` hash-open routes through `stepIn()` so mode-keyed chrome (burger,
-  ticket tally) yields correctly; `StaticCv` links to a server-rendered
-  `id="doodle-wall"` target for the no-canvas tier.
-- **Merged:** PR #65 → master `12d4a39` (2026-07-14). Close-out chain (`5a2df8d`
-  glossary-guard, `c43bf60` review fixes), docs sync (`b4bc279`) and the board-only
-  revision (`4860738`) are all in.
-- **Supabase provisioned (this session, via the CLI):** project **iamnick**, ref
-  `hzwjezozoxlopyfgmxoc`, Central EU (Frankfurt), created 2026-07-14. `supabase link` +
-  `supabase db push` applied `20260714115029_doodle_wall.sql`; `supabase migration
-list` shows local/remote in sync. Verified on the remote: `public.tiles` exists with
-  RLS enabled and exactly one policy ("anon reads approved tiles only", SELECT to
-  anon); `tiles` bucket public, 131072 file-size limit, image/png only.
-- **Storage-listing fix (security follow-up): ✅ merged as PR #66 (`cbcd832`).**
-  `supabase/migrations/20260714203433_drop_tiles_listing_policy.sql` drops the
-  "public read of tile images" SELECT policy on `storage.objects` (advisor
-  `0025_public_bucket_allows_listing`: on a public bucket its only effect was letting
-  anon LIST — enumerating pending/rejected tile PNGs). Applied remotely, advisors
-  clean, and **verified live by the e2e**: an anon bucket-listing attempt returned
-  `[]` while the object itself served fine by public URL.
-- **Real mode is live:** Nick set all four env vars in `.env.local` AND Vercel —
-  using the **legacy JWT-format keys** (§5 provisioning canon). Both routes leave
-  stub mode wherever the env is present; the end-to-end check confirmed real mode
-  locally (§6).
-- **Live fix branch (`fix/mobile-framing-and-npc-paths`, PR to follow):** carries
-  the e2e fix as commit `6cc67f9` — `SUPABASE_URL` flipped to `@sensitive=false` in
-  `.env.schema`; without it varlock's runtime leak scan 500s `GET /api/wall` the
-  moment any approved tile exists (§7). Same commit gitignores `supabase/.temp/`
-  and `.mcp.json` (Nick's ask).
-- **Mobile framing fix (same branch, 2026-07-15, uncommitted at absorb time):**
-  Nick reported the board cropped on phones during the fly-in. `Attraction`
-  (`synty/attractions.ts`) gained an optional `frameWidth` — a world width (m)
-  that must stay in frame when focused; `IsoControls` backs the camera off beyond
-  `focusDist` on narrow viewports until that width fits the horizontal fov (fov 34
-  is fixed, so portrait aspect shrinks the h-fov). The `doodle-wall` entry declares
-  `frameWidth: 3.6` (BOARD_W 2.93 + pole/bulb margin). Verified by headless
-  portrait (390×844) screenshot: full 6×4 grid, bulbs and both poles in frame
-  during the fly-in; desktop framing unchanged (5.5 m still governs where the
-  width already fits). No other attraction declares one. The branch also carries
-  non-doodle-wall mobile fixes (intro camera aspect compensation, burger gated on
-  `started`, NPC walker re-routes + `scripts/walker-clearance.mjs`).
-- Supabase MCP server configured in `.mcp.json` (now gitignored), pointed at the
-  project ref; not yet OAuth-connected in-session — the CLI is the working path.
+  `src/app/api/wall/route.ts`; Supabase adapters in `src/lib/supabase/`
+  (supabase-js confined there, grep-verified). Migrations applied remotely: tiles
+  table + RLS **select-approved-only, no anon INSERT** (all writes service-role);
+  `tiles` bucket public-read, 128KB + image/png limits, listing policy dropped
+  (PR #66). Absent env = stub mode; **partial Supabase env in production throws**.
+- **Scene:** `three/game/doodleWallConfig.ts` (three-free; re-exports server truths
+  and `WallTile`) and `three/game/DoodleWall.tsx` — a **freestanding** bulb-strung
+  6×4 tile-grid board on poles in the NE fence corner at three **(17.5, 39)**, fed
+  by `GET /api/wall`; no stall prefab (Nick's revision `4860738`). Attraction entry
+  `doodle-wall` in `synty/attractions.ts` declares `frameWidth: 3.6` (mobile
+  framing, PR #68). Own bisection key `?off=doodle`.
+- **Overlay + store:** `overlays/DoodleWallHud.tsx` — step-in overlay showing the
+  approved wall (`<img>` grid) plus the 512→256 drawing surface
+  (palette / 3 brushes / undo 20 / clear) and submit. Store slice `doodleWallPhase`
+  (`intro | drawing | submitting | submitted | error`) in `src/store/scene.ts`;
+  `stepIn('doodle-wall')` resets it atomically; `#doodle-wall` hash-open routes
+  through `stepIn()`; `StaticCv` carries a server-rendered target for the
+  no-canvas tier.
+- **Merged PRs:** #65 Stage 1 (`12d4a39`), #66 storage-listing drop (`cbcd832`),
+  #67 e2e varlock fix (`0e60a41`, carries `6cc67f9` — `SUPABASE_URL`
+  `@sensitive=false`, §7), #68 mobile framing + NPC re-routes (`4631df6` —
+  optional `Attraction.frameWidth` honoured by `IsoControls`; portrait-verified).
+- **Supabase live:** project **iamnick**, ref `hzwjezozoxlopyfgmxoc`, Central EU
+  (Frankfurt); migrations local/remote in sync, advisors clean; all four env vars
+  set (`.env.local` + Vercel, legacy JWT-format keys — §5); real-Supabase
+  end-to-end check PASSED 2026-07-14 (§6).
+
+**Stage 2 (this branch, built 2026-07-15, staged/working tree):**
+
+- **Domain:** `tileService` gained `getQueue()` — oldest-first `pending`, bounded by
+  the new constant `QUEUE_PAGE_COUNT` (48), projected through a shared `toWallTile`
+  helper, **the** privacy boundary (`submitterHash`/`imagePath` never cross it) —
+  and `moderate({ id, verdict })` with the transition rules: approve
+  `pending→approved`; reject `pending|approved→rejected` (approved→rejected = a
+  takedown); **rejected is final**. `TileRepository` port gained
+  `oldestPending` / `findById` / `setStatus`. The Supabase adapter maintains
+  `approved_at` (set on approve, cleared otherwise) and maps Postgres `22P02`
+  invalid-uuid to `null`, so malformed ids 404 rather than 500.
+- **Auth (`src/lib/supabase/adminAuth.ts`, server-only):** `@supabase/ssr` 0.12.3
+  cookie sessions, all server-side — **the anon key never reaches the client
+  bundle**. `getClaims()` (JWKS-verified) + hard allow-list
+  `MODERATOR_EMAILS = ['nick@iamnick.dev']`, moved OUT of `doodle-wall/constants.ts`
+  into this server-only module (structural boundary — `constants.ts` is
+  client-reachable via `doodleWallConfig`), + a **provider pin**: the session must
+  be Google (`app_metadata.provider(s)`), so an email/password account claiming the
+  carny's address can never pass. The configured-predicate matches
+  `getTileAdapters` (all three Supabase vars, or stub). `requestOrigin()` pins to
+  `SITE_URL` in production (`x-forwarded-host` never steers redirects);
+  dev/preview use the request URL origin. No middleware/proxy — one page, one
+  person; an expired token simply reads as signed-out.
+- **Routes:** `GET /api/admin/auth/login` (server-side `signInWithOAuth` google →
+  303), `GET …/callback` (`exchangeCodeForSession` → `/admin`; failures →
+  `/admin?auth=error`), `POST …/logout`. `PATCH /api/admin/tiles/:id` — contract in
+  §2.1. `GET /api/keepalive` → `{ ok, mode: 'live' | 'stub' }` with an optional
+  `CRON_SECRET` guard (timing-safe compare); `vercel.json` cron daily 08:00 UTC.
+  `.env.schema`: new `CRON_SECRET` (`@sensitive @optional`); the
+  `SUPABASE_ANON_KEY` comment updated (drives admin auth, server-only).
+- **UI:** `/admin` is **the carny's counter** (CONTEXT.md gained entries _The
+  carny's counter_ and _Verdict_; _The carny_ widened — Nick IS the carny at the
+  counter; "moderation queue" copy corrected to the canon "pre-moderation queue").
+  Server page with four identity states
+  (unconfigured / anonymous / denied / moderator), letterpress ticket-frame
+  styling, noindex + `robots.ts` disallow `/admin` and `/api/`. `AdminQueue`
+  client component: oldest-first cards, approve/reject per tile, stale cards
+  dropped only on tile-level reasons (not bare 404s), keyed remount on refresh so
+  `router.refresh()` actually updates the list.
+- **Tests:** 149 total (was 120 pre-Stage-2): tileService queue + verdict rules,
+  adminAuth allow-list, PATCH route (guards + verdicts), keepalive, `AdminQueue`
+  component. Gate green; stub-mode `/admin` smoke-tested by portrait screenshot.
+- **Close-out chain done:** glossary-guard (5 findings → counter/verdict renames +
+  the CONTEXT.md entries) and /code-review high (24 candidates → 10 confirmed,
+  all fixed; list in §5).
 
 ## 2. Architecture (binding)
 
@@ -132,12 +141,14 @@ src/lib/supabase/             adapter: server/service-role clients + port implem
 schema/query design) for any Supabase work; `security-best-practices` for any API surface;
 the relevant `r3f-*` skill for canvas work; `building-components` for overlay work.
 
-### 2.1 Landed contracts (Stage 2 builds against these — do not renegotiate)
+### 2.1 Landed contracts (do not renegotiate)
 
 **Server truths** (`src/lib/doodle-wall/constants.ts` — re-exported by
 `doodleWallConfig.ts`, never redefined): `STORED_TILE_SIZE` 256, `DRAWING_CANVAS_SIZE`
 512, `TILE_MAX_BYTES` 131072, `WALL_TILE_COUNT` 48, `SCENE_TILE_COUNT` 24,
-`SUBMIT_BURST_PER_MINUTE` 2, `SUBMIT_DAILY_CAP` 10.
+`QUEUE_PAGE_COUNT` 48, `SUBMIT_BURST_PER_MINUTE` 2, `SUBMIT_DAILY_CAP` 10.
+`MODERATOR_EMAILS` is deliberately NOT here — it lives in the server-only
+`src/lib/supabase/adminAuth.ts` (§5).
 
 **`POST /api/tiles`** — body `{ "image": "<base64 PNG, no data: prefix>" }`, raw request
 ceiling 204800 bytes, byte-accurate (`Buffer.byteLength`) with a Content-Length
@@ -151,6 +162,22 @@ as `{ error }` JSON: 400 `invalid-request` | `invalid-image`, 413 `too-large`, 4
 boundary). Newest first, ≤48, `Cache-Control: public, s-maxage=60,
 stale-while-revalidate=300`. In stub mode `imageUrl` is a `data:image/png;base64,` URI;
 with Supabase it is a Storage public URL — **consumers must handle both**.
+
+**Pre-moderation queue (domain, no public route)** — the queue is server-rendered
+into `/admin`, never exposed anonymously. `tileService.getQueue()`: oldest-first
+`pending`, ≤ `QUEUE_PAGE_COUNT` (48), projected to `WallTile` through the same
+`toWallTile` helper as `getWall()` — the single privacy boundary.
+
+**`PATCH /api/admin/tiles/:id`** — body `{ "verdict": "approve" | "reject" }`.
+200 → `{ id, status }`. Errors as `{ error }` JSON: 401 anonymous, 403 for both
+not-the-carny AND bad-origin (the same cross-site Origin rejection as
+`POST /api/tiles`), 400 bad body, 404 unknown/malformed id, 409
+invalid-transition, 503 stub mode. Transitions: approve `pending→approved`;
+reject `pending|approved→rejected`; rejected is final.
+
+**`GET /api/keepalive`** — 200 → `{ ok, mode: 'live' | 'stub' }`. If `CRON_SECRET`
+is set, the bearer token must match (timing-safe compare); unset means open.
+Driven by the `vercel.json` cron, daily 08:00 UTC.
 
 ## 3. Feature spec (v1)
 
@@ -172,23 +199,25 @@ with Supabase it is a Storage public URL — **consumers must handle both**.
 
 ## 4. File map
 
-| Piece                              | Path                                                                          | Stage | Status                                           |
-| ---------------------------------- | ----------------------------------------------------------------------------- | ----- | ------------------------------------------------ |
-| SQL migration (tiles, RLS, bucket) | `supabase/migrations/20260714115029_doodle_wall.sql`                          | 1     | ✅ done + applied remotely                       |
-| Storage-listing fix migration      | `supabase/migrations/20260714203433_drop_tiles_listing_policy.sql`            | 1     | ✅ merged (PR #66, `cbcd832`)                    |
-| Domain: types, ports, service      | `src/lib/doodle-wall/`                                                        | 1     | ✅ done                                          |
-| Supabase clients + adapters        | `src/lib/supabase/` (dormant until provisioning)                              | 1     | ✅ done                                          |
-| Submit route (thin) + rate limiter | `src/app/api/tiles/route.ts` + `rateLimit.ts`                                 | 1     | ✅ done                                          |
-| Wall route (thin, cacheable)       | `src/app/api/wall/route.ts`                                                   | 1     | ✅ done                                          |
-| Env vars (4, all optional)         | `.env.schema` (SUPABASE_URL/ANON_KEY/SERVICE_ROLE_KEY, SUBMITTER_HASH_SECRET) | 1     | ✅ set live; URL-sensitivity fix PR pending (§5) |
-| Tuning config (three-free) + tests | `src/components/three/game/doodleWallConfig.ts`                               | 1     | ✅ done                                          |
-| In-scene stall + tile grid         | `src/components/three/game/DoodleWall.tsx`                                    | 1     | ✅ done                                          |
-| Drawing overlay                    | `src/components/overlays/DoodleWallHud.tsx`                                   | 1     | ✅ done                                          |
-| Store slice                        | `src/store/scene.ts` (`doodleWallPhase`)                                      | 1     | ✅ done                                          |
-| Attraction entry                   | `src/components/three/synty/attractions.ts` (`doodle-wall`)                   | 1     | ✅ done                                          |
-| Admin queue page                   | `src/app/admin/page.tsx`                                                      | 2     | —                                                |
-| Approve/reject route               | `src/app/api/admin/tiles/[id]/route.ts`                                       | 2     | —                                                |
-| Keepalive route + cron             | `src/app/api/keepalive/route.ts` + Vercel cron                                | 2     | —                                                |
+| Piece                               | Path                                                                                       | Stage | Status                                              |
+| ----------------------------------- | ------------------------------------------------------------------------------------------ | ----- | --------------------------------------------------- |
+| SQL migration (tiles, RLS, bucket)  | `supabase/migrations/20260714115029_doodle_wall.sql`                                       | 1     | ✅ done + applied remotely                          |
+| Storage-listing fix migration       | `supabase/migrations/20260714203433_drop_tiles_listing_policy.sql`                         | 1     | ✅ merged (PR #66, `cbcd832`)                       |
+| Domain: types, ports, service       | `src/lib/doodle-wall/`                                                                     | 1     | ✅ done                                             |
+| Supabase clients + adapters         | `src/lib/supabase/` (dormant until provisioning)                                           | 1     | ✅ done                                             |
+| Submit route (thin) + rate limiter  | `src/app/api/tiles/route.ts` + `rateLimit.ts`                                              | 1     | ✅ done                                             |
+| Wall route (thin, cacheable)        | `src/app/api/wall/route.ts`                                                                | 1     | ✅ done                                             |
+| Env vars (5, all optional)          | `.env.schema` (SUPABASE_URL/ANON_KEY/SERVICE_ROLE_KEY, SUBMITTER_HASH_SECRET, CRON_SECRET) | 1+2   | ✅ 4 set live; CRON_SECRET optional (§5 Needs Nick) |
+| Tuning config (three-free) + tests  | `src/components/three/game/doodleWallConfig.ts`                                            | 1     | ✅ done                                             |
+| In-scene stall + tile grid          | `src/components/three/game/DoodleWall.tsx`                                                 | 1     | ✅ done                                             |
+| Drawing overlay                     | `src/components/overlays/DoodleWallHud.tsx`                                                | 1     | ✅ done                                             |
+| Store slice                         | `src/store/scene.ts` (`doodleWallPhase`)                                                   | 1     | ✅ done                                             |
+| Attraction entry                    | `src/components/three/synty/attractions.ts` (`doodle-wall`)                                | 1     | ✅ done                                             |
+| The carny's counter (page + queue)  | `src/app/admin/page.tsx` + `AdminQueue.tsx`                                                | 2     | ✅ built (working tree)                             |
+| Verdict route                       | `src/app/api/admin/tiles/[id]/route.ts`                                                    | 2     | ✅ built (working tree)                             |
+| Auth routes (login/callback/logout) | `src/app/api/admin/auth/*/route.ts`                                                        | 2     | ✅ built (working tree)                             |
+| Admin auth (server-only)            | `src/lib/supabase/adminAuth.ts` (allow-list, provider pin, origin pin)                     | 2     | ✅ built (working tree)                             |
+| Keepalive route + cron              | `src/app/api/keepalive/route.ts` + `vercel.json`                                           | 2     | ✅ built (working tree)                             |
 
 ## 5. Decisions
 
@@ -238,7 +267,50 @@ programmatically.
 - Daily-cap count-then-insert TOCTOU is **accepted and documented** (worst case: a
   racer lands one tile over cap; pre-moderation queue absorbs it).
 
+**Stage 2 decisions (build session, 2026-07-15 — now canon):**
+
+- **Allow-list is structural, not just data:** `MODERATOR_EMAILS` lives in the
+  server-only `src/lib/supabase/adminAuth.ts`, never in
+  `doodle-wall/constants.ts` (client-reachable via `doodleWallConfig`). Hard-coded
+  `['nick@iamnick.dev']` — never widen (ADR-0001).
+- **Provider pin:** a passing session must be a Google session
+  (`app_metadata.provider(s)`); an email/password signup claiming the carny's
+  address can never pass, even before the dashboard-side provider is disabled.
+- **Origin pin:** `requestOrigin()` returns `SITE_URL` in production —
+  `x-forwarded-host` never steers OAuth redirects. Dev/preview use the request
+  URL origin.
+- **No middleware/proxy** for `/admin` — one page, one person; an expired token
+  reads as signed-out and the page re-offers login.
+- **Verdict transitions** (encoded in `tileService.moderate`): approve
+  `pending→approved`; reject `pending|approved→rejected` (approved→rejected is a
+  takedown); rejected is FINAL — never restored.
+- The Supabase adapter owns `approved_at` (set on approve, cleared otherwise);
+  `findById` maps Postgres `22P02` to `null` so malformed ids 404.
+- **Glossary additions (CONTEXT.md):** _The carny's counter_ (= `/admin`; plain
+  DOM page, not an attraction/stall/overlay; "booth" stays banned) and _Verdict_
+  (approve | reject); _The carny_ widened — Nick IS the carny at the counter.
+
+**Stage 2 close-out fixes (code review, 2026-07-15 — 24 candidates, 10 confirmed,
+all fixed):** queue-refresh no-op (keyed remount so `router.refresh()` bites);
+provider pin; forwarded-host trust in redirects; timing-safe `CRON_SECRET`
+compare; blind 404 card-drop (stale cards now dropped only on tile-level
+reasons); configured-predicate disagreement with `getTileAdapters`; `22P02` →
+500 (now 404); missing Origin check on PATCH; duplicated privacy projection
+(now one `toWallTile`); allow-list in a client-reachable module (moved to
+`adminAuth.ts`).
+
 **Parked follow-ons (verified in review, deliberately not fixed — pick up post-merge):**
+
+- **(Stage 2)** Atomic transition port method — a single conditional UPDATE instead
+  of `findById` + `setStatus` (the `setStatus` write is unconfirmed against the
+  read; the race window is Nick-vs-Nick, so parked).
+- **(Stage 2)** Rate limiting on the admin auth routes.
+- **(Stage 2)** Pin session cookie flags explicitly rather than inheriting
+  `@supabase/ssr` defaults.
+- **(Stage 2)** `requireModerator()` route-preamble helper — extract when a second
+  admin route appears.
+- **(Stage 2)** Card-shell dedup across `/admin` + the `AdminQueue` empty state —
+  joins the existing `CardShell` follow-on below.
 
 - Card chrome triplicated across `overlays/BallTossHud.tsx` / `HighStrikerHud.tsx` /
   `DoodleWallHud.tsx` → extract a shared `overlays/CardShell`.
@@ -271,37 +343,51 @@ programmatically.
   verified working by the e2e. A later swap to the new-format keys (`sb_secret_...` /
   `sb_publishable_...`) needs **no code change**; the adapters are format-agnostic.
   The anon key is unused until Stage 2.
-- `SUPABASE_URL` is `@sensitive=false` in `.env.schema` (e2e fix, branch
-  `fix/doodle-wall-e2e-provisioning`): every Storage public URL that `GET /api/wall`
-  returns embeds the project URL, so marking it sensitive made varlock's runtime leak
-  scan 500 the route as soon as any tile was approved. Same reasoning as the Sentry
-  DSN precedent already in `.env.schema`; Stage 2 ships the URL to the browser anyway.
+- `SUPABASE_URL` is `@sensitive=false` in `.env.schema` (e2e fix `6cc67f9`, merged
+  PR #67): every Storage public URL that `GET /api/wall` returns embeds the project
+  URL, so marking it sensitive made varlock's runtime leak scan 500 the route as
+  soon as any tile was approved. Same reasoning as the Sentry DSN precedent. The
+  anon key, by contrast, **stays `@sensitive`** — Stage 2 kept it server-only
+  (cookie sessions, no client-side Supabase).
 - The rejected e2e test tile stays in the project (canon: rows and PNGs retained) —
   row `315595ae-efe4-477f-929f-8f0f3362e61e`, image
   `973052c3-1ed7-45b1-98e4-30cb8dbd219a.png`, status `rejected`. Not a stray; do not
   clean it up.
 
-**Open:**
-
-- Admin queue UX details (batch approve, preview size) — resolve at Stage 2 start.
+**Open:** none — the Stage 2 queue UX questions (batch approve, preview size)
+were resolved by the build: one verdict per tile, no batching; card previews.
 
 **Needs Nick (human gates):**
 
-- **Merge the fix PR** (from `fix/mobile-framing-and-npc-paths`, carrying the e2e
-  fix `6cc67f9` + the mobile framing fix; PR to follow) — without it production
-  500s `GET /api/wall` on the first approved tile and crops the board on phones.
+- **Stage 2 config gate — `/admin` cannot work until this is done:**
+  1. Google Cloud Console (console.cloud.google.com/auth/clients): create an
+     OAuth client (web application), Authorized redirect URI =
+     `https://hzwjezozoxlopyfgmxoc.supabase.co/auth/v1/callback`.
+  2. Supabase dashboard → Auth → Providers → Google: enable, paste the client ID
+     - secret.
+  3. Supabase dashboard → Auth → URL Configuration: Site URL
+     `https://iamnick.dev`; add to the redirect allow-list
+     `https://iamnick.dev/api/admin/auth/callback` and
+     `http://localhost:3000/api/admin/auth/callback`.
+  4. RECOMMENDED: disable the email/password provider (defence in depth — the
+     provider pin already blocks it).
+  5. Optionally set `CRON_SECRET` in the Vercel env.
+  6. Then the Stage 2 e2e per §6: sign in on the phone → a pending tile appears
+     at the counter → approve → on the wall; a non-allow-listed account → denied.
 - **Real-GPU look pass** on the freestanding board (outstanding since `4860738`,
-  now including the mobile fly-in framing on a real phone) — headless swiftshader
-  can't judge colour/glow; also eyeball the error cards and the `#doodle-wall`
-  hash entry, still unexercised visually (§6).
-- Stage 2 admin allow-list uses Nick's actual Google identity — collect it at Stage 2
-  start; never widen to "any Google login" (ADR-0001).
+  including the mobile fly-in framing on a real phone) — headless swiftshader
+  can't judge colour/glow; also eyeball the error cards, the `#doodle-wall` hash
+  entry, and now the carny's counter styling (§6).
 
 ## 6. How to verify
 
 - **Gate (every slice):** `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build`
-  — all green at `c43bf60` (120 tests, keyless).
-- **Domain + routes + config:** ✅ covered by colocated unit tests against fakes.
+  — all green at the Stage 2 head (149 tests, keyless).
+- **Domain + routes + config:** ✅ covered by colocated unit tests against fakes —
+  Stage 2 added tileService queue + verdict rules, adminAuth allow-list, PATCH
+  route guards + verdicts, keepalive, and the `AdminQueue` component.
+- **The carny's counter, stub mode:** ✅ smoke-tested by portrait screenshot
+  (unconfigured state renders; no auth possible pre-config).
 - **Scene/overlay headless:** recipe in `ball-toss-game-handoff.md` §6 (Playwright +
   swiftshader, `?debug=1` + `window.__sceneStore`; `?off=doodle` isolates the wall).
   ✅ Re-verified at `4860738`: fly-in frames the freestanding board (grid + bulbs +
@@ -320,8 +406,13 @@ programmatically.
   PNG fetched anonymously by its Storage public URL (200, byte-identical) → anon
   bucket-listing returned `[]` (listing-policy drop live) → SQL approve → wall served
   it with the real Storage URL → SQL reject → wall empty again. Test tile retained by
-  design (ids in §5). Still to come at Stage 2: non-allow-listed Google account
-  denied `/admin`.
+  design (ids in §5).
+- **Stage 2 end-to-end (after Nick's config gate, §5):** sign in at `/admin` on
+  the phone with the allow-listed account → a submitted tile appears at the
+  counter as `pending` → approve → it reaches `GET /api/wall`; reject an approved
+  tile → it leaves the wall (takedown); a non-allow-listed Google account →
+  denied; `GET /api/keepalive` → `{ ok: true, mode: 'live' }` (with the bearer
+  token if `CRON_SECRET` is set).
 - **Degradation:** WebGL off → `StaticCv` link → overlay with `<img>` tiles.
 
 ## 7. Gotchas (inherited — details in `ball-toss-game-handoff.md` §7)
@@ -343,8 +434,8 @@ programmatically.
   or varlock's runtime leak scan (patched `Response.json`) 500s the route the moment
   the value shows up. Found live by the e2e: `SUPABASE_URL` sits inside every approved
   tile's `imageUrl`, so a sensitive URL killed `GET /api/wall` on the first approved
-  tile. Check this for every future var — the Stage 2 anon/publishable key ships to
-  the client and needs the same treatment when it does.
+  tile. Check this for every future var. (The anon key dodged it — Stage 2 kept it
+  server-only, so it stays `@sensitive`.)
 - Bisection keys: `?off=doodle` unmounts the wall; `?off=game` covers only the game sims.
 - Nick's dev server usually holds port 3000 — smoke servers go on a spare port.
 - Commit messages end `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
@@ -366,49 +457,46 @@ programmatically.
     Nick, `.env.local` + Vercel, legacy JWT keys (§5); ~~stub→real end-to-end
     check~~ ✅ **PASSED** (§6) — and found + fixed the varlock `SUPABASE_URL` bug
     en route (§7).
-11. **← YOU ARE HERE. Blocked on Nick:** (a) merge the fix PR (from
-    `fix/mobile-framing-and-npc-paths` — e2e fix + mobile framing) → (b) real-GPU
-    look pass on the board, desktop and mobile (outstanding since `4860738`).
-12. Stage 2: admin + keepalive, same shape (brief from this doc; contracts in §2.1;
-    needs Nick's Google identity for the allow-list before any code).
+11. ~~Merge the fix PRs~~ ✅ #67 (`0e60a41`, e2e varlock fix) and #68 (`4631df6`,
+    mobile framing + NPC re-routes) merged to master.
+12. ~~Stage 2: admin + keepalive~~ ✅ **built 2026-07-15** on
+    `feature/doodle-wall-moderation` (staged/working tree; gate green, 149 tests;
+    glossary-guard + /code-review close-out done — §1, §5).
+13. **← YOU ARE HERE:** (a) raise the Stage 2 PR → (b) **Nick's config gate**
+    (§5 Needs Nick: Google OAuth client, Supabase provider + URL config, optional
+    `CRON_SECRET`) → (c) the Stage 2 end-to-end check (§6). In parallel, Nick's
+    real-GPU look pass on the board is still outstanding (since `4860738`).
 
 ## 9. What just happened
 
-2026-07-15 (latest) — **mobile framing fixed** on `fix/mobile-framing-and-npc-paths`
-(cut from the e2e fix, which it carries as `6cc67f9`; one PR to follow with both).
-Nick reported the board cropped on phones during the fly-in ("needs zooming out
-when camera pans in"). Fix: optional `frameWidth` on `Attraction`
-(`synty/attractions.ts`) — a world width that must stay in frame when focused —
-honoured by `IsoControls`, which backs the camera off beyond `focusDist` on narrow
-viewports until the width fits the horizontal fov; `doodle-wall` declares 3.6 m.
-Headless portrait (390×844) screenshot verified the full 6×4 grid, bulbs and both
-poles in frame; desktop framing unchanged; no other attraction declares a
-`frameWidth`. The branch also carries mobile fixes outside doodle-wall scope
-(intro camera, burger gating, NPC walker re-routes). Nick's real-GPU look pass
-(§5) now covers the mobile look too.
+2026-07-15 (latest) — **Stage 2 (moderation) BUILT** on
+`feature/doodle-wall-moderation` (staged/working tree; PR to follow). One slice,
+same hexagonal shape: `tileService.getQueue()` + `moderate()` with the verdict
+transition rules (rejected is final), new `TileRepository` port methods, the
+server-only `adminAuth.ts` (cookie sessions via `@supabase/ssr`, JWKS-verified
+claims, hard allow-list `nick@iamnick.dev`, Google provider pin, production
+origin pin), the three auth routes, `PATCH /api/admin/tiles/:id`,
+`GET /api/keepalive` + the `vercel.json` daily cron, and `/admin` — the carny's
+counter (four identity states, `AdminQueue` client component, noindex + robots
+disallow). CONTEXT.md gained _The carny's counter_ and _Verdict_. Gate green
+with 149 tests (was 120); stub-mode `/admin` smoke-tested by portrait
+screenshot. Close-out done: glossary-guard (5 findings) and /code-review high
+(10 confirmed fixed — §5); five new Stage 2 follow-ons parked (§5). **Nothing
+works at `/admin` in production until Nick's config gate (§5 Needs Nick):**
+Google OAuth client + Supabase provider/URL config, then the Stage 2 e2e (§6).
+Earlier the same day the fix PRs merged: #67 (`0e60a41`, the e2e varlock
+`SUPABASE_URL` fix) and #68 (`4631df6`, mobile framing via
+`Attraction.frameWidth` + NPC re-routes) — master is `4631df6`.
 
-2026-07-14 — **Stage 1 live-verified end to end against the real Supabase
-project.** PR #66 (storage-listing policy drop) merged to master (`cbcd832`); Nick set
-all four env vars in `.env.local` and Vercel — with the legacy JWT-format keys (canon
-note §5). The full real-mode chain then passed locally (prod build, port 3001):
-submit → `pending` and invisible → remote row + `submitter_hash` verified → PNG
-served anonymously by public URL, byte-identical → anon listing returns `[]` (the
-#66 drop verified live) → SQL approve → on the wall with a real Storage URL → SQL
-reject → wall empty again; the rejected test tile is retained by design (ids in §5).
-The e2e also **found a bug production would have hit on the first approved tile**:
-`SUPABASE_URL` marked `@sensitive` made varlock's runtime leak scan 500
-`GET /api/wall` because every `imageUrl` embeds the project URL. Fixed
-(`@sensitive=false`, Sentry-DSN precedent) as `6cc67f9`, alongside gitignoring
-`supabase/.temp/` and `.mcp.json` (Nick's ask). **Remaining before Stage 2**
-(§8 step 11): merge the fix PR, Nick's real-GPU look pass (outstanding since
-`4860738`), and Nick's Google identity for the admin allow-list.
-
-Earlier the same day: PR #65 merged (`12d4a39`); Supabase provisioned via the CLI
-(project **iamnick**, ref `hzwjezozoxlopyfgmxoc`, Central EU Frankfurt; migrations
-applied and remote state verified, advisors clean after the listing-policy drop);
-and before merge, the close-out chain (`5a2df8d`, `c43bf60`, `b4bc279`) and Nick's
-board-only revision (`4860738` — stall prefab dropped, freestanding board at three
-(17.5, 39)).
+2026-07-14 — **Stage 1 shipped end to end.** PR #65 merged (`12d4a39`) after the
+close-out chain (`5a2df8d`, `c43bf60`, `b4bc279`) and Nick's board-only revision
+(`4860738`). Supabase provisioned via the CLI (project **iamnick**, ref
+`hzwjezozoxlopyfgmxoc`, Frankfurt); storage-listing PR #66 merged (`cbcd832`);
+Nick set all four env vars (legacy JWT keys, §5); the real-Supabase e2e passed
+locally — the full submit → pending → approve → wall → reject chain, anon
+listing blocked, test tile retained by design (§5, §6). The e2e found the
+varlock `SUPABASE_URL` leak-scan bug that would have 500'd `GET /api/wall` on
+the first approved tile (§7); fixed as `6cc67f9`.
 
 For a NEW session picking this up: read `CONTEXT.md`, then this doc top to bottom —
 §2.1 has the frozen contracts, §5 the canon decisions + parked follow-ons, §8 the next

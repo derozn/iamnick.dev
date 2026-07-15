@@ -7,6 +7,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
+      // The carny's counter and the API surface aren't content (Stage 2 also
+      // sets robots noindex metadata on /admin itself).
+      disallow: ['/admin', '/api/'],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

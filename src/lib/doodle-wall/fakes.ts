@@ -4,7 +4,7 @@ import { deflateSync } from 'node:zlib';
 
 import { STORED_TILE_SIZE } from './constants';
 import type { TileImageStore, TileRepository } from './ports';
-import type { Tile } from './types';
+import type { Tile, TileStatus } from './types';
 
 /**
  * In-memory adapters for the doodle wall ports — what dev, CI, and a
@@ -169,6 +169,24 @@ export class InMemoryTileRepository implements TileRepository {
       (tile) => tile.submitterHash === submitterHash && tile.createdAt >= sinceIso,
     ).length;
     return Promise.resolve(count);
+  }
+
+  oldestPending(limit: number): Promise<Tile[]> {
+    const pending = this.tiles
+      .filter((tile) => tile.status === 'pending')
+      .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+      .slice(0, limit);
+    return Promise.resolve(pending);
+  }
+
+  findById(id: string): Promise<Tile | null> {
+    return Promise.resolve(this.tiles.find((tile) => tile.id === id) ?? null);
+  }
+
+  setStatus(id: string, status: TileStatus): Promise<void> {
+    const tile = this.tiles.find((t) => t.id === id);
+    if (tile) tile.status = status;
+    return Promise.resolve();
   }
 
   /** Test/stub inspection — deliberately not part of the port. */

@@ -1,9 +1,15 @@
 import { randomUUID } from 'node:crypto';
 
-import { STORED_TILE_SIZE, SUBMIT_DAILY_CAP, TILE_MAX_BYTES, WALL_TILE_COUNT } from './constants';
+import {
+  QUEUE_PAGE_COUNT,
+  STORED_TILE_SIZE,
+  SUBMIT_DAILY_CAP,
+  TILE_MAX_BYTES,
+  WALL_TILE_COUNT,
+} from './constants';
 import { readPngDimensions } from './png';
 import type { TileImageStore, TileRepository } from './ports';
-import type { Tile, WallTile } from './types';
+import type { Tile, TileStatus, WallTile } from './types';
 
 /**
  * The doodle wall's submit and wall rules, pure of HTTP and of Supabase.
@@ -14,6 +20,24 @@ import type { Tile, WallTile } from './types';
 export type SubmitTileResult =
   { ok: true; tile: Tile } | { ok: false; reason: 'invalid-image' | 'too-large' | 'daily-cap' };
 
+/** The carny's ruling on a queued tile (CONTEXT.md: Verdict). */
+export type Verdict = 'approve' | 'reject';
+
+export type ModerateResult =
+  | { ok: true; id: string; status: TileStatus }
+  | { ok: false; reason: 'not-found' | 'invalid-transition' };
+
+/**
+ * Legal verdict transitions (Stage 2): the carny approves or rejects
+ * pending tiles, and may take an approved tile back down (reject it) if one
+ * turns sour after the fact. A rejected tile stays rejected — restoring one
+ * is deliberately not a thing (resubmit instead).
+ */
+const VERDICT_FROM: Record<Verdict, readonly TileStatus[]> = {
+  approve: ['pending'],
+  reject: ['pending', 'approved'],
+};
+
 export interface TileService {
   submitTile(input: { imageBytes: Uint8Array; submitterHash: string }): Promise<SubmitTileResult>;
   /**
@@ -21,9 +45,24 @@ export interface TileService {
    * already projected to the public WallTile shape.
    */
   getWall(): Promise<WallTile[]>;
+  /**
+   * The pre-moderation queue: oldest-first (first drawn, first reviewed),
+   * bounded at QUEUE_PAGE_COUNT, projected like the wall — the carny's
+   * counter needs nothing the public shape doesn't carry.
+   */
+  getQueue(): Promise<WallTile[]>;
+  /** Apply one verdict; transition legality enforced here. */
+  moderate(input: { id: string; verdict: Verdict }): Promise<ModerateResult>;
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * The public projection — THE privacy boundary at the domain edge: no
+ * submitterHash, no imagePath, applied once here so no consumer (wall or
+ * queue) can forget to strip them.
+ */
+const toWallTile = ({ id, imageUrl, createdAt }: Tile): WallTile => ({ id, imageUrl, createdAt });
 
 export function createTileService(deps: {
   repository: TileRepository;
@@ -81,10 +120,27 @@ export function createTileService(deps: {
     },
 
     async getWall() {
-      // Public projection at the domain boundary: submitterHash and imagePath
-      // must never depend on each consumer remembering to strip them.
       const tiles = await repository.recentApproved(WALL_TILE_COUNT);
-      return tiles.map(({ id, imageUrl, createdAt }) => ({ id, imageUrl, createdAt }));
+      return tiles.map(toWallTile);
+    },
+
+    async getQueue() {
+      const tiles = await repository.oldestPending(QUEUE_PAGE_COUNT);
+      return tiles.map(toWallTile);
+    },
+
+    async moderate({ id, verdict }) {
+      const tile = await repository.findById(id);
+      if (!tile) return { ok: false, reason: 'not-found' };
+      if (!VERDICT_FROM[verdict].includes(tile.status)) {
+        return { ok: false, reason: 'invalid-transition' };
+      }
+      // Read-then-write, not compare-and-set: there is exactly one carny, so
+      // the race this admits (two verdicts on the same tile crossing) needs
+      // two of him. Same trade as the daily cap's count-then-insert.
+      const status: TileStatus = verdict === 'approve' ? 'approved' : 'rejected';
+      await repository.setStatus(id, status);
+      return { ok: true, id, status };
     },
   };
 }
