@@ -131,6 +131,90 @@ describe('tileService.getWall', () => {
   });
 });
 
+describe('tileService.getQueue', () => {
+  it('returns pending tiles oldest-first, projected to the public shape', async () => {
+    const base = Date.parse('2026-07-01T00:00:00Z');
+    repository = new InMemoryTileRepository([
+      makeStoredTile({ status: 'pending', createdAt: new Date(base + 2000).toISOString() }),
+      makeStoredTile({ status: 'approved', createdAt: new Date(base + 1000).toISOString() }),
+      makeStoredTile({ status: 'pending', createdAt: new Date(base).toISOString() }),
+      makeStoredTile({ status: 'rejected', createdAt: new Date(base + 3000).toISOString() }),
+    ]);
+    service = createTileService({ repository, imageStore: new InMemoryTileImageStore() });
+
+    const queue = await service.getQueue();
+    expect(queue.map((t) => t.createdAt)).toEqual([
+      new Date(base).toISOString(),
+      new Date(base + 2000).toISOString(),
+    ]);
+    // Projection: nothing beyond the public shape leaves the domain.
+    expect(Object.keys(queue[0]).sort()).toEqual(['createdAt', 'id', 'imageUrl']);
+  });
+
+  it(`is bounded at QUEUE_PAGE_COUNT`, async () => {
+    const { QUEUE_PAGE_COUNT } = await import('./constants');
+    repository = new InMemoryTileRepository(
+      Array.from({ length: QUEUE_PAGE_COUNT + 5 }, () => makeStoredTile({ status: 'pending' })),
+    );
+    service = createTileService({ repository, imageStore: new InMemoryTileImageStore() });
+    expect(await service.getQueue()).toHaveLength(QUEUE_PAGE_COUNT);
+  });
+});
+
+describe('tileService.moderate', () => {
+  const withTile = (status: Tile['status']) => {
+    const tile = makeStoredTile({ status });
+    repository = new InMemoryTileRepository([tile]);
+    service = createTileService({ repository, imageStore: new InMemoryTileImageStore() });
+    return tile;
+  };
+
+  it('approves a pending tile', async () => {
+    const tile = withTile('pending');
+    const result = await service.moderate({ id: tile.id, verdict: 'approve' });
+    expect(result).toEqual({ ok: true, id: tile.id, status: 'approved' });
+    expect((await repository.findById(tile.id))?.status).toBe('approved');
+  });
+
+  it('rejects a pending tile', async () => {
+    const tile = withTile('pending');
+    const result = await service.moderate({ id: tile.id, verdict: 'reject' });
+    expect(result).toEqual({ ok: true, id: tile.id, status: 'rejected' });
+  });
+
+  it('takes an approved tile back down (approved → rejected)', async () => {
+    const tile = withTile('approved');
+    const result = await service.moderate({ id: tile.id, verdict: 'reject' });
+    expect(result).toEqual({ ok: true, id: tile.id, status: 'rejected' });
+  });
+
+  it('refuses to re-approve an approved tile', async () => {
+    const tile = withTile('approved');
+    expect(await service.moderate({ id: tile.id, verdict: 'approve' })).toEqual({
+      ok: false,
+      reason: 'invalid-transition',
+    });
+  });
+
+  it('refuses any verdict on a rejected tile — rejection is final', async () => {
+    const tile = withTile('rejected');
+    for (const verdict of ['approve', 'reject'] as const) {
+      expect(await service.moderate({ id: tile.id, verdict })).toEqual({
+        ok: false,
+        reason: 'invalid-transition',
+      });
+    }
+  });
+
+  it('reports an unknown id as not-found', async () => {
+    withTile('pending');
+    expect(await service.moderate({ id: 'no-such-tile', verdict: 'approve' })).toEqual({
+      ok: false,
+      reason: 'not-found',
+    });
+  });
+});
+
 let tileCounter = 0;
 
 function makeStoredTile(overrides: Partial<Tile>): Tile {

@@ -77,5 +77,13 @@ The holding area every submitted tile enters. Nick reviews and approves/rejects 
 _Avoid_: review board, moderation inbox
 
 **The carny**:
-The unseen stallholder persona the doodle wall's copy hands a submitted tile to ("your tile is with the carny") — the in-world face of the pre-moderation queue. Purely narrative; the actual moderator is Nick.
+The stallholder persona of the doodle wall's pre-moderation queue. Visitors meet him in copy ("your tile is with the carny"); Nick _is_ the carny at the carny's counter — the allow-listed /admin account acts in his name. Internal identifiers (`MODERATOR_EMAILS`, `kind: 'moderator'`) stay technical.
 _Avoid_: moderator (in visitor-facing copy), attendant, admin (as a character)
+
+**The carny's counter**:
+/admin — the page where the carny reviews the pre-moderation queue and gives verdicts. A plain DOM page (no canvas): not an attraction, not a stall, not an overlay. "Counter" is deliberate — "booth" stays banned (see Stall).
+_Avoid_: booth, admin panel/dashboard (in copy), back office
+
+**Verdict**:
+The carny's single ruling on a queued tile: approve (publishes to the wall) or reject (final — a rejected tile is never restored; an approved tile can later be rejected to take it down). Code carries it as `Verdict`; the moderation route's body field is `verdict`.
+_Avoid_: decision, action (in copy), ban/delete

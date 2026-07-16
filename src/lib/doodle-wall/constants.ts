@@ -31,3 +31,11 @@ export const SUBMIT_BURST_PER_MINUTE = 2;
 
 /** Daily cap: submissions per submitter hash per rolling 24 h (durable). */
 export const SUBMIT_DAILY_CAP = 10;
+
+/** Upper bound on pending tiles per pre-moderation-queue load (/admin). */
+export const QUEUE_PAGE_COUNT = 48;
+
+// NB: the carny's allow-list (MODERATOR_EMAILS) deliberately does NOT live
+// here — this module is re-exported by the client-shipped doodleWallConfig,
+// and the auth boundary should be structural, not tree-shaking luck. It
+// lives in src/lib/supabase/adminAuth.ts, a server-only module.

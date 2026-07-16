@@ -22,6 +22,8 @@ export interface TileAdapters {
   repository: TileRepository;
   imageStore: TileImageStore;
   submitterHashSecret: string;
+  /** true = real Supabase; false = in-memory stub mode. */
+  live: boolean;
 }
 
 /**
@@ -58,6 +60,7 @@ export function getTileAdapters(): TileAdapters {
     return {
       ...fakes,
       submitterHashSecret: process.env.SUBMITTER_HASH_SECRET || DEV_SUBMITTER_HASH_SECRET,
+      live: false,
     };
   }
 
@@ -77,7 +80,7 @@ export function getTileAdapters(): TileAdapters {
       imageStore: new SupabaseTileImageStore(client),
     };
   }
-  return { ...supabase, submitterHashSecret };
+  return { ...supabase, submitterHashSecret, live: true };
 }
 
 /** Test hook: drop the singletons so each case starts from the seed. */

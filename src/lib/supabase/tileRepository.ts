@@ -58,6 +58,40 @@ export class SupabaseTileRepository implements TileRepository {
     return count ?? 0;
   }
 
+  async oldestPending(limit: number): Promise<Tile[]> {
+    const { data, error } = await this.client
+      .from('tiles')
+      .select(TILE_COLUMNS)
+      .eq('status', 'pending')
+      .order('created_at', { ascending: true })
+      .limit(limit);
+    if (error) throw new Error(`[doodle-wall] queue query failed: ${error.message}`);
+    return ((data ?? []) as TileRow[]).map((row) => this.toTile(row));
+  }
+
+  async findById(id: string): Promise<Tile | null> {
+    const { data, error } = await this.client
+      .from('tiles')
+      .select(TILE_COLUMNS)
+      .eq('id', id)
+      .maybeSingle();
+    // 22P02 = invalid uuid syntax: a malformed id is "no such tile" (the
+    // fakes return null too), not a 500 — the column is uuid-typed.
+    if (error?.code === '22P02') return null;
+    if (error) throw new Error(`[doodle-wall] tile lookup failed: ${error.message}`);
+    return data ? this.toTile(data as TileRow) : null;
+  }
+
+  async setStatus(id: string, status: TileStatus): Promise<void> {
+    // approved_at lives only in the database (the domain Tile doesn't carry
+    // it): set on approve, cleared on any other transition.
+    const { error } = await this.client
+      .from('tiles')
+      .update({ status, approved_at: status === 'approved' ? new Date().toISOString() : null })
+      .eq('id', id);
+    if (error) throw new Error(`[doodle-wall] status update failed: ${error.message}`);
+  }
+
   private toTile(row: TileRow): Tile {
     // getPublicUrl is a synchronous URL construction — no network call.
     const { data } = this.client.storage.from(TILES_BUCKET).getPublicUrl(row.image_path);

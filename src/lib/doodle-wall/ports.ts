@@ -1,4 +1,4 @@
-import type { Tile } from './types';
+import type { Tile, TileStatus } from './types';
 
 /**
  * Ports the tileService depends on — one interface per dependency direction.
@@ -17,6 +17,17 @@ export interface TileRepository {
    * instance churn.
    */
   countSubmittedSince(submitterHash: string, sinceIso: string): Promise<number>;
+  /** Oldest-first pending tiles, at most `limit` — the pre-moderation queue (FIFO). */
+  oldestPending(limit: number): Promise<Tile[]>;
+  /** One tile by id, any status; null when absent. */
+  findById(id: string): Promise<Tile | null>;
+  /**
+   * Persist a status transition. The Supabase adapter also maintains
+   * approved_at (set on approve, cleared otherwise) — a column the domain
+   * Tile deliberately doesn't carry. Transition legality is the service's
+   * rule, not the repository's.
+   */
+  setStatus(id: string, status: TileStatus): Promise<void>;
 }
 
 export interface TileImageStore {
