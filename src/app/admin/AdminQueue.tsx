@@ -6,11 +6,14 @@ import { useRouter } from 'next/navigation';
 import type { Verdict } from '@/lib/doodle-wall/tileService';
 import type { WallTile } from '@/lib/doodle-wall/types';
 
+import { sendVerdict } from './verdictClient';
+
 /**
  * The queue itself — one card per pending tile, oldest first (first drawn,
  * first reviewed), each with the only two verdicts that exist. Client
  * component so a verdict can strike the card without a reload; the server
- * page hands in the initial queue and router.refresh() re-pulls it.
+ * page hands in the initial queue (keyed, so router.refresh() remounts)
+ * and sendVerdict owns the PATCH semantics.
  *
  * imageUrl is a data URI in stub mode and a Storage URL live — <img> takes
  * both (same contract as the overlay's wall grid).
@@ -28,27 +31,12 @@ export function AdminQueue({ initialTiles }: { initialTiles: WallTile[] }) {
   const decide = async (id: string, verdict: Verdict) => {
     setBusy(id);
     setError(null);
-    try {
-      const res = await fetch(`/api/admin/tiles/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ verdict }),
-      });
-      const payload = (await res.json().catch(() => ({}))) as { error?: string };
-      // Drop the card on success — or when the queue is stale (verdict
-      // already given: not-found / invalid-transition from OUR route, by
-      // reason rather than bare status, so a platform 404 mid-deploy can't
-      // silently swallow verdicts).
-      if (res.ok || payload.error === 'not-found' || payload.error === 'invalid-transition') {
-        setTiles((current) => current.filter((tile) => tile.id !== id));
-      } else {
-        setError(payload.error ?? 'something went wrong — try again');
-      }
-    } catch {
-      setError('something went wrong — try again');
-    } finally {
-      setBusy(null);
-    }
+    const outcome = await sendVerdict(id, verdict);
+    // 'stale' drops too: the tile was already ruled on — a stranded card
+    // helps no one.
+    if (outcome === 'error') setError('something went wrong — try again');
+    else setTiles((current) => current.filter((tile) => tile.id !== id));
+    setBusy(null);
   };
 
   if (tiles.length === 0) {
@@ -69,7 +57,7 @@ export function AdminQueue({ initialTiles }: { initialTiles: WallTile[] }) {
   }
 
   return (
-    <section className="mt-8" aria-label="Pending tiles">
+    <section className="mt-6" aria-label="Pending tiles">
       <div className="flex items-center justify-between">
         <p className="font-fell-sc text-[13px] tracking-[0.1em] text-ink-soft">
           {tiles.length} awaiting review, oldest first
