@@ -10,8 +10,8 @@
 > back in. Read `CONTEXT.md` first — its language is law.
 >
 > Stage 1 merged and live (PRs #65–#68). Stage 2 merged and live (PR #69).
-> Housekeeping (`/admin/wall`) built on `feature/doodle-wall-housekeeping`
-> (working tree; PR to follow). PRs target `master`.
+> Housekeeping merged and live (PR #70). Every Nick-gate cleared 2026-07-16 —
+> the doodle wall is fully live end to end. PRs target `master`.
 
 ---
 
@@ -28,19 +28,21 @@ Staged delivery, each slice its own PR:
    OAuth, hard allow-list `nick@iamnick.dev` only), verdict route, daily
    keepalive cron. Nick completed the Google OAuth config gate and confirmed
    `/admin` works in production ("This works great").
-3. **Housekeeping — the counter's second view:** ✅ **BUILT** (2026-07-16) on
-   `feature/doodle-wall-housekeeping` (working tree, **PR to follow**):
-   `/admin/wall` shows the wall exactly as hung and offers Take down — the
-   final reject verdict — per tile, guarded by two-tap arm/confirm. Gate green,
-   156 tests. **§5 Needs Nick: merge the PR, then a phone check of `/admin/wall`.**
+3. **Housekeeping — the counter's second view:** ✅ **MERGED AND
+   LIVE-VERIFIED** (PR #70, `c70ff22`): `/admin/wall` shows the wall exactly
+   as hung and offers Take down — the final reject verdict — per tile,
+   guarded by two-tap arm/confirm. Nick's phone check passed 2026-07-16.
 
-## 1. Current state (verified 2026-07-16, `feature/doodle-wall-housekeeping` over master `f592da8`)
+Nothing is in flight. Next work = Nick's three future follow-ons (§5), all
+unscoped and deliberately not started.
 
-**Stages 1 and 2 are merged, configured, and live** — Nick did the Google OAuth
-config and confirmed `/admin` works in production. **Housekeeping
-(`/admin/wall`) is BUILT** — working-tree on this branch, gate green
-(typecheck / lint / test:ci with 156 tests keyless / build, `/admin/wall` in
-the route list), **PR to follow**.
+## 1. Current state (verified 2026-07-16, master `c70ff22`)
+
+**Everything is merged, configured, and live-verified** — Stages 1 and 2 plus
+housekeeping (PR #70, `c70ff22`). Nick cleared the last two human gates on
+2026-07-16: the phone check of `/admin/wall` and the real-GPU look pass on the
+freestanding board (including the mobile fly-in framing). **No open
+Nick-gates.**
 
 **Stage 1 (all merged to master):**
 
@@ -120,7 +122,7 @@ the route list), **PR to follow**.
   findings) and /code-review high (24 candidates → 10 confirmed, all fixed;
   list in §5).
 
-**Housekeeping (this branch, built 2026-07-16, working tree):**
+**Housekeeping (merged to master as PR #70, `c70ff22`; live and phone-checked):**
 
 - **`/admin/wall` — the counter's second view:** the wall exactly as hung —
   reuses `tileService.getWall()`, same newest-first bounded 48; tiles older
@@ -245,9 +247,9 @@ Driven by the `vercel.json` cron, daily 08:00 UTC.
 | Auth routes (login/callback/logout) | `src/app/api/admin/auth/*/route.ts`                                                        | 2     | ✅ merged (PR #69)                                  |
 | Admin auth (server-only)            | `src/lib/supabase/adminAuth.ts` (allow-list, provider pin, origin pin)                     | 2     | ✅ merged (PR #69)                                  |
 | Keepalive route + cron              | `src/app/api/keepalive/route.ts` + `vercel.json`                                           | 2     | ✅ merged (PR #69)                                  |
-| Counter shell (shared)              | `src/app/admin/AdminGate.tsx` (header, tabs, identity states, CounterCard, SignOutButton)  | HK    | ✅ built (working tree)                             |
-| Verdict client helper (shared)      | `src/app/admin/verdictClient.ts` (`sendVerdict` → done \| stale \| error)                  | HK    | ✅ built (working tree)                             |
-| The counter's wall view             | `src/app/admin/wall/page.tsx` + `AdminWall.tsx` (take-downs, two-tap arm/confirm)          | HK    | ✅ built (working tree)                             |
+| Counter shell (shared)              | `src/app/admin/AdminGate.tsx` (header, tabs, identity states, CounterCard, SignOutButton)  | HK    | ✅ merged (PR #70)                                  |
+| Verdict client helper (shared)      | `src/app/admin/verdictClient.ts` (`sendVerdict` → done \| stale \| error)                  | HK    | ✅ merged (PR #70)                                  |
+| The counter's wall view             | `src/app/admin/wall/page.tsx` + `AdminWall.tsx` (take-downs, two-tap arm/confirm)          | HK    | ✅ merged (PR #70)                                  |
 
 HK = the housekeeping slice (the counter's second view, §0 item 3).
 
@@ -381,6 +383,21 @@ reasons); configured-predicate disagreement with `getTileAdapters`; `22P02` →
   extend a pre-existing convention — a follow-on sweep should rename the whole family to
   `cv-*` (CV, not resume, per CONTEXT.md).
 
+**Future follow-ons (Nick, 2026-07-16 — open, deliberately not started):**
+
+1. **AI moderation (Claude API):** Nick wants tile verdicts assisted or made
+   by AI — e.g. Claude vision pre-screening, or auto-verdicts feeding (or
+   replacing) the carny's pre-moderation queue. Unscoped. Needs decisions on
+   human-in-the-loop vs auto-approve, cost, and prompt-injection-resistant
+   handling of untrusted images (tile PNGs are user content — §7). The
+   Anthropic key already exists for Madame Zara (`ANTHROPIC_API_KEY`).
+2. **Counter styling:** the near-black `background-primary` behind `/admin`
+   washes out the text and card chrome — Nick wants a more neutral backdrop
+   for the counter pages.
+3. **Counter routing:** `/admin` ↔ `/admin/wall` tab switches are full server
+   roundtrips; explore Next.js parallel/intercepting routes ("amazing for
+   dashboard-like configurations" — Nick's suggestion, his words).
+
 **Provisioning canon (2026-07-14, post-merge session):**
 
 - `storage.objects` carries **zero policies** — intentional. The bucket-level public
@@ -406,26 +423,21 @@ reasons); configured-predicate disagreement with `getTileAdapters`; `22P02` →
 **Open:** none — the Stage 2 queue UX questions (batch approve, preview size)
 were resolved by the build: one verdict per tile, no batching; card previews.
 
-**Needs Nick (human gates):**
-
-- **Merge the housekeeping PR** (from `feature/doodle-wall-housekeeping`), then
-  a **quick phone check of `/admin/wall`**: the hung wall renders, Take down
-  arms on the first tap and commits on the second, the tile leaves the public
-  wall on next load.
-- **Real-GPU look pass** on the freestanding board (outstanding since `4860738`,
-  including the mobile fly-in framing on a real phone) — headless swiftshader
-  can't judge colour/glow; also eyeball the error cards and the `#doodle-wall`
-  hash entry (§6).
+**Needs Nick (human gates):** none — every gate is cleared as of 2026-07-16.
+The three future follow-ons above are Nick's own asks awaiting his scoping and
+prioritisation, not gates on anything shipped.
 
 **Done by Nick (2026-07-15/16):** the Stage 2 config gate — Google OAuth
-client, Supabase Google provider + URL configuration — is complete; `/admin`
-confirmed working in production ("This works great"). `CRON_SECRET` remains
-optional.
+client, Supabase Google provider + URL configuration — complete; `/admin`
+confirmed working in production ("This works great"). Then on 2026-07-16:
+merged PR #70, passed the phone check of `/admin/wall`, and did the real-GPU
+look pass on the freestanding board (outstanding since `4860738`, including
+the mobile fly-in framing). `CRON_SECRET` remains optional.
 
 ## 6. How to verify
 
 - **Gate (every slice):** `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build`
-  — all green at the housekeeping head (156 tests, keyless; `/admin/wall` in
+  — all green at the housekeeping merge (156 tests, keyless; `/admin/wall` in
   the build's route list).
 - **Domain + routes + config:** ✅ covered by colocated unit tests against fakes —
   Stage 2 added tileService queue + verdict rules, adminAuth allow-list, PATCH
@@ -441,8 +453,8 @@ optional.
   (scripts: `/tmp/shot/doodle-board.mjs`, `doodle-area.mjs` — uncommitted rig).
   Framing changes need a **portrait shot too** (390×844 viewport): the whole 6×4
   grid, bulbs and both poles must sit in frame during the fly-in — ✅ verified
-  2026-07-15 with `frameWidth: 3.6`, desktop unchanged. Still unexercised
-  visually: the new error cards and the `#doodle-wall` hash entry.
+  2026-07-15 with `frameWidth: 3.6`, desktop unchanged. Nick's real-GPU look
+  pass (2026-07-16) closed the visual gate headless swiftshader couldn't judge.
 - **Remote schema/policies:** `supabase migration list` — local/remote in sync;
   `supabase db advisors --linked` — "No issues found" (both verified 2026-07-14).
 - **End-to-end (real Supabase):** ✅ **PASSED 2026-07-14** (prod build, port 3001,
@@ -457,7 +469,7 @@ optional.
   works in production (2026-07-15/16). Legs not yet exercised live: a
   non-allow-listed Google account → denied; `GET /api/keepalive` →
   `{ ok: true, mode: 'live' }` (with the bearer token if `CRON_SECRET` is set).
-- **Housekeeping live check (post-merge, §5 Needs Nick):** on the phone,
+- **Housekeeping live check:** ✅ **PASSED 2026-07-16** — Nick's phone check:
   `/admin/wall` shows the wall exactly as hung; Take down arms on the first
   tap and commits on the second; the tile leaves the public wall on next load.
 - **Degradation:** WebGL off → `StaticCv` link → overlay with `<img>` tiles.
@@ -514,19 +526,38 @@ optional.
 14. ~~Housekeeping: `/admin/wall` + shared counter shell~~ ✅ **built
     2026-07-16** on `feature/doodle-wall-housekeeping` (gate green, 156 tests
     — §1).
-15. **← YOU ARE HERE:** raise the housekeeping PR → Nick merges → Nick's phone
-    check of `/admin/wall` (§5 Needs Nick, §6). In parallel, Nick's real-GPU
-    look pass on the board is still outstanding (since `4860738`).
+15. ~~Housekeeping PR → merge → Nick's phone check; real-GPU look pass~~ ✅
+    2026-07-16: PR #70 merged (`c70ff22`); phone check of `/admin/wall` and
+    the real-GPU look pass on the board both passed.
+16. **← YOU ARE HERE:** done — no open work, no open Nick-gates. Next work,
+    when Nick picks it up, is his future follow-ons (§5): AI moderation,
+    counter styling, counter routing. All unscoped; scope before building.
 
 ## 9. What just happened
 
-2026-07-16 (latest) — **Stage 2 merged and live; housekeeping BUILT.** PR #69
+2026-07-16 (latest) — **Housekeeping merged; every gate cleared — the doodle
+wall is fully live end to end.** PR #70 merged to master (`c70ff22`); Nick's
+phone check of `/admin/wall` passed and his real-GPU look pass on the
+freestanding board (outstanding since `4860738`, including the mobile fly-in
+framing) is done. No open Nick-gates. Nick then filed three future follow-ons,
+recorded in §5 and deliberately not started: AI moderation of tiles via the
+Claude API (unscoped — human-in-the-loop vs auto-approve, cost, untrusted-image
+handling all undecided), a more neutral backdrop for the counter pages, and
+Next.js parallel/intercepting routes for the counter's tab switches. Same day,
+not doodle-wall: the waving clown NPC at the clown tent stood inside the west
+barricade rail (baseline (-3.8, 18.4), ≈0.2 m from a barricade); moved
+mid-walkway to (-1.8, 18.5) (spec out 2.5 / side 0.2), verified numerically
+(1.33 m nearest solid) plus screenshot — branch `fix/clown-npc-placement`, PR
+to follow.
+
+2026-07-16 (earlier) — **Stage 2 merged and live; housekeeping built.** PR #69
 merged to master (`f592da8`); Nick completed the config gate (Google OAuth
 client, Supabase provider + URL config) and confirmed `/admin` works in
 production ("This works great"). He then asked for takedown UI — the
 reject-approved verdict had existed in the domain since Stage 2 but had no
-surface. Built on `feature/doodle-wall-housekeeping` (working tree, PR to
-follow): `/admin/wall` — the counter's second view — shows the wall exactly as
+surface. Built on `feature/doodle-wall-housekeeping` (merged later the same
+day as PR #70): `/admin/wall` — the counter's second view — shows the wall
+exactly as
 hung (reuses `tileService.getWall()`, newest-first bounded 48) with a two-tap
 arm/confirm Take down per tile; the shared counter shell
 `src/app/admin/AdminGate.tsx` extracted (taking the parked `/admin` card-shell
@@ -534,7 +565,6 @@ dedup — both pages are now slim identity+data wrappers); the shared
 `verdictClient.ts` PATCH helper so reason-gated staleness handling lives in
 one place; CONTEXT.md's _carny's counter_ entry widened to two views. No
 route/domain/schema changes — §2.1 untouched. Gate green, 156 tests (was 149).
-Next: raise the PR; then §5 Needs Nick.
 
 2026-07-15 — **Stage 2 (moderation) built** on `feature/doodle-wall-moderation`
 (merged next day as PR #69). One slice, same hexagonal shape:

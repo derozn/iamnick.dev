@@ -2,10 +2,11 @@
 
 > **Start here for a new session.** What the shipped scene is, how it's built,
 > how to verify a change, and what's in flight. Companions: `CONTEXT.md`
-> (glossary — use its language), `docs/refactor-plan.md` (the standards
-> refactor, complete and merged), `docs/CODE_QUALITY_AUDIT.md` (July 2026
-> audit), the ADRs (locked decisions), and `scene-map-guide.md` (authoring
-> NPC/walker placements).
+> (glossary — use its language), `doodle-wall-handoff.md` (the doodle wall's
+> living handoff — contracts, decisions, follow-ons), `docs/refactor-plan.md`
+> (the standards refactor, complete and merged), `docs/CODE_QUALITY_AUDIT.md`
+> (July 2026 audit), the ADRs (locked decisions), and `scene-map-guide.md`
+> (authoring NPC/walker placements).
 
 ## Where we are
 
@@ -17,8 +18,9 @@ that attraction's content overlay. The earlier first-person on-rails walk
 (ADR-0004) was reversed in the iso pivot; free-roam is the shipped design.
 
 Live on top of the scene: three playable stalls — ball-toss, high-striker,
-and the doodle wall (Stage 1, the visitor path: view + draw on Full and Lite;
-its API runs in stub mode until Supabase is provisioned) — a golden-ticket
+and the doodle wall (fully live end to end: view + draw on Full and Lite,
+backed by the provisioned Supabase project, every tile pre-moderated at the
+carny's counter — `/admin`) — a golden-ticket
 hunt, Madame Zara's fortune wagon (`/api/fortune`, Anthropic-backed with a
 keyless stub mode), a letterpress-carnival HUD language, and Full/Lite quality
 tiers plus a no-canvas tier — under `prefers-reduced-motion` the sr-only
@@ -51,16 +53,21 @@ Entry chain — `src/app/page.tsx` mounts client islands over a server page:
   `high-striker`, `fortune`, `ball-toss`, `doodle-wall`. Each carries its
   prefab, authored
   Unity transform, world-centre `position` (indicator anchor + camera focus
-  target), `facing` and `focusDist`. Indicators, camera fly-ins, SiteNav links
+  target), `facing`, `focusDist` and an optional `frameWidth` — a world width
+  the fly-in must fit (`doodle-wall` declares 3.6 m so the whole board frames
+  on portrait phones). Indicators, camera fly-ins, SiteNav links
   and overlay routing all derive from this array.
 - **`synty/IsoControls.tsx`** — camera + gestures: fixed iso angle (225°
   azimuth, ~53° tilt), drag-to-pan (viewport-relative sensitivity, gentler on
   touch), scroll/pinch zoom (clamped), and the fly-in/return easing when
-  `focusedAttraction` changes.
+  `focusedAttraction` changes — backing off beyond `focusDist` when the
+  attraction declares a `frameWidth` (aspect-aware framing; the intro shot
+  gets the same compensation).
 - **Games** — `three/game/BallTossGame.tsx` (slingshot pull-back throw, tuning
   in `ballTossConfig.ts`), `three/game/HighStrikerGame.tsx`
   (`highStrikerConfig.ts`) and `three/game/DoodleWall.tsx` (the doodle wall's
-  board at the end of the Midway — the newest approved tiles from `/api/wall`
+  freestanding bulb-strung board — on its own poles at the end of the Midway,
+  no stall prefab — the newest approved tiles from `/api/wall`
   as a 6×4 grid; layout/tools tuning in `doodleWallConfig.ts`, a three-free
   module that re-exports the server truths from `lib/doodle-wall/constants.ts`);
   `three/tickets/GoldenTickets.tsx` for the hunt.
@@ -153,22 +160,37 @@ final judge for grading changes.
 
 ## What just happened
 
-**Doodle wall, Stage 1 — the visitor path** (`feature/doodle-wall`,
-2026-07-14). The communal stall now closes the Midway. A hexagonal slice:
-domain layer in `src/lib/doodle-wall/` (`tileService` holding every acceptance
-rule, ports, PNG header validation, HMAC submitter hashing, in-memory fakes),
-dormant Supabase adapters in `src/lib/supabase/` (`tileAdapters.ts` is the
-single selection point — a fully keyless env is stub mode against the fakes;
-a _partially_ set Supabase env in production throws instead of silently
-serving fakes), `POST /api/tiles` + `GET /api/wall`, a reviewed-only migration
-(`supabase/migrations/20260714115029_doodle_wall.sql` — anon may read approved
-tiles only; there is **no anon insert policy**, every write goes through the
-service role), four new `.env.schema` vars, the in-scene board
-(`three/game/DoodleWall.tsx`), the `DoodleWallHud` step-in overlay and the
-`doodle-wall` attraction plus `StaticCv`'s `#doodle-wall` anchor. **Stage 2 —
-the admin moderation view and the keepalive cron — is not built**, and the
-Supabase project is not yet provisioned: both routes run in stub mode
-everywhere.
+**Doodle wall — fully live end to end** (PRs #65–#70 merged to master; every
+Nick-gate cleared 2026-07-16). `doodle-wall-handoff.md` is the authoritative
+detail; the shape:
+
+- **Stage 1, the visitor path** (PR #65 + fixes #66–#68): a hexagonal slice —
+  domain layer in `src/lib/doodle-wall/` (`tileService` holding every
+  acceptance rule, ports, PNG header validation, HMAC submitter hashing,
+  in-memory fakes), Supabase adapters in `src/lib/supabase/`
+  (`tileAdapters.ts` is the single selection point — a fully keyless env is
+  stub mode against the fakes; a _partially_ set Supabase env in production
+  throws), `POST /api/tiles` + `GET /api/wall`, the reviewed migrations (anon
+  may read approved tiles only; **no anon insert policy** — every write goes
+  through the service role), the freestanding in-scene board, the
+  `DoodleWallHud` step-in overlay and the `doodle-wall` attraction plus
+  `StaticCv`'s `#doodle-wall` anchor. The Supabase project is provisioned,
+  all four env vars are set, and the real-Supabase end-to-end check passed.
+- **Stage 2, moderation** (PR #69): the carny's counter — `/admin` over the
+  pre-moderation queue (Supabase Auth Google OAuth, entirely server-side,
+  hard allow-listed to Nick's account in `src/lib/supabase/adminAuth.ts`),
+  the verdict route `PATCH /api/admin/tiles/:id` (approve/reject; rejected is
+  final) and the daily keepalive cron (`/api/keepalive` + `vercel.json`).
+- **Housekeeping** (PR #70): `/admin/wall`, the counter's second view —
+  take-downs of hung tiles via a two-tap Take down (the final reject
+  verdict), on the shared counter shell `src/app/admin/AdminGate.tsx`.
+
+Nick's phone check of `/admin/wall` and his real-GPU look pass on the board
+are done; nothing is in flight. PR #68 also landed scene fixes beyond the
+wall: the aspect-aware `frameWidth` fly-in plus intro compensation, the
+burger menu gated on `started`, and both NPC walker loops re-routed onto
+verified open ground (`scripts/walker-clearance.mjs` samples each loop
+against every solid prop instance).
 
 Before that, the **standards refactor** completed and merged to master
 (PRs #60–64; `docs/refactor-plan.md` is now historical). Its Phase 2 still
@@ -180,14 +202,9 @@ conventions codified in `docs/redesign/architecture.md`.
 
 ## What's next
 
-- **Supabase provisioning** (Nick) — create the project, apply
-  `supabase/migrations/20260714115029_doodle_wall.sql`, set `SUPABASE_URL`,
-  `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` and `SUBMITTER_HASH_SECRET`
-  in Vercel; `getTileAdapters()` leaves stub mode on its own once all three
-  Supabase vars are present.
-- **Doodle wall, Stage 2** — the admin moderation view over the
-  pre-moderation queue (Supabase Auth Google OAuth, hard allow-listed to
-  Nick's account) with approve/reject, plus the free daily keepalive cron
-  (ADR-0001).
+- **Doodle wall follow-ons** (Nick's asks, unscoped and deliberately not
+  started — `doodle-wall-handoff.md` §5): AI moderation of tiles via the
+  Claude API, a more neutral backdrop for the counter pages, and Next.js
+  parallel/intercepting routes for the counter's tab switches.
 - **Keyboard navigation** for scene and games (carried over from the July
   2026 audit — `IsoControls` is still pointer/touch only).
