@@ -75,8 +75,10 @@ const NPC_SPECS: NpcSpec[] = [
   // visitor just INSIDE the entrance arch (negative out = fair side, not out on
   // the dark approach), gazing into the fair
   { file: 'SM_Chr_Visitor_female_01__HappyIdle', at: 'intro', out: -2.5, side: 3.2, look: 'in' },
-  // clown waving at the big-top mouth
-  { file: 'SM_Chr_Clown_Male_01__Waving', at: 'work', out: 2.6, side: 2.2, look: 'out' },
+  // clown waving mid-walkway at the big-top mouth — the entrance lane is
+  // flanked by barricade rails at x≈-3.2 and x≈0.2 (his old side offset put
+  // him IN the west rail; Nick, 2026-07-16), so he stands between them
+  { file: 'SM_Chr_Clown_Male_01__Waving', at: 'work', out: 2.5, side: 0.2, look: 'out' },
   // (the clown that used to spectate the striker is now the nervous diver on the
   //  dive board — see EXPLICIT below; her striker spot sat in the dive POOL)
   // the ringleader presenting the ferris wheel
