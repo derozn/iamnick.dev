@@ -9,35 +9,38 @@
 > (`.claude/agents/carnival-context.md`). Builders are briefed from it; outcomes are folded
 > back in. Read `CONTEXT.md` first — its language is law.
 >
-> Stage 1 merged and live (PRs #65–#68). Stage 2 built on
-> `feature/doodle-wall-moderation` (working tree; PR to follow). PRs target
-> `master`.
+> Stage 1 merged and live (PRs #65–#68). Stage 2 merged and live (PR #69).
+> Housekeeping (`/admin/wall`) built on `feature/doodle-wall-housekeeping`
+> (working tree; PR to follow). PRs target `master`.
 
 ---
 
 ## 0. TL;DR of what to do
 
-Two stages, each its own PR:
+Staged delivery, each slice its own PR:
 
 1. **Stage 1 — visitor path:** ✅ **complete, LIVE-VERIFIED end to end, and fully
    merged.** PR #65 (`12d4a39`), storage-listing PR #66 (`cbcd832`), e2e varlock
    fix PR #67 (`0e60a41`) and mobile-framing PR #68 (`4631df6`) all on master;
    Supabase provisioned, all four env vars set, real-Supabase e2e passed (§6).
-2. **Stage 2 — moderation:** ✅ **BUILT** (2026-07-15) on
-   `feature/doodle-wall-moderation` (working tree, **PR to follow**): `/admin` —
-   the carny's counter — over the pre-moderation queue (Supabase Auth, Google
+2. **Stage 2 — moderation:** ✅ **MERGED AND LIVE** (PR #69, `f592da8`): `/admin`
+   — the carny's counter — over the pre-moderation queue (Supabase Auth, Google
    OAuth, hard allow-list `nick@iamnick.dev` only), verdict route, daily
-   keepalive cron. Gate green, 149 tests, close-out chain done. `/admin` stays
-   in its "unconfigured" state until Nick does the Google OAuth config —
-   **§5 Needs Nick is the gate.**
+   keepalive cron. Nick completed the Google OAuth config gate and confirmed
+   `/admin` works in production ("This works great").
+3. **Housekeeping — the counter's second view:** ✅ **BUILT** (2026-07-16) on
+   `feature/doodle-wall-housekeeping` (working tree, **PR to follow**):
+   `/admin/wall` shows the wall exactly as hung and offers Take down — the
+   final reject verdict — per tile, guarded by two-tap arm/confirm. Gate green,
+   156 tests. **§5 Needs Nick: merge the PR, then a phone check of `/admin/wall`.**
 
-## 1. Current state (verified 2026-07-15, `feature/doodle-wall-moderation` over master `4631df6`)
+## 1. Current state (verified 2026-07-16, `feature/doodle-wall-housekeeping` over master `f592da8`)
 
-**Stage 1 is merged, provisioned, and live-verified end to end. Stage 2
-(moderation) is BUILT** — staged/working-tree on this branch, gate green
-(typecheck / lint / test:ci with 149 tests keyless / build), close-out chain
-done, **PR to follow**. `/admin` renders its "unconfigured" state until Nick
-does the Google OAuth config (§5 Needs Nick).
+**Stages 1 and 2 are merged, configured, and live** — Nick did the Google OAuth
+config and confirmed `/admin` works in production. **Housekeeping
+(`/admin/wall`) is BUILT** — working-tree on this branch, gate green
+(typecheck / lint / test:ci with 156 tests keyless / build, `/admin/wall` in
+the route list), **PR to follow**.
 
 **Stage 1 (all merged to master):**
 
@@ -72,7 +75,7 @@ does the Google OAuth config (§5 Needs Nick).
   set (`.env.local` + Vercel, legacy JWT-format keys — §5); real-Supabase
   end-to-end check PASSED 2026-07-14 (§6).
 
-**Stage 2 (this branch, built 2026-07-15, staged/working tree):**
+**Stage 2 (merged to master as PR #69, `f592da8`; live and Nick-confirmed):**
 
 - **Domain:** `tileService` gained `getQueue()` — oldest-first `pending`, bounded by
   the new constant `QUEUE_PAGE_COUNT` (48), projected through a shared `toWallTile`
@@ -111,12 +114,36 @@ does the Google OAuth config (§5 Needs Nick).
   client component: oldest-first cards, approve/reject per tile, stale cards
   dropped only on tile-level reasons (not bare 404s), keyed remount on refresh so
   `router.refresh()` actually updates the list.
-- **Tests:** 149 total (was 120 pre-Stage-2): tileService queue + verdict rules,
-  adminAuth allow-list, PATCH route (guards + verdicts), keepalive, `AdminQueue`
-  component. Gate green; stub-mode `/admin` smoke-tested by portrait screenshot.
-- **Close-out chain done:** glossary-guard (5 findings → counter/verdict renames +
-  the CONTEXT.md entries) and /code-review high (24 candidates → 10 confirmed,
-  all fixed; list in §5).
+- **Tests:** Stage 2 brought the suite to 149 (was 120): tileService queue +
+  verdict rules, adminAuth allow-list, PATCH route (guards + verdicts),
+  keepalive, `AdminQueue` component. Close-out chain done: glossary-guard (5
+  findings) and /code-review high (24 candidates → 10 confirmed, all fixed;
+  list in §5).
+
+**Housekeeping (this branch, built 2026-07-16, working tree):**
+
+- **`/admin/wall` — the counter's second view:** the wall exactly as hung —
+  reuses `tileService.getWall()`, same newest-first bounded 48; tiles older
+  than the bound have aged out of public view, so the hung set is all
+  housekeeping can need. Each tile carries a Take down button = the final
+  reject verdict (approved→rejected, §2.1 — no restore), guarded by a two-tap
+  arm/confirm; arming one tile re-arms off any other.
+- **Shared shell extracted:** `src/app/admin/AdminGate.tsx` (header, queue/wall
+  tabs, the three non-moderator identity states, `CounterCard`,
+  `SignOutButton`) — this took the parked "card-shell dedup across `/admin`"
+  follow-on; both pages are now slim identity+data wrappers. Shared client
+  PATCH helper `src/app/admin/verdictClient.ts` (`sendVerdict` →
+  `'done' | 'stale' | 'error'`) used by `AdminQueue` and `AdminWall` —
+  reason-gated staleness handling now lives in ONE place.
+- **CONTEXT.md widened:** _The carny's counter_ now names two views — the
+  queue (`/admin`, pre-moderation verdicts) and the wall (`/admin/wall`,
+  housekeeping/take-downs).
+- **No route/domain/schema changes:** `PATCH /api/admin/tiles/:id` and the
+  verdict rules are untouched; §2.1 contracts unchanged.
+- **Tests:** 156 (was 149) — new `AdminWall` component suite (arm-only first
+  tap, commit on second, re-arm on other tile, stale drop, transient error,
+  bare-wall state). Gate green: typecheck / lint / test:ci / build
+  (`/admin/wall` in the route list).
 
 ## 2. Architecture (binding)
 
@@ -213,11 +240,16 @@ Driven by the `vercel.json` cron, daily 08:00 UTC.
 | Drawing overlay                     | `src/components/overlays/DoodleWallHud.tsx`                                                | 1     | ✅ done                                             |
 | Store slice                         | `src/store/scene.ts` (`doodleWallPhase`)                                                   | 1     | ✅ done                                             |
 | Attraction entry                    | `src/components/three/synty/attractions.ts` (`doodle-wall`)                                | 1     | ✅ done                                             |
-| The carny's counter (page + queue)  | `src/app/admin/page.tsx` + `AdminQueue.tsx`                                                | 2     | ✅ built (working tree)                             |
-| Verdict route                       | `src/app/api/admin/tiles/[id]/route.ts`                                                    | 2     | ✅ built (working tree)                             |
-| Auth routes (login/callback/logout) | `src/app/api/admin/auth/*/route.ts`                                                        | 2     | ✅ built (working tree)                             |
-| Admin auth (server-only)            | `src/lib/supabase/adminAuth.ts` (allow-list, provider pin, origin pin)                     | 2     | ✅ built (working tree)                             |
-| Keepalive route + cron              | `src/app/api/keepalive/route.ts` + `vercel.json`                                           | 2     | ✅ built (working tree)                             |
+| The carny's counter (queue view)    | `src/app/admin/page.tsx` + `AdminQueue.tsx`                                                | 2     | ✅ merged (PR #69)                                  |
+| Verdict route                       | `src/app/api/admin/tiles/[id]/route.ts`                                                    | 2     | ✅ merged (PR #69)                                  |
+| Auth routes (login/callback/logout) | `src/app/api/admin/auth/*/route.ts`                                                        | 2     | ✅ merged (PR #69)                                  |
+| Admin auth (server-only)            | `src/lib/supabase/adminAuth.ts` (allow-list, provider pin, origin pin)                     | 2     | ✅ merged (PR #69)                                  |
+| Keepalive route + cron              | `src/app/api/keepalive/route.ts` + `vercel.json`                                           | 2     | ✅ merged (PR #69)                                  |
+| Counter shell (shared)              | `src/app/admin/AdminGate.tsx` (header, tabs, identity states, CounterCard, SignOutButton)  | HK    | ✅ built (working tree)                             |
+| Verdict client helper (shared)      | `src/app/admin/verdictClient.ts` (`sendVerdict` → done \| stale \| error)                  | HK    | ✅ built (working tree)                             |
+| The counter's wall view             | `src/app/admin/wall/page.tsx` + `AdminWall.tsx` (take-downs, two-tap arm/confirm)          | HK    | ✅ built (working tree)                             |
+
+HK = the housekeeping slice (the counter's second view, §0 item 3).
 
 ## 5. Decisions
 
@@ -299,6 +331,22 @@ reasons); configured-predicate disagreement with `getTileAdapters`; `22P02` →
 (now one `toWallTile`); allow-list in a client-reachable module (moved to
 `adminAuth.ts`).
 
+**Housekeeping decisions (build session, 2026-07-16 — now canon):**
+
+- **Housekeeping is bounded to the hung wall by design:** `/admin/wall` reuses
+  `tileService.getWall()` (newest-first, ≤48). Tiles older than the bound have
+  aged out of public view, so the hung set is all housekeeping can need — no
+  new query, no pagination.
+- **Take down = the final reject verdict** (approved→rejected, §2.1). No
+  restore exists, so the button is guarded by a two-tap arm/confirm; arming a
+  tile disarms any other.
+- **One staleness path:** the reason-gated stale handling (drop the card only
+  on tile-level reasons, not bare 404s) lives solely in
+  `src/app/admin/verdictClient.ts` (`sendVerdict`), shared by `AdminQueue` and
+  `AdminWall`.
+- **CONTEXT.md widened:** _The carny's counter_ now names two views — the
+  queue (`/admin`) and the wall (`/admin/wall`).
+
 **Parked follow-ons (verified in review, deliberately not fixed — pick up post-merge):**
 
 - **(Stage 2)** Atomic transition port method — a single conditional UPDATE instead
@@ -309,8 +357,9 @@ reasons); configured-predicate disagreement with `getTileAdapters`; `22P02` →
   `@supabase/ssr` defaults.
 - **(Stage 2)** `requireModerator()` route-preamble helper — extract when a second
   admin route appears.
-- **(Stage 2)** Card-shell dedup across `/admin` + the `AdminQueue` empty state —
-  joins the existing `CardShell` follow-on below.
+- ~~**(Stage 2)** Card-shell dedup across `/admin`~~ ✅ **taken by the
+  housekeeping slice** (`AdminGate.tsx` — both `/admin` pages are now slim
+  identity+data wrappers). The three-HUD `CardShell` half remains parked below.
 
 - Card chrome triplicated across `overlays/BallTossHud.tsx` / `HighStrikerHud.tsx` /
   `DoodleWallHud.tsx` → extract a shared `overlays/CardShell`.
@@ -359,33 +408,30 @@ were resolved by the build: one verdict per tile, no batching; card previews.
 
 **Needs Nick (human gates):**
 
-- **Stage 2 config gate — `/admin` cannot work until this is done:**
-  1. Google Cloud Console (console.cloud.google.com/auth/clients): create an
-     OAuth client (web application), Authorized redirect URI =
-     `https://hzwjezozoxlopyfgmxoc.supabase.co/auth/v1/callback`.
-  2. Supabase dashboard → Auth → Providers → Google: enable, paste the client ID
-     - secret.
-  3. Supabase dashboard → Auth → URL Configuration: Site URL
-     `https://iamnick.dev`; add to the redirect allow-list
-     `https://iamnick.dev/api/admin/auth/callback` and
-     `http://localhost:3000/api/admin/auth/callback`.
-  4. RECOMMENDED: disable the email/password provider (defence in depth — the
-     provider pin already blocks it).
-  5. Optionally set `CRON_SECRET` in the Vercel env.
-  6. Then the Stage 2 e2e per §6: sign in on the phone → a pending tile appears
-     at the counter → approve → on the wall; a non-allow-listed account → denied.
+- **Merge the housekeeping PR** (from `feature/doodle-wall-housekeeping`), then
+  a **quick phone check of `/admin/wall`**: the hung wall renders, Take down
+  arms on the first tap and commits on the second, the tile leaves the public
+  wall on next load.
 - **Real-GPU look pass** on the freestanding board (outstanding since `4860738`,
   including the mobile fly-in framing on a real phone) — headless swiftshader
-  can't judge colour/glow; also eyeball the error cards, the `#doodle-wall` hash
-  entry, and now the carny's counter styling (§6).
+  can't judge colour/glow; also eyeball the error cards and the `#doodle-wall`
+  hash entry (§6).
+
+**Done by Nick (2026-07-15/16):** the Stage 2 config gate — Google OAuth
+client, Supabase Google provider + URL configuration — is complete; `/admin`
+confirmed working in production ("This works great"). `CRON_SECRET` remains
+optional.
 
 ## 6. How to verify
 
 - **Gate (every slice):** `pnpm typecheck && pnpm lint && pnpm test:ci && pnpm build`
-  — all green at the Stage 2 head (149 tests, keyless).
+  — all green at the housekeeping head (156 tests, keyless; `/admin/wall` in
+  the build's route list).
 - **Domain + routes + config:** ✅ covered by colocated unit tests against fakes —
   Stage 2 added tileService queue + verdict rules, adminAuth allow-list, PATCH
-  route guards + verdicts, keepalive, and the `AdminQueue` component.
+  route guards + verdicts, keepalive, and the `AdminQueue` component; the
+  housekeeping slice added the `AdminWall` suite (arm-only first tap, commit on
+  second, re-arm on other tile, stale drop, transient error, bare-wall state).
 - **The carny's counter, stub mode:** ✅ smoke-tested by portrait screenshot
   (unconfigured state renders; no auth possible pre-config).
 - **Scene/overlay headless:** recipe in `ball-toss-game-handoff.md` §6 (Playwright +
@@ -407,12 +453,13 @@ were resolved by the build: one verdict per tile, no batching; card previews.
   bucket-listing returned `[]` (listing-policy drop live) → SQL approve → wall served
   it with the real Storage URL → SQL reject → wall empty again. Test tile retained by
   design (ids in §5).
-- **Stage 2 end-to-end (after Nick's config gate, §5):** sign in at `/admin` on
-  the phone with the allow-listed account → a submitted tile appears at the
-  counter as `pending` → approve → it reaches `GET /api/wall`; reject an approved
-  tile → it leaves the wall (takedown); a non-allow-listed Google account →
-  denied; `GET /api/keepalive` → `{ ok: true, mode: 'live' }` (with the bearer
-  token if `CRON_SECRET` is set).
+- **Stage 2 end-to-end:** the config gate is done and Nick confirmed `/admin`
+  works in production (2026-07-15/16). Legs not yet exercised live: a
+  non-allow-listed Google account → denied; `GET /api/keepalive` →
+  `{ ok: true, mode: 'live' }` (with the bearer token if `CRON_SECRET` is set).
+- **Housekeeping live check (post-merge, §5 Needs Nick):** on the phone,
+  `/admin/wall` shows the wall exactly as hung; Take down arms on the first
+  tap and commits on the second; the tile leaves the public wall on next load.
 - **Degradation:** WebGL off → `StaticCv` link → overlay with `<img>` tiles.
 
 ## 7. Gotchas (inherited — details in `ball-toss-game-handoff.md` §7)
@@ -459,34 +506,51 @@ were resolved by the build: one verdict per tile, no batching; card previews.
     en route (§7).
 11. ~~Merge the fix PRs~~ ✅ #67 (`0e60a41`, e2e varlock fix) and #68 (`4631df6`,
     mobile framing + NPC re-routes) merged to master.
-12. ~~Stage 2: admin + keepalive~~ ✅ **built 2026-07-15** on
-    `feature/doodle-wall-moderation` (staged/working tree; gate green, 149 tests;
-    glossary-guard + /code-review close-out done — §1, §5).
-13. **← YOU ARE HERE:** (a) raise the Stage 2 PR → (b) **Nick's config gate**
-    (§5 Needs Nick: Google OAuth client, Supabase provider + URL config, optional
-    `CRON_SECRET`) → (c) the Stage 2 end-to-end check (§6). In parallel, Nick's
-    real-GPU look pass on the board is still outstanding (since `4860738`).
+12. ~~Stage 2: admin + keepalive~~ ✅ **merged as PR #69** (`f592da8`); built
+    2026-07-15, gate green, glossary-guard + /code-review close-out done (§1, §5).
+13. ~~Nick's config gate + live check~~ ✅ 2026-07-15/16: Google OAuth client
+    - Supabase provider/URL config done; `/admin` confirmed working in
+      production ("This works great"). `CRON_SECRET` remains optional.
+14. ~~Housekeeping: `/admin/wall` + shared counter shell~~ ✅ **built
+    2026-07-16** on `feature/doodle-wall-housekeeping` (gate green, 156 tests
+    — §1).
+15. **← YOU ARE HERE:** raise the housekeeping PR → Nick merges → Nick's phone
+    check of `/admin/wall` (§5 Needs Nick, §6). In parallel, Nick's real-GPU
+    look pass on the board is still outstanding (since `4860738`).
 
 ## 9. What just happened
 
-2026-07-15 (latest) — **Stage 2 (moderation) BUILT** on
-`feature/doodle-wall-moderation` (staged/working tree; PR to follow). One slice,
-same hexagonal shape: `tileService.getQueue()` + `moderate()` with the verdict
-transition rules (rejected is final), new `TileRepository` port methods, the
-server-only `adminAuth.ts` (cookie sessions via `@supabase/ssr`, JWKS-verified
-claims, hard allow-list `nick@iamnick.dev`, Google provider pin, production
-origin pin), the three auth routes, `PATCH /api/admin/tiles/:id`,
+2026-07-16 (latest) — **Stage 2 merged and live; housekeeping BUILT.** PR #69
+merged to master (`f592da8`); Nick completed the config gate (Google OAuth
+client, Supabase provider + URL config) and confirmed `/admin` works in
+production ("This works great"). He then asked for takedown UI — the
+reject-approved verdict had existed in the domain since Stage 2 but had no
+surface. Built on `feature/doodle-wall-housekeeping` (working tree, PR to
+follow): `/admin/wall` — the counter's second view — shows the wall exactly as
+hung (reuses `tileService.getWall()`, newest-first bounded 48) with a two-tap
+arm/confirm Take down per tile; the shared counter shell
+`src/app/admin/AdminGate.tsx` extracted (taking the parked `/admin` card-shell
+dedup — both pages are now slim identity+data wrappers); the shared
+`verdictClient.ts` PATCH helper so reason-gated staleness handling lives in
+one place; CONTEXT.md's _carny's counter_ entry widened to two views. No
+route/domain/schema changes — §2.1 untouched. Gate green, 156 tests (was 149).
+Next: raise the PR; then §5 Needs Nick.
+
+2026-07-15 — **Stage 2 (moderation) built** on `feature/doodle-wall-moderation`
+(merged next day as PR #69). One slice, same hexagonal shape:
+`tileService.getQueue()` + `moderate()` with the verdict transition rules
+(rejected is final), new `TileRepository` port methods, the server-only
+`adminAuth.ts` (cookie sessions via `@supabase/ssr`, JWKS-verified claims,
+hard allow-list `nick@iamnick.dev`, Google provider pin, production origin
+pin), the three auth routes, `PATCH /api/admin/tiles/:id`,
 `GET /api/keepalive` + the `vercel.json` daily cron, and `/admin` — the carny's
 counter (four identity states, `AdminQueue` client component, noindex + robots
 disallow). CONTEXT.md gained _The carny's counter_ and _Verdict_. Gate green
-with 149 tests (was 120); stub-mode `/admin` smoke-tested by portrait
-screenshot. Close-out done: glossary-guard (5 findings) and /code-review high
-(10 confirmed fixed — §5); five new Stage 2 follow-ons parked (§5). **Nothing
-works at `/admin` in production until Nick's config gate (§5 Needs Nick):**
-Google OAuth client + Supabase provider/URL config, then the Stage 2 e2e (§6).
-Earlier the same day the fix PRs merged: #67 (`0e60a41`, the e2e varlock
+with 149 tests (was 120). Close-out: glossary-guard (5 findings) and
+/code-review high (10 confirmed fixed — §5); five Stage 2 follow-ons parked
+(§5). Earlier the same day the fix PRs merged: #67 (`0e60a41`, the e2e varlock
 `SUPABASE_URL` fix) and #68 (`4631df6`, mobile framing via
-`Attraction.frameWidth` + NPC re-routes) — master is `4631df6`.
+`Attraction.frameWidth` + NPC re-routes).
 
 2026-07-14 — **Stage 1 shipped end to end.** PR #65 merged (`12d4a39`) after the
 close-out chain (`5a2df8d`, `c43bf60`, `b4bc279`) and Nick's board-only revision

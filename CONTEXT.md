@@ -81,7 +81,7 @@ The stallholder persona of the doodle wall's pre-moderation queue. Visitors meet
 _Avoid_: moderator (in visitor-facing copy), attendant, admin (as a character)
 
 **The carny's counter**:
-/admin — the page where the carny reviews the pre-moderation queue and gives verdicts. A plain DOM page (no canvas): not an attraction, not a stall, not an overlay. "Counter" is deliberate — "booth" stays banned (see Stall).
+/admin — where the carny works. A plain DOM page (no canvas): not an attraction, not a stall, not an overlay. Two views: **the queue** (/admin — pre-moderation verdicts) and **the wall** (/admin/wall — housekeeping: taking down hung tiles, a final reject). "Counter" is deliberate — "booth" stays banned (see Stall).
 _Avoid_: booth, admin panel/dashboard (in copy), back office
 
 **Verdict**:
