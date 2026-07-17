@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>iamnick — Concept A — whoami</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  /* ---- Concept A token source ---- */
+  :root {
+    --a-ink: #0e0f11;        /* base — warm-grey ink, NOT carnival blue-black */
+    --a-panel: #16181b;
+    --a-paper: #f2f0eb;      /* text on ink */
+    --a-muted: #8b8f94;
+    --a-accent: #58c4dc;     /* signal cyan — the only accent */
+    --a-hairline: #26292d;
+    --a-display: 'Space Grotesk', sans-serif;
+    --a-text: 'Inter', sans-serif;
+    --a-mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1600px; height: 1200px;
+    background: #0a0b0c;
+    font-family: var(--a-text);
+    color: var(--a-paper);
+    padding: 48px 56px 40px;
+    display: flex; flex-direction: column;
+  }
+  header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: var(--a-mono); font-size: 12px; letter-spacing: .14em;
+    color: var(--a-muted); text-transform: uppercase; padding-bottom: 28px;
+  }
+  header .acc { color: var(--a-accent); }
+  .grid {
+    flex: 1; display: grid; grid-template-columns: 1.35fr 1fr 1fr;
+    grid-template-rows: 1.25fr 1fr; gap: 22px;
+  }
+  .panel {
+    background: var(--a-panel); border: 1px solid var(--a-hairline);
+    border-radius: 10px; padding: 36px; position: relative; overflow: hidden;
+  }
+  .label {
+    position: absolute; top: 18px; left: 22px;
+    font-family: var(--a-mono); font-size: 10px; letter-spacing: .2em;
+    color: var(--a-muted); text-transform: uppercase;
+  }
+  .num { left: auto; right: 22px; }
+
+  /* 1 — logo cover */
+  .cover { grid-column: 1; grid-row: 1; background: var(--a-ink);
+    display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 34px; }
+  .cover .word { font-family: var(--a-display); font-size: 58px; font-weight: 700; letter-spacing: -0.02em; }
+  .cover .word .dim { color: var(--a-muted); font-weight: 400; }
+  .cover .word .dot { color: var(--a-accent); }
+
+  /* 2 — product surface */
+  .browser { grid-column: 2 / 4; grid-row: 1; display: flex; flex-direction: column; padding: 0; }
+  .chrome { display: flex; align-items: center; gap: 14px; padding: 16px 22px;
+    border-bottom: 1px solid var(--a-hairline); }
+  .dots span { display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    background: #2e3237; margin-right: 5px; }
+  .url { flex: 1; background: var(--a-ink); border: 1px solid var(--a-hairline); border-radius: 6px;
+    font-family: var(--a-mono); font-size: 12.5px; color: var(--a-muted); padding: 8px 14px; }
+  .url b { color: var(--a-paper); font-weight: 500; }
+  .post { padding: 44px 52px; }
+  .post .meta { font-family: var(--a-mono); font-size: 12.5px; color: var(--a-accent);
+    letter-spacing: .08em; margin-bottom: 18px; }
+  .post .meta span { color: var(--a-muted); }
+  .post h1 { font-family: var(--a-display); font-size: 40px; font-weight: 700;
+    letter-spacing: -0.02em; line-height: 1.12; margin-bottom: 18px; }
+  .post p { font-size: 16.5px; line-height: 1.65; color: #c9c7c1; max-width: 58ch; }
+
+  /* 3 — terminal */
+  .term { grid-column: 1; grid-row: 2; background: var(--a-ink);
+    font-family: var(--a-mono); font-size: 17px; line-height: 2.05;
+    display: flex; flex-direction: column; justify-content: center; padding-left: 48px; }
+  .term .ps { color: var(--a-accent); }
+  .term .out { color: var(--a-paper); }
+  .term .cmt { color: var(--a-muted); }
+  .cursor { display: inline-block; width: 10px; height: 20px; background: var(--a-accent);
+    vertical-align: text-bottom; margin-left: 2px; }
+
+  /* 4 — construction */
+  .construct { grid-column: 2; grid-row: 2;
+    display: flex; align-items: center; justify-content: center; }
+
+  /* 5 — tagline */
+  .tag { grid-column: 3; grid-row: 2; background: var(--a-ink);
+    display: flex; flex-direction: column; justify-content: center; padding: 44px; gap: 22px; }
+  .tag h2 { font-family: var(--a-display); font-size: 34px; font-weight: 500;
+    letter-spacing: -0.01em; line-height: 1.25; }
+  .tag h2 em { font-style: normal; color: var(--a-accent); }
+  .swatches { display: flex; gap: 10px; }
+  .sw { width: 44px; height: 44px; border-radius: 7px; border: 1px solid var(--a-hairline); }
+
+  footer { display: flex; justify-content: space-between; padding-top: 26px;
+    font-family: var(--a-mono); font-size: 11px; letter-spacing: .18em;
+    color: var(--a-muted); text-transform: uppercase; }
+</style>
+</head>
+<body>
+  <header>
+    <span>iamnick — brand concept <span class="acc">A</span> / whoami</span>
+    <span>identity board · 01</span>
+  </header>
+
+  <div class="grid">
+    <div class="panel cover">
+      <span class="label">Mark + Wordmark</span>
+      <!-- n with prompt-chevron counter -->
+      <svg width="150" height="150" viewBox="0 0 96 96" fill="none">
+        <rect x="2" y="2" width="92" height="92" rx="20" fill="#16181b" stroke="#26292d"/>
+        <path d="M28 70 V38 q0 -12 12 -12 h4 q12 0 12 12 v32" stroke="#f2f0eb" stroke-width="8" stroke-linecap="round" fill="none"/>
+        <path d="M43 47 l9 9 -9 9" stroke="#58c4dc" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <div class="word"><span class="dim">~/</span>iamnick<span class="dot">.</span>dev</div>
+    </div>
+
+    <div class="panel browser">
+      <span class="label num">blog surface</span>
+      <div class="chrome">
+        <span class="dots"><span></span><span></span><span></span></span>
+        <div class="url">https://<b>iamnick.dev</b>/blog/teaching-agents-to-run-a-carnival</div>
+      </div>
+      <div class="post">
+        <div class="meta">2026-07-17 <span>·</span> 7 min <span>·</span> agentic-workflows</div>
+        <h1>Teaching agents to run a carnival</h1>
+        <p>The fortune teller needed a fact source, the moderation queue needed a
+        human gate, and I needed a way to stop rebuilding context every session.
+        This is the working, shown.</p>
+      </div>
+    </div>
+
+    <div class="panel term">
+      <span class="label">Functional</span>
+      <div><span class="ps">$</span> whoami</div>
+      <div class="out">nick — senior front-end engineer</div>
+      <div><span class="ps">$</span> cat status</div>
+      <div class="out">building in the open<span class="cursor"></span></div>
+    </div>
+
+    <div class="panel construct">
+      <span class="label">Construction</span>
+      <svg width="230" height="230" viewBox="0 0 96 96" fill="none">
+        <circle cx="48" cy="38" r="22" stroke="#26292d" stroke-width="1"/>
+        <line x1="28" y1="8" x2="28" y2="88" stroke="#26292d" stroke-width="1"/>
+        <line x1="56" y1="8" x2="56" y2="88" stroke="#26292d" stroke-width="1"/>
+        <line x1="8" y1="70" x2="88" y2="70" stroke="#26292d" stroke-width="1"/>
+        <path d="M28 70 V38 q0 -12 12 -12 h4 q12 0 12 12 v32" stroke="#f2f0eb" stroke-width="7" stroke-linecap="round" fill="none"/>
+        <path d="M43 47 l9 9 -9 9" stroke="#58c4dc" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="28" cy="70" r="2.5" fill="#58c4dc"/>
+        <circle cx="56" cy="70" r="2.5" fill="#58c4dc"/>
+      </svg>
+    </div>
+
+    <div class="panel tag">
+      <span class="label num">essence</span>
+      <h2>Showing the<br /><em>working</em>.</h2>
+      <div class="swatches">
+        <div class="sw" style="background:#0e0f11"></div>
+        <div class="sw" style="background:#16181b"></div>
+        <div class="sw" style="background:#f2f0eb"></div>
+        <div class="sw" style="background:#58c4dc"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span>ink #0e0f11 · paper #f2f0eb · signal #58c4dc</span>
+    <span>space grotesk / inter / jetbrains mono · utopia fluid scale</span>
+  </footer>
+</body>
+</html>
