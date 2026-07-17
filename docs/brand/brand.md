@@ -12,8 +12,8 @@ Front-end craft as engineering drawing: decisions dimensioned, work drawn to sca
 
 ## Identity
 
-- **Mark:** a lowercase `n` built from visible construction geometry — grid, stems, quarter-turn arch — with construction points picked out in steel blue. The construction lines are part of the identity (the brand literally shows its working). One refinement pass is owed: increase distinctiveness at small sizes.
-- **Wordmark:** the iamnick.dev wordmark is used **verbatim everywhere** — Montserrat, `iamnick` in primary text with `.dev` in the carnival red (`--color-accent`). The logo is the one deliberate red bleed onto brand surfaces: consistency of the mark beats token purity (Nick's ruling, 2026-07-17; supersedes the earlier `iam`-dimmed/steel-dot treatment). The red appears on brand surfaces **only** inside the wordmark.
+- **Mark:** a lowercase `n` built from visible construction geometry — grid, stems, quarter-turn arch — with its markup (points/tick) in the redline red. The construction lines are part of the identity (the brand literally shows its working). One refinement pass is owed: increase distinctiveness at small sizes (variants on `monogram-pass.png`, Nick's ruling pending).
+- **Wordmark:** the iamnick.dev wordmark is used **verbatim everywhere** — Montserrat, `iamnick` in primary text with `.dev` in the red. Consistency of the mark beats token purity (Nick's ruling, 2026-07-17; supersedes the earlier `iam`-dimmed/steel-dot treatment). The same red is the brand's core accent site-wide — see Colour.
 - **Detail language:** hairline grids, dimension labels (`fig. 07`, `r=26`), spec-sheet tables, measured rules, and the **redline underline** — a low-alpha red underline-highlight on at most one key phrase per view (ported from the Notebook board at Nick's request; recoloured steel → red when red became the core accent). Sparse — details reward looking closer.
 
 ## Colour
