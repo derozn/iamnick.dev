@@ -9,6 +9,15 @@ import { varlockNextConfigPlugin } from '@varlock/nextjs-integration/plugin';
 // Vercel reads the pnpm override; see docs/DEPLOY.md.)
 const withVarlock = varlockNextConfigPlugin();
 
+// Velite watches content/blog/ during dev so MDX edits regenerate the typed
+// layer live. Production builds run `velite build` explicitly first (see the
+// `build` script) — deterministic, no race with Next's compile.
+const isDev = process.argv.includes('dev');
+if (isDev && !process.env.VELITE_STARTED) {
+  process.env.VELITE_STARTED = '1';
+  import('velite').then((velite) => velite.build({ watch: true, clean: false }));
+}
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,

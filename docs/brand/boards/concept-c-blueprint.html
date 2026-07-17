@@ -1,171 +1,347 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8" />
-<title>iamnick — Concept C — Blueprint</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
-<style>
-  /* ---- Concept C token source ---- */
-  :root {
-    --c-slate: #14171c;      /* base */
-    --c-panel: #1a1e24;
-    --c-fog: #9aa3ad;        /* secondary text */
-    --c-white: #edf0f3;      /* primary text */
-    --c-accent: #7fa8d9;     /* steel blue */
-    --c-hairline: #262c34;
-    --c-grid: rgba(127,168,217,.07);
-    --c-sans: 'IBM Plex Sans', sans-serif;
-    --c-mono: 'IBM Plex Mono', monospace;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    width: 1600px; height: 1200px; background: #101318;
-    font-family: var(--c-sans); color: var(--c-white);
-    padding: 48px 56px 40px; display: flex; flex-direction: column;
-  }
-  header { display: flex; justify-content: space-between; align-items: baseline;
-    font-family: var(--c-mono); font-size: 12px; letter-spacing: .14em;
-    color: var(--c-fog); text-transform: uppercase; padding-bottom: 28px; }
-  header .acc { color: var(--c-accent); }
-  .grid { flex: 1; display: grid; grid-template-columns: 1.35fr 1fr 1fr;
-    grid-template-rows: 1.25fr 1fr; gap: 22px; }
-  .panel { background: var(--c-panel); border: 1px solid var(--c-hairline);
-    border-radius: 10px; padding: 36px; position: relative; overflow: hidden; }
-  .blueprint-bg {
-    background-image:
-      linear-gradient(var(--c-grid) 1px, transparent 1px),
-      linear-gradient(90deg, var(--c-grid) 1px, transparent 1px);
-    background-size: 28px 28px;
-  }
-  .label { position: absolute; top: 18px; left: 22px; font-family: var(--c-mono);
-    font-size: 10px; letter-spacing: .2em; color: var(--c-fog); text-transform: uppercase; }
-  .num { left: auto; right: 22px; }
+  <head>
+    <meta charset="utf-8" />
+    <title>iamnick — Concept C — Blueprint</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ---- Concept C token source ---- */
+      :root {
+        --c-slate: #14171c; /* base */
+        --c-panel: #1a1e24;
+        --c-fog: #9aa3ad; /* secondary text */
+        --c-white: #edf0f3; /* primary text */
+        --c-accent: #7fa8d9; /* steel blue */
+        --c-hairline: #262c34;
+        --c-grid: rgba(127, 168, 217, 0.07);
+        --c-sans: 'IBM Plex Sans', sans-serif;
+        --c-mono: 'IBM Plex Mono', monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        width: 1600px;
+        height: 1200px;
+        background: #101318;
+        font-family: var(--c-sans);
+        color: var(--c-white);
+        padding: 48px 56px 40px;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-family: var(--c-mono);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        color: var(--c-fog);
+        text-transform: uppercase;
+        padding-bottom: 28px;
+      }
+      header .acc {
+        color: var(--c-accent);
+      }
+      .grid {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1.35fr 1fr 1fr;
+        grid-template-rows: 1.25fr 1fr;
+        gap: 22px;
+      }
+      .panel {
+        background: var(--c-panel);
+        border: 1px solid var(--c-hairline);
+        border-radius: 10px;
+        padding: 36px;
+        position: relative;
+        overflow: hidden;
+      }
+      .blueprint-bg {
+        background-image:
+          linear-gradient(var(--c-grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--c-grid) 1px, transparent 1px);
+        background-size: 28px 28px;
+      }
+      .label {
+        position: absolute;
+        top: 18px;
+        left: 22px;
+        font-family: var(--c-mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        color: var(--c-fog);
+        text-transform: uppercase;
+      }
+      .num {
+        left: auto;
+        right: 22px;
+      }
 
-  /* 1 — logo cover */
-  .cover { background: var(--c-slate); display: flex; flex-direction: column;
-    justify-content: center; align-items: center; gap: 32px; }
-  .cover .word { font-size: 50px; font-weight: 600; letter-spacing: -0.015em; }
-  .cover .word .thin { font-weight: 400; color: var(--c-fog); }
-  .cover .word .dot { color: var(--c-accent); }
+      /* 1 — logo cover */
+      .cover {
+        background: var(--c-slate);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 32px;
+      }
+      .cover .word {
+        font-size: 50px;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+      }
+      .cover .word .thin {
+        font-weight: 400;
+        color: var(--c-fog);
+      }
+      .cover .word .dot {
+        color: var(--c-accent);
+      }
 
-  /* 2 — product surface */
-  .browser { grid-column: 2 / 4; display: flex; flex-direction: column; padding: 0; }
-  .chrome { display: flex; align-items: center; gap: 14px; padding: 16px 22px;
-    border-bottom: 1px solid var(--c-hairline); }
-  .dots span { display: inline-block; width: 9px; height: 9px; border-radius: 50%;
-    background: #2c333c; margin-right: 5px; }
-  .url { flex: 1; background: var(--c-slate); border: 1px solid var(--c-hairline);
-    border-radius: 6px; font-family: var(--c-mono); font-size: 12.5px;
-    color: var(--c-fog); padding: 8px 14px; }
-  .url b { color: var(--c-white); font-weight: 500; }
-  .post { padding: 44px 52px; }
-  .post .meta { font-family: var(--c-mono); font-size: 12.5px; color: var(--c-fog);
-    letter-spacing: .08em; margin-bottom: 18px; }
-  .post .meta b { color: var(--c-accent); font-weight: 500; }
-  .post h1 { font-size: 40px; font-weight: 600; letter-spacing: -0.02em;
-    line-height: 1.15; margin-bottom: 18px; }
-  .post p { font-size: 16.5px; line-height: 1.68; color: #b8bfc7; max-width: 58ch; }
-  .post p mark { background: linear-gradient(transparent 68%, rgba(127,168,217,.38) 68%);
-    color: #edf0f3; }
+      /* 2 — product surface */
+      .browser {
+        grid-column: 2 / 4;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+      }
+      .chrome {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--c-hairline);
+      }
+      .dots span {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #2c333c;
+        margin-right: 5px;
+      }
+      .url {
+        flex: 1;
+        background: var(--c-slate);
+        border: 1px solid var(--c-hairline);
+        border-radius: 6px;
+        font-family: var(--c-mono);
+        font-size: 12.5px;
+        color: var(--c-fog);
+        padding: 8px 14px;
+      }
+      .url b {
+        color: var(--c-white);
+        font-weight: 500;
+      }
+      .post {
+        padding: 44px 52px;
+      }
+      .post .meta {
+        font-family: var(--c-mono);
+        font-size: 12.5px;
+        color: var(--c-fog);
+        letter-spacing: 0.08em;
+        margin-bottom: 18px;
+      }
+      .post .meta b {
+        color: var(--c-accent);
+        font-weight: 500;
+      }
+      .post h1 {
+        font-size: 40px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 18px;
+      }
+      .post p {
+        font-size: 16.5px;
+        line-height: 1.68;
+        color: #b8bfc7;
+        max-width: 58ch;
+      }
+      .post p mark {
+        background: linear-gradient(transparent 68%, rgba(127, 168, 217, 0.38) 68%);
+        color: #edf0f3;
+      }
 
-  /* 3 — functional: spec sheet */
-  .spec { background: var(--c-slate); font-family: var(--c-mono); font-size: 15px;
-    line-height: 2.15; display: flex; flex-direction: column; justify-content: center;
-    padding-left: 46px; }
-  .spec .k { color: var(--c-fog); display: inline-block; width: 12ch; }
-  .spec .v { color: var(--c-white); }
-  .spec .a { color: var(--c-accent); }
+      /* 3 — functional: spec sheet */
+      .spec {
+        background: var(--c-slate);
+        font-family: var(--c-mono);
+        font-size: 15px;
+        line-height: 2.15;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-left: 46px;
+      }
+      .spec .k {
+        color: var(--c-fog);
+        display: inline-block;
+        width: 12ch;
+      }
+      .spec .v {
+        color: var(--c-white);
+      }
+      .spec .a {
+        color: var(--c-accent);
+      }
 
-  /* 4 — construction */
-  .construct { display: flex; align-items: center; justify-content: center; }
+      /* 4 — construction */
+      .construct {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-  /* 5 — tagline */
-  .tag { background: var(--c-slate); display: flex; flex-direction: column;
-    justify-content: center; padding: 44px; gap: 22px; }
-  .tag h2 { font-size: 34px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.28; }
-  .tag h2 em { font-style: normal; color: var(--c-accent); }
-  .swatches { display: flex; gap: 10px; }
-  .sw { width: 44px; height: 44px; border-radius: 7px; border: 1px solid var(--c-hairline); }
+      /* 5 — tagline */
+      .tag {
+        background: var(--c-slate);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 44px;
+        gap: 22px;
+      }
+      .tag h2 {
+        font-size: 34px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        line-height: 1.28;
+      }
+      .tag h2 em {
+        font-style: normal;
+        color: var(--c-accent);
+      }
+      .swatches {
+        display: flex;
+        gap: 10px;
+      }
+      .sw {
+        width: 44px;
+        height: 44px;
+        border-radius: 7px;
+        border: 1px solid var(--c-hairline);
+      }
 
-  footer { display: flex; justify-content: space-between; padding-top: 26px;
-    font-family: var(--c-mono); font-size: 11px; letter-spacing: .18em;
-    color: var(--c-fog); text-transform: uppercase; }
-</style>
-</head>
-<body>
-  <header>
-    <span>iamnick — brand concept <span class="acc">C</span> / blueprint</span>
-    <span>identity board · 03</span>
-  </header>
+      footer {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 26px;
+        font-family: var(--c-mono);
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        color: var(--c-fog);
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span>iamnick — brand concept <span class="acc">C</span> / blueprint</span>
+      <span>identity board · 03</span>
+    </header>
 
-  <div class="grid">
-    <div class="panel cover blueprint-bg">
-      <span class="label">Mark + Wordmark</span>
-      <svg width="150" height="150" viewBox="0 0 96 96" fill="none">
-        <rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/>
-        <path d="M30 72 V40" stroke="#edf0f3" stroke-width="7" stroke-linecap="round"/>
-        <path d="M30 46 q0 -20 18 -20 q18 0 18 20 v26" stroke="#edf0f3" stroke-width="7" stroke-linecap="round" fill="none"/>
-        <path d="M66 26 v46" stroke="#7fa8d9" stroke-width="2" stroke-dasharray="4 4"/>
-      </svg>
-      <div class="word"><span class="thin">iam</span>nick<span class="dot">.</span>dev</div>
-    </div>
-
-    <div class="panel browser">
-      <span class="label num">blog surface</span>
-      <div class="chrome">
-        <span class="dots"><span></span><span></span><span></span></span>
-        <div class="url">https://<b>iamnick.dev</b>/blog/teaching-agents-to-run-a-carnival</div>
+    <div class="grid">
+      <div class="panel cover blueprint-bg">
+        <span class="label">Mark + Wordmark</span>
+        <svg width="150" height="150" viewBox="0 0 96 96" fill="none">
+          <rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34" />
+          <path d="M30 72 V40" stroke="#edf0f3" stroke-width="7" stroke-linecap="round" />
+          <path
+            d="M30 46 q0 -20 18 -20 q18 0 18 20 v26"
+            stroke="#edf0f3"
+            stroke-width="7"
+            stroke-linecap="round"
+            fill="none"
+          />
+          <path d="M66 26 v46" stroke="#7fa8d9" stroke-width="2" stroke-dasharray="4 4" />
+        </svg>
+        <div class="word"><span class="thin">iam</span>nick<span class="dot">.</span>dev</div>
       </div>
-      <div class="post">
-        <div class="meta"><b>fig. 07</b> — 2026-07-17 · 7 min · agentic-workflows</div>
-        <h1>Teaching agents to run a carnival</h1>
-        <p>The fortune teller needed a fact source, the moderation queue needed a
-        human gate, and I needed to stop rebuilding context every session.
-        <mark>Drawn to scale, decisions dimensioned.</mark></p>
+
+      <div class="panel browser">
+        <span class="label num">blog surface</span>
+        <div class="chrome">
+          <span class="dots"><span></span><span></span><span></span></span>
+          <div class="url">https://<b>iamnick.dev</b>/blog/teaching-agents-to-run-a-carnival</div>
+        </div>
+        <div class="post">
+          <div class="meta"><b>fig. 07</b> — 2026-07-17 · 7 min · agentic-workflows</div>
+          <h1>Teaching agents to run a carnival</h1>
+          <p>
+            The fortune teller needed a fact source, the moderation queue needed a human gate, and I
+            needed to stop rebuilding context every session.
+            <mark>Drawn to scale, decisions dimensioned.</mark>
+          </p>
+        </div>
+      </div>
+
+      <div class="panel spec">
+        <span class="label">Functional</span>
+        <div>
+          <span class="k">type</span>
+          <span class="v">fluid <span class="a">18 → 21px</span> / utopia</span>
+        </div>
+        <div>
+          <span class="k">measure</span> <span class="v"><span class="a">68ch</span> max</span>
+        </div>
+        <div><span class="k">space</span> <span class="v">s-2 … s+4, paired</span></div>
+        <div><span class="k">contrast</span> <span class="v">AAA body text</span></div>
+      </div>
+
+      <div class="panel construct blueprint-bg">
+        <span class="label">Construction</span>
+        <svg width="240" height="230" viewBox="0 0 100 96" fill="none">
+          <circle cx="50" cy="42" r="26" stroke="#2c3946" stroke-width="1" />
+          <circle cx="50" cy="42" r="17" stroke="#2c3946" stroke-width="1" />
+          <line x1="30" y1="6" x2="30" y2="90" stroke="#2c3946" stroke-width="1" />
+          <line x1="70" y1="6" x2="70" y2="90" stroke="#2c3946" stroke-width="1" />
+          <line x1="6" y1="74" x2="94" y2="74" stroke="#2c3946" stroke-width="1" />
+          <path d="M30 74 V44" stroke="#edf0f3" stroke-width="6" stroke-linecap="round" />
+          <path
+            d="M30 48 q0 -18 20 -18 q20 0 20 18 v26"
+            stroke="#edf0f3"
+            stroke-width="6"
+            stroke-linecap="round"
+            fill="none"
+          />
+          <circle cx="30" cy="74" r="2.5" fill="#7fa8d9" />
+          <circle cx="70" cy="74" r="2.5" fill="#7fa8d9" />
+          <circle cx="50" cy="30" r="2.5" fill="#7fa8d9" />
+          <text x="76" y="60" font-family="IBM Plex Mono, monospace" font-size="7" fill="#7fa8d9">
+            r=26
+          </text>
+        </svg>
+      </div>
+
+      <div class="panel tag">
+        <span class="label num">essence</span>
+        <h2>Measured<br /><em>twice</em>.</h2>
+        <div class="swatches">
+          <div class="sw" style="background: #14171c"></div>
+          <div class="sw" style="background: #1a1e24"></div>
+          <div class="sw" style="background: #edf0f3"></div>
+          <div class="sw" style="background: #7fa8d9"></div>
+        </div>
       </div>
     </div>
 
-    <div class="panel spec">
-      <span class="label">Functional</span>
-      <div><span class="k">type</span> <span class="v">fluid <span class="a">18 → 21px</span> / utopia</span></div>
-      <div><span class="k">measure</span> <span class="v"><span class="a">68ch</span> max</span></div>
-      <div><span class="k">space</span> <span class="v">s-2 … s+4, paired</span></div>
-      <div><span class="k">contrast</span> <span class="v">AAA body text</span></div>
-    </div>
-
-    <div class="panel construct blueprint-bg">
-      <span class="label">Construction</span>
-      <svg width="240" height="230" viewBox="0 0 100 96" fill="none">
-        <circle cx="50" cy="42" r="26" stroke="#2c3946" stroke-width="1"/>
-        <circle cx="50" cy="42" r="17" stroke="#2c3946" stroke-width="1"/>
-        <line x1="30" y1="6" x2="30" y2="90" stroke="#2c3946" stroke-width="1"/>
-        <line x1="70" y1="6" x2="70" y2="90" stroke="#2c3946" stroke-width="1"/>
-        <line x1="6" y1="74" x2="94" y2="74" stroke="#2c3946" stroke-width="1"/>
-        <path d="M30 74 V44" stroke="#edf0f3" stroke-width="6" stroke-linecap="round"/>
-        <path d="M30 48 q0 -18 20 -18 q20 0 20 18 v26" stroke="#edf0f3" stroke-width="6" stroke-linecap="round" fill="none"/>
-        <circle cx="30" cy="74" r="2.5" fill="#7fa8d9"/>
-        <circle cx="70" cy="74" r="2.5" fill="#7fa8d9"/>
-        <circle cx="50" cy="30" r="2.5" fill="#7fa8d9"/>
-        <text x="76" y="60" font-family="IBM Plex Mono, monospace" font-size="7" fill="#7fa8d9">r=26</text>
-      </svg>
-    </div>
-
-    <div class="panel tag">
-      <span class="label num">essence</span>
-      <h2>Measured<br /><em>twice</em>.</h2>
-      <div class="swatches">
-        <div class="sw" style="background:#14171c"></div>
-        <div class="sw" style="background:#1a1e24"></div>
-        <div class="sw" style="background:#edf0f3"></div>
-        <div class="sw" style="background:#7fa8d9"></div>
-      </div>
-    </div>
-  </div>
-
-  <footer>
-    <span>slate #14171c · fog #9aa3ad · steel #7fa8d9</span>
-    <span>ibm plex sans / ibm plex mono · utopia fluid scale</span>
-  </footer>
-</body>
+    <footer>
+      <span>slate #14171c · fog #9aa3ad · steel #7fa8d9</span>
+      <span>ibm plex sans / ibm plex mono · utopia fluid scale</span>
+    </footer>
+  </body>
 </html>

@@ -1,164 +1,341 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8" />
-<title>iamnick — Concept B — The Notebook</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
-<style>
-  /* ---- Concept B token source ---- */
-  :root {
-    --b-paper: #faf7f0;      /* base — warm ivory */
-    --b-panel: #ffffff;
-    --b-ink: #1c1b18;        /* near-black warm ink */
-    --b-muted: #8a857b;
-    --b-accent: #2545c8;     /* ultramarine */
-    --b-ochre: #d9a441;      /* secondary highlight */
-    --b-hairline: #e6e0d4;
-    --b-display: 'Fraunces', serif;
-    --b-text: 'Inter', sans-serif;
-    --b-mono: 'JetBrains Mono', monospace;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    width: 1600px; height: 1200px;
-    background: var(--b-paper);
-    font-family: var(--b-text); color: var(--b-ink);
-    padding: 48px 56px 40px; display: flex; flex-direction: column;
-  }
-  header {
-    display: flex; justify-content: space-between; align-items: baseline;
-    font-family: var(--b-mono); font-size: 12px; letter-spacing: .14em;
-    color: var(--b-muted); text-transform: uppercase; padding-bottom: 28px;
-  }
-  header .acc { color: var(--b-accent); }
-  .grid { flex: 1; display: grid; grid-template-columns: 1.35fr 1fr 1fr;
-    grid-template-rows: 1.25fr 1fr; gap: 22px; }
-  .panel { background: var(--b-panel); border: 1px solid var(--b-hairline);
-    border-radius: 10px; padding: 36px; position: relative; overflow: hidden;
-    box-shadow: 0 1px 2px rgba(28,27,24,.04); }
-  .label { position: absolute; top: 18px; left: 22px; font-family: var(--b-mono);
-    font-size: 10px; letter-spacing: .2em; color: var(--b-muted); text-transform: uppercase; }
-  .num { left: auto; right: 22px; }
+  <head>
+    <meta charset="utf-8" />
+    <title>iamnick — Concept B — The Notebook</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ---- Concept B token source ---- */
+      :root {
+        --b-paper: #faf7f0; /* base — warm ivory */
+        --b-panel: #ffffff;
+        --b-ink: #1c1b18; /* near-black warm ink */
+        --b-muted: #8a857b;
+        --b-accent: #2545c8; /* ultramarine */
+        --b-ochre: #d9a441; /* secondary highlight */
+        --b-hairline: #e6e0d4;
+        --b-display: 'Fraunces', serif;
+        --b-text: 'Inter', sans-serif;
+        --b-mono: 'JetBrains Mono', monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        width: 1600px;
+        height: 1200px;
+        background: var(--b-paper);
+        font-family: var(--b-text);
+        color: var(--b-ink);
+        padding: 48px 56px 40px;
+        display: flex;
+        flex-direction: column;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-family: var(--b-mono);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        color: var(--b-muted);
+        text-transform: uppercase;
+        padding-bottom: 28px;
+      }
+      header .acc {
+        color: var(--b-accent);
+      }
+      .grid {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1.35fr 1fr 1fr;
+        grid-template-rows: 1.25fr 1fr;
+        gap: 22px;
+      }
+      .panel {
+        background: var(--b-panel);
+        border: 1px solid var(--b-hairline);
+        border-radius: 10px;
+        padding: 36px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(28, 27, 24, 0.04);
+      }
+      .label {
+        position: absolute;
+        top: 18px;
+        left: 22px;
+        font-family: var(--b-mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        color: var(--b-muted);
+        text-transform: uppercase;
+      }
+      .num {
+        left: auto;
+        right: 22px;
+      }
 
-  /* 1 — logo cover */
-  .cover { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 30px; }
-  .mono-mark { font-family: var(--b-display); font-size: 120px; font-weight: 500;
-    letter-spacing: -0.03em; line-height: 1; }
-  .mono-mark .stop { color: var(--b-accent); }
-  .cover .word { font-family: var(--b-text); font-size: 21px; letter-spacing: .34em;
-    text-transform: uppercase; color: var(--b-ink); }
-  .cover .word b { color: var(--b-accent); font-weight: 500; }
+      /* 1 — logo cover */
+      .cover {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+      }
+      .mono-mark {
+        font-family: var(--b-display);
+        font-size: 120px;
+        font-weight: 500;
+        letter-spacing: -0.03em;
+        line-height: 1;
+      }
+      .mono-mark .stop {
+        color: var(--b-accent);
+      }
+      .cover .word {
+        font-family: var(--b-text);
+        font-size: 21px;
+        letter-spacing: 0.34em;
+        text-transform: uppercase;
+        color: var(--b-ink);
+      }
+      .cover .word b {
+        color: var(--b-accent);
+        font-weight: 500;
+      }
 
-  /* 2 — product surface */
-  .browser { grid-column: 2 / 4; display: flex; flex-direction: column; padding: 0; }
-  .chrome { display: flex; align-items: center; gap: 14px; padding: 16px 22px;
-    border-bottom: 1px solid var(--b-hairline); }
-  .dots span { display: inline-block; width: 9px; height: 9px; border-radius: 50%;
-    background: #e0dacc; margin-right: 5px; }
-  .url { flex: 1; background: var(--b-paper); border: 1px solid var(--b-hairline); border-radius: 6px;
-    font-family: var(--b-mono); font-size: 12.5px; color: var(--b-muted); padding: 8px 14px; }
-  .url b { color: var(--b-ink); font-weight: 500; }
-  .post { padding: 42px 52px; }
-  .post .kicker { font-family: var(--b-mono); font-size: 12px; letter-spacing: .22em;
-    text-transform: uppercase; color: var(--b-accent); margin-bottom: 16px; }
-  .post h1 { font-family: var(--b-display); font-size: 42px; font-weight: 600;
-    line-height: 1.12; margin-bottom: 16px; letter-spacing: -0.01em; }
-  .post p { font-size: 16.5px; line-height: 1.7; color: #4a463e; max-width: 58ch; }
-  .post p mark { background: linear-gradient(transparent 62%, rgba(217,164,65,.45) 62%);
-    color: inherit; }
+      /* 2 — product surface */
+      .browser {
+        grid-column: 2 / 4;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+      }
+      .chrome {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--b-hairline);
+      }
+      .dots span {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #e0dacc;
+        margin-right: 5px;
+      }
+      .url {
+        flex: 1;
+        background: var(--b-paper);
+        border: 1px solid var(--b-hairline);
+        border-radius: 6px;
+        font-family: var(--b-mono);
+        font-size: 12.5px;
+        color: var(--b-muted);
+        padding: 8px 14px;
+      }
+      .url b {
+        color: var(--b-ink);
+        font-weight: 500;
+      }
+      .post {
+        padding: 42px 52px;
+      }
+      .post .kicker {
+        font-family: var(--b-mono);
+        font-size: 12px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--b-accent);
+        margin-bottom: 16px;
+      }
+      .post h1 {
+        font-family: var(--b-display);
+        font-size: 42px;
+        font-weight: 600;
+        line-height: 1.12;
+        margin-bottom: 16px;
+        letter-spacing: -0.01em;
+      }
+      .post p {
+        font-size: 16.5px;
+        line-height: 1.7;
+        color: #4a463e;
+        max-width: 58ch;
+      }
+      .post p mark {
+        background: linear-gradient(transparent 62%, rgba(217, 164, 65, 0.45) 62%);
+        color: inherit;
+      }
 
-  /* 3 — functional: frontmatter page */
-  .front { background: var(--b-panel); font-family: var(--b-mono); font-size: 15.5px;
-    line-height: 2.1; display: flex; flex-direction: column; justify-content: center;
-    padding-left: 46px;
-    background-image: repeating-linear-gradient(transparent 0 32px, #f0ebdf 32px 33px); }
-  .front .key { color: var(--b-muted); }
-  .front .val { color: var(--b-ink); }
-  .front .rule { color: var(--b-accent); }
+      /* 3 — functional: frontmatter page */
+      .front {
+        background: var(--b-panel);
+        font-family: var(--b-mono);
+        font-size: 15.5px;
+        line-height: 2.1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding-left: 46px;
+        background-image: repeating-linear-gradient(transparent 0 32px, #f0ebdf 32px 33px);
+      }
+      .front .key {
+        color: var(--b-muted);
+      }
+      .front .val {
+        color: var(--b-ink);
+      }
+      .front .rule {
+        color: var(--b-accent);
+      }
 
-  /* 4 — construction */
-  .construct { display: flex; align-items: center; justify-content: center; }
+      /* 4 — construction */
+      .construct {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-  /* 5 — tagline */
-  .tag { display: flex; flex-direction: column; justify-content: center; padding: 44px; gap: 22px;
-    background: var(--b-ink); color: var(--b-paper); border-color: var(--b-ink); }
-  .tag h2 { font-family: var(--b-display); font-size: 34px; font-weight: 500; line-height: 1.28; }
-  .tag h2 em { font-style: italic; color: var(--b-ochre); }
-  .swatches { display: flex; gap: 10px; }
-  .sw { width: 44px; height: 44px; border-radius: 7px; border: 1px solid rgba(250,247,240,.2); }
+      /* 5 — tagline */
+      .tag {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 44px;
+        gap: 22px;
+        background: var(--b-ink);
+        color: var(--b-paper);
+        border-color: var(--b-ink);
+      }
+      .tag h2 {
+        font-family: var(--b-display);
+        font-size: 34px;
+        font-weight: 500;
+        line-height: 1.28;
+      }
+      .tag h2 em {
+        font-style: italic;
+        color: var(--b-ochre);
+      }
+      .swatches {
+        display: flex;
+        gap: 10px;
+      }
+      .sw {
+        width: 44px;
+        height: 44px;
+        border-radius: 7px;
+        border: 1px solid rgba(250, 247, 240, 0.2);
+      }
 
-  footer { display: flex; justify-content: space-between; padding-top: 26px;
-    font-family: var(--b-mono); font-size: 11px; letter-spacing: .18em;
-    color: var(--b-muted); text-transform: uppercase; }
-</style>
-</head>
-<body>
-  <header>
-    <span>iamnick — brand concept <span class="acc">B</span> / the notebook</span>
-    <span>identity board · 02</span>
-  </header>
+      footer {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 26px;
+        font-family: var(--b-mono);
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        color: var(--b-muted);
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span>iamnick — brand concept <span class="acc">B</span> / the notebook</span>
+      <span>identity board · 02</span>
+    </header>
 
-  <div class="grid">
-    <div class="panel cover">
-      <span class="label">Mark + Wordmark</span>
-      <div class="mono-mark">in<span class="stop">.</span></div>
-      <div class="word">iamnick<b>.dev</b></div>
-    </div>
-
-    <div class="panel browser">
-      <span class="label num">blog surface</span>
-      <div class="chrome">
-        <span class="dots"><span></span><span></span><span></span></span>
-        <div class="url">https://<b>iamnick.dev</b>/blog/teaching-agents-to-run-a-carnival</div>
+    <div class="grid">
+      <div class="panel cover">
+        <span class="label">Mark + Wordmark</span>
+        <div class="mono-mark">in<span class="stop">.</span></div>
+        <div class="word">iamnick<b>.dev</b></div>
       </div>
-      <div class="post">
-        <div class="kicker">Build journal — entry 01</div>
-        <h1>Teaching agents to run a carnival</h1>
-        <p>The fortune teller needed a fact source, the moderation queue needed a
-        human gate, and I needed to stop rebuilding context every session.
-        <mark>These are the notes from the build</mark> — decisions, dead ends and all.</p>
+
+      <div class="panel browser">
+        <span class="label num">blog surface</span>
+        <div class="chrome">
+          <span class="dots"><span></span><span></span><span></span></span>
+          <div class="url">https://<b>iamnick.dev</b>/blog/teaching-agents-to-run-a-carnival</div>
+        </div>
+        <div class="post">
+          <div class="kicker">Build journal — entry 01</div>
+          <h1>Teaching agents to run a carnival</h1>
+          <p>
+            The fortune teller needed a fact source, the moderation queue needed a human gate, and I
+            needed to stop rebuilding context every session.
+            <mark>These are the notes from the build</mark> — decisions, dead ends and all.
+          </p>
+        </div>
+      </div>
+
+      <div class="panel front">
+        <span class="label">Functional</span>
+        <div><span class="rule">---</span></div>
+        <div><span class="key">title:</span> <span class="val">Notes from the build</span></div>
+        <div><span class="key">date:</span> <span class="val">2026-07-17</span></div>
+        <div><span class="key">tags:</span> <span class="val">[agentic, front-end]</span></div>
+        <div><span class="key">draft:</span> <span class="val">false</span></div>
+        <div><span class="rule">---</span></div>
+      </div>
+
+      <div class="panel construct">
+        <span class="label">Construction</span>
+        <svg width="240" height="220" viewBox="0 0 120 110" fill="none">
+          <line x1="10" y1="88" x2="110" y2="88" stroke="#e6e0d4" stroke-width="1" />
+          <line x1="10" y1="30" x2="110" y2="30" stroke="#e6e0d4" stroke-width="1" />
+          <line x1="10" y1="14" x2="110" y2="14" stroke="#e6e0d4" stroke-width="1" />
+          <text
+            x="30"
+            y="88"
+            font-family="Fraunces, serif"
+            font-size="76"
+            font-weight="500"
+            fill="#1c1b18"
+          >
+            in
+          </text>
+          <circle cx="97" cy="82" r="6.5" fill="#2545c8" />
+          <circle cx="36.5" cy="22" r="5" fill="#1c1b18" />
+          <line
+            x1="97"
+            y1="10"
+            x2="97"
+            y2="100"
+            stroke="#d9a441"
+            stroke-width="1"
+            stroke-dasharray="3 3"
+          />
+        </svg>
+      </div>
+
+      <div class="panel tag">
+        <span class="label num" style="color: rgba(250, 247, 240, 0.5)">essence</span>
+        <h2>Notes from<br />the <em>build</em>.</h2>
+        <div class="swatches">
+          <div class="sw" style="background: #faf7f0"></div>
+          <div class="sw" style="background: #1c1b18"></div>
+          <div class="sw" style="background: #2545c8"></div>
+          <div class="sw" style="background: #d9a441"></div>
+        </div>
       </div>
     </div>
 
-    <div class="panel front">
-      <span class="label">Functional</span>
-      <div><span class="rule">---</span></div>
-      <div><span class="key">title:</span> <span class="val">Notes from the build</span></div>
-      <div><span class="key">date:</span> <span class="val">2026-07-17</span></div>
-      <div><span class="key">tags:</span> <span class="val">[agentic, front-end]</span></div>
-      <div><span class="key">draft:</span> <span class="val">false</span></div>
-      <div><span class="rule">---</span></div>
-    </div>
-
-    <div class="panel construct">
-      <span class="label">Construction</span>
-      <svg width="240" height="220" viewBox="0 0 120 110" fill="none">
-        <line x1="10" y1="88" x2="110" y2="88" stroke="#e6e0d4" stroke-width="1"/>
-        <line x1="10" y1="30" x2="110" y2="30" stroke="#e6e0d4" stroke-width="1"/>
-        <line x1="10" y1="14" x2="110" y2="14" stroke="#e6e0d4" stroke-width="1"/>
-        <text x="30" y="88" font-family="Fraunces, serif" font-size="76" font-weight="500" fill="#1c1b18">in</text>
-        <circle cx="97" cy="82" r="6.5" fill="#2545c8"/>
-        <circle cx="36.5" cy="22" r="5" fill="#1c1b18"/>
-        <line x1="97" y1="10" x2="97" y2="100" stroke="#d9a441" stroke-width="1" stroke-dasharray="3 3"/>
-      </svg>
-    </div>
-
-    <div class="panel tag">
-      <span class="label num" style="color:rgba(250,247,240,.5)">essence</span>
-      <h2>Notes from<br />the <em>build</em>.</h2>
-      <div class="swatches">
-        <div class="sw" style="background:#faf7f0"></div>
-        <div class="sw" style="background:#1c1b18"></div>
-        <div class="sw" style="background:#2545c8"></div>
-        <div class="sw" style="background:#d9a441"></div>
-      </div>
-    </div>
-  </div>
-
-  <footer>
-    <span>ivory #faf7f0 · ink #1c1b18 · ultramarine #2545c8 · ochre #d9a441</span>
-    <span>fraunces / inter / jetbrains mono · utopia fluid scale</span>
-  </footer>
-</body>
+    <footer>
+      <span>ivory #faf7f0 · ink #1c1b18 · ultramarine #2545c8 · ochre #d9a441</span>
+      <span>fraunces / inter / jetbrains mono · utopia fluid scale</span>
+    </footer>
+  </body>
 </html>

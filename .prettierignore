@@ -1,4 +1,5 @@
 .next
+.velite
 node_modules
 public
 coverage
