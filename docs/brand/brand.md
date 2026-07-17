@@ -40,7 +40,7 @@ The system reads as a blueprint that has been **redlined**: steel-blue construct
 
 ## Voice
 
-Plain, precise, first person. States measurements and reasons, not adjectives. Shows dead ends as data, not confessions. No exclamation marks, no hype vocabulary. British English, matching the docs house style.
+**`docs/brand/voice.md` is the law for all visitor-facing writing** — Post prose, blog UI copy, descriptions. Short version: write like Nick talks (chat register, tidied), dry and self-deprecating, first person singular always; hard bans on "we" for solo work, emoji and exclamation marks. Every piece of public copy is final-passed through the avoid-ai-writing skill with that profile before merge. This section is a pointer; voice.md is the source.
 
 ## Considered directions (kept for the record)
 

@@ -18,8 +18,8 @@ export default function BlogIndexPage() {
         Notes, <span className="brand-underline">measured twice</span>.
       </h1>
       <p className="mt-brand-s max-w-[52ch] text-brand-base leading-[var(--text-brand-base--line-height)] text-brand-fog">
-        Engineering, agentic experiments and the odd ramble — decisions dimensioned, dead ends
-        included.
+        Mostly how this site gets built with AI agents. Sometimes whatever else is in my head. Dead
+        ends included.
       </p>
 
       <ul className="mt-brand-xl">
