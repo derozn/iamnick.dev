@@ -127,6 +127,12 @@
   --color-brand-panel: #1a1e24;
   --color-brand-white: #edf0f3;
   --color-brand-fog: #9aa3ad;
+  /* The core red — shared with the carnival wordmark; the "redline" markup
+     colour on blueprint surfaces. Too dark for small text on slate (~2.9:1),
+     so text accents use the brightened variant below. */
+  --color-brand-red: #c50201;
+  --color-brand-red-bright: #f0463c;
+  /* Construction blue — grid and drawing furniture only, never text emphasis. */
   --color-brand-steel: #7fa8d9;
   --color-brand-hairline: #262c34;
 
@@ -657,9 +663,9 @@
   font-family: var(--font-brand-sans);
 }
 
-/* The dimension underline — at most one key phrase per view (brand.md). */
+/* The redline underline — at most one key phrase per view (brand.md). */
 @utility brand-underline {
-  background: linear-gradient(transparent 68%, rgb(127 168 217 / 0.38) 68%);
+  background: linear-gradient(transparent 68%, rgb(197 2 1 / 0.55) 68%);
   color: var(--color-brand-white);
 }
 
@@ -689,13 +695,13 @@
   line-height: var(--text-brand-lg--line-height);
 }
 .brand-prose a {
-  color: var(--color-brand-steel);
+  color: var(--color-brand-red-bright);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: color-mix(in srgb, var(--color-brand-steel) 45%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--color-brand-red-bright) 45%, transparent);
 }
 .brand-prose a:hover {
-  text-decoration-color: var(--color-brand-steel);
+  text-decoration-color: var(--color-brand-red-bright);
 }
 .brand-prose :is(ul, ol) {
   padding-inline-start: 1.4em;
@@ -707,10 +713,10 @@
   margin-block: var(--spacing-brand-3xs);
 }
 .brand-prose li::marker {
-  color: var(--color-brand-steel);
+  color: var(--color-brand-red-bright);
 }
 .brand-prose blockquote {
-  border-inline-start: 2px solid var(--color-brand-steel);
+  border-inline-start: 2px solid var(--color-brand-red);
   padding-inline-start: var(--spacing-brand-s);
   color: var(--color-brand-fog);
 }

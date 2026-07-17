@@ -8,27 +8,29 @@ Front-end craft as engineering drawing: decisions dimensioned, work drawn to sca
 
 **Essence line:** Measured twice.
 
-**Avoid:** anything carnival (neon, letterpress fairground, blue-black `#070810`), generic AI purple-glow, startup gradients, decorative noise. The carnival red `#c50201` is banned on brand surfaces **except inside the wordmark** — the logo's red is a deliberate, bounded bleed (see Identity).
+**Avoid:** anything carnival (neon, letterpress fairground, blue-black `#070810`), generic AI purple-glow, startup gradients, decorative noise. The red `#c50201` is **not** carnival-only: it is a core brand colour shared across the whole site (Nick's ruling, 2026-07-17) — on Blueprint surfaces it is the **redline**, the markup colour engineers draw corrections in. The wordmark, the dimension underline and text accents all carry it; steel blue is demoted to construction furniture.
 
 ## Identity
 
 - **Mark:** a lowercase `n` built from visible construction geometry — grid, stems, quarter-turn arch — with construction points picked out in steel blue. The construction lines are part of the identity (the brand literally shows its working). One refinement pass is owed: increase distinctiveness at small sizes.
 - **Wordmark:** the iamnick.dev wordmark is used **verbatim everywhere** — Montserrat, `iamnick` in primary text with `.dev` in the carnival red (`--color-accent`). The logo is the one deliberate red bleed onto brand surfaces: consistency of the mark beats token purity (Nick's ruling, 2026-07-17; supersedes the earlier `iam`-dimmed/steel-dot treatment). The red appears on brand surfaces **only** inside the wordmark.
-- **Detail language:** hairline grids, dimension labels (`fig. 07`, `r=26`), spec-sheet tables, measured rules, and the **dimension underline** — a low-alpha steel underline-highlight on at most one key phrase per view (ported from the Notebook board at Nick's request, recoloured to steel). Sparse — details reward looking closer.
+- **Detail language:** hairline grids, dimension labels (`fig. 07`, `r=26`), spec-sheet tables, measured rules, and the **redline underline** — a low-alpha red underline-highlight on at most one key phrase per view (ported from the Notebook board at Nick's request; recoloured steel → red when red became the core accent). Sparse — details reward looking closer.
 
 ## Colour
 
-| Token              | Value                   | Role                   |
-| ------------------ | ----------------------- | ---------------------- |
-| `--brand-slate`    | `#14171c`               | base surface           |
-| `--brand-panel`    | `#1a1e24`               | raised surface         |
-| `--brand-white`    | `#edf0f3`               | primary text           |
-| `--brand-fog`      | `#9aa3ad`               | secondary text         |
-| `--brand-steel`    | `#7fa8d9`               | the single accent      |
-| `--brand-hairline` | `#262c34`               | rules, borders         |
-| `--brand-grid`     | `rgba(127,168,217,.07)` | blueprint grid texture |
+| Token                | Value                   | Role                                                                                                                                                  |
+| -------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--brand-slate`      | `#14171c`               | base surface                                                                                                                                          |
+| `--brand-panel`      | `#1a1e24`               | raised surface                                                                                                                                        |
+| `--brand-white`      | `#edf0f3`               | primary text                                                                                                                                          |
+| `--brand-fog`        | `#9aa3ad`               | secondary text                                                                                                                                        |
+| `--brand-red`        | `#c50201`               | **the core accent** — the redline markup, shared with the carnival wordmark. Fills only (underline, rules); too dark for small text on slate (~2.9:1) |
+| `--brand-red-bright` | `#f0463c`               | the redline for small text on slate (fig. labels, links, hovers) — ≥4.5:1                                                                             |
+| `--brand-steel`      | `#7fa8d9`               | construction blue — grid and drawing furniture only, never text emphasis                                                                              |
+| `--brand-hairline`   | `#262c34`               | rules, borders                                                                                                                                        |
+| `--brand-grid`       | `rgba(127,168,217,.07)` | blueprint grid texture                                                                                                                                |
 
-One accent, used sparingly: links, the wordmark dot, construction points, one highlighted value per view. Body text targets AAA contrast.
+The system reads as a blueprint that has been **redlined**: steel-blue construction paper underneath, red markup on top. Red carries emphasis (the underline, fig. labels, links, one highlight per view); it never floods a surface. Body text targets AAA contrast.
 
 ## Type and space
 

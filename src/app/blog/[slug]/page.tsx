@@ -32,7 +32,7 @@ export default async function PostPage({ params }: PostPageProps) {
     <article>
       <header>
         <p className="font-brand-mono text-brand-xs uppercase tracking-[0.22em] text-brand-fog">
-          <span className="normal-case text-brand-steel">
+          <span className="normal-case text-brand-red-bright">
             fig. {String(publishedPosts.length - index).padStart(2, '0')}
           </span>
           {' — '}
@@ -61,9 +61,12 @@ export default async function PostPage({ params }: PostPageProps) {
       >
         <div>
           {older && (
-            <Link href={older.permalink} className="group text-brand-fog hover:text-brand-steel">
+            <Link
+              href={older.permalink}
+              className="group text-brand-fog hover:text-brand-red-bright"
+            >
               <span aria-hidden>←</span> older
-              <span className="mt-brand-3xs block text-brand-white group-hover:text-brand-steel">
+              <span className="mt-brand-3xs block text-brand-white group-hover:text-brand-red-bright">
                 {older.title}
               </span>
             </Link>
@@ -71,9 +74,12 @@ export default async function PostPage({ params }: PostPageProps) {
         </div>
         <div className="text-right">
           {newer && (
-            <Link href={newer.permalink} className="group text-brand-fog hover:text-brand-steel">
+            <Link
+              href={newer.permalink}
+              className="group text-brand-fog hover:text-brand-red-bright"
+            >
               newer <span aria-hidden>→</span>
-              <span className="mt-brand-3xs block text-brand-white group-hover:text-brand-steel">
+              <span className="mt-brand-3xs block text-brand-white group-hover:text-brand-red-bright">
                 {newer.title}
               </span>
             </Link>

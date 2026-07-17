@@ -11,7 +11,7 @@ const formatDate = (iso: string) =>
 export default function BlogIndexPage() {
   return (
     <>
-      <p className="font-brand-mono text-brand-xs uppercase tracking-[0.22em] text-brand-steel">
+      <p className="font-brand-mono text-brand-xs uppercase tracking-[0.22em] text-brand-red-bright">
         Nick&rsquo;s rambles
       </p>
       <h1 className="mt-brand-2xs text-brand-3xl font-semibold leading-[var(--text-brand-3xl--line-height)] tracking-tight">
@@ -27,13 +27,13 @@ export default function BlogIndexPage() {
           <li key={post.slug} className="border-t border-brand-hairline">
             <Link href={post.permalink} className="group block py-brand-m">
               <p className="font-brand-mono text-brand-xs text-brand-fog">
-                <span className="text-brand-steel">fig. {figNumber(index)}</span>
+                <span className="text-brand-red-bright">fig. {figNumber(index)}</span>
                 {' — '}
                 <time dateTime={post.date}>{formatDate(post.date)}</time>
                 {' · '}
                 {Math.max(1, Math.round(post.metadata.readingTime))} min
               </p>
-              <h2 className="mt-brand-3xs text-brand-xl font-semibold leading-[var(--text-brand-xl--line-height)] tracking-tight transition-colors group-hover:text-brand-steel">
+              <h2 className="mt-brand-3xs text-brand-xl font-semibold leading-[var(--text-brand-xl--line-height)] tracking-tight transition-colors group-hover:text-brand-red-bright">
                 {post.title}
               </h2>
               <p className="mt-brand-2xs max-w-[58ch] text-brand-sm leading-relaxed text-brand-fog">

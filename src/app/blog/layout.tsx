@@ -28,7 +28,7 @@ export default function BlogLayout({ children }: PropsWithChildren) {
         </Link>
         <Link
           href="/blog"
-          className="font-brand-mono text-brand-xs uppercase tracking-[0.2em] text-brand-fog transition-colors hover:text-brand-steel"
+          className="font-brand-mono text-brand-xs uppercase tracking-[0.2em] text-brand-fog transition-colors hover:text-brand-red-bright"
         >
           blog
         </Link>
