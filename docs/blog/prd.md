@@ -6,7 +6,7 @@
 
 iamnick.dev demonstrates creativity and craft through the Dark Carnival, but the site has almost no indexable long-form text and no surface that shows how Nick thinks and works over time. Recruiters and hiring managers get the wow; they do not get the reasoning. Meanwhile Nick is deliberately building his AI-engineering practice — sub-agents, skills, spec-driven delivery — and that learning currently evaporates into session transcripts.
 
-The blog solves both at once: it is the site's primary indexable-text / SEO surface (ADR-0002), and its flagship content is an **AI-build-journal** — posts documenting how this site is built with agentic workflows, written by Nick with AI as the editorial team. The delivery process is designed to generate the raw material (decision logs, stage journal) that the posts are made of.
+The blog solves both at once: it is the site's primary indexable-text / SEO surface (ADR-0002), and it is Nick's own space — anything he wants to write, "Nick's rambles" (ruling, 2026-07-17). The **AI-build-journal** — posts documenting how this site is built with agentic workflows, written by Nick with AI as the editorial team — is the flagship strand within it, not the blog's definition. The delivery process is designed to generate the raw material (decision logs, stage journal) that those posts are made of.
 
 ## Audience
 

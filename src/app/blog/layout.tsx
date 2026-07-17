@@ -18,12 +18,13 @@ export default function BlogLayout({ children }: PropsWithChildren) {
   return (
     <div className={cn(brandSansFont.variable, brandMonoFont.variable, 'brand-surface min-h-dvh')}>
       <header className="mx-auto flex w-full max-w-3xl items-baseline justify-between px-6 pt-brand-m">
+        {/* The wordmark is the one carnival-red bleed on brand surfaces — the
+            logo stays identical everywhere (Nick's ruling, docs/brand/brand.md). */}
         <Link
           href="/"
-          className="text-brand-sm font-semibold tracking-tight transition-colors hover:text-brand-steel"
+          className="font-expressive text-[15px] font-semibold tracking-tight text-text-primary transition-colors hover:text-accent"
         >
-          <span className="font-normal text-brand-fog">iam</span>nick
-          <span className="text-brand-steel">.</span>dev
+          iamnick<span className="text-accent">.dev</span>
         </Link>
         <Link
           href="/blog"

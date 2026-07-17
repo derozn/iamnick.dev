@@ -93,7 +93,7 @@ The identity of every non-carnival surface (ADR-0011): the blog and future conte
 _Avoid_: site theme, blog theme, Blueprint (as the brand's name — Blueprint names the ruled direction/board)
 
 **Blog**:
-The site's long-form writing surface — `/blog` and `/blog/[slug]`, statically generated from MDX, the primary indexable-text/SEO surface. An **iamnick-brand** surface, not a carnival one (ADR-0011): no carnival styling or vocabulary, no live canvas, three.js never in its bundles. Flagship content is the AI-build-journal.
+The site's long-form writing surface — `/blog` and `/blog/[slug]`, statically generated from MDX, the primary indexable-text/SEO surface. An **iamnick-brand** surface, not a carnival one (ADR-0011): no carnival styling or vocabulary, no live canvas, three.js never in its bundles. Content is anything Nick wants to write — "Nick's rambles"; the AI-build-journal is the flagship strand, not the definition.
 _Avoid_: news, writings, articles (as the section name)
 
 **Post**:

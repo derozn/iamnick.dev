@@ -8,12 +8,12 @@ Front-end craft as engineering drawing: decisions dimensioned, work drawn to sca
 
 **Essence line:** Measured twice.
 
-**Avoid:** anything carnival (neon, letterpress fairground, `#c50201` red, blue-black `#070810`), generic AI purple-glow, startup gradients, decorative noise.
+**Avoid:** anything carnival (neon, letterpress fairground, blue-black `#070810`), generic AI purple-glow, startup gradients, decorative noise. The carnival red `#c50201` is banned on brand surfaces **except inside the wordmark** — the logo's red is a deliberate, bounded bleed (see Identity).
 
 ## Identity
 
 - **Mark:** a lowercase `n` built from visible construction geometry — grid, stems, quarter-turn arch — with construction points picked out in steel blue. The construction lines are part of the identity (the brand literally shows its working). One refinement pass is owed: increase distinctiveness at small sizes.
-- **Wordmark:** the iamnick.dev wordmark stays original (standing constraint). Brand treatment: `iam` at secondary weight/colour, `nick` at full weight, the `.` in steel blue — `iam` recedes, `nick` asserts.
+- **Wordmark:** the iamnick.dev wordmark is used **verbatim everywhere** — Montserrat, `iamnick` in primary text with `.dev` in the carnival red (`--color-accent`). The logo is the one deliberate red bleed onto brand surfaces: consistency of the mark beats token purity (Nick's ruling, 2026-07-17; supersedes the earlier `iam`-dimmed/steel-dot treatment). The red appears on brand surfaces **only** inside the wordmark.
 - **Detail language:** hairline grids, dimension labels (`fig. 07`, `r=26`), spec-sheet tables, measured rules, and the **dimension underline** — a low-alpha steel underline-highlight on at most one key phrase per view (ported from the Notebook board at Nick's request, recoloured to steel). Sparse — details reward looking closer.
 
 ## Colour

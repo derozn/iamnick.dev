@@ -12,13 +12,14 @@ export default function BlogIndexPage() {
   return (
     <>
       <p className="font-brand-mono text-brand-xs uppercase tracking-[0.22em] text-brand-steel">
-        Build journal
+        Nick&rsquo;s rambles
       </p>
       <h1 className="mt-brand-2xs text-brand-3xl font-semibold leading-[var(--text-brand-3xl--line-height)] tracking-tight">
         Notes, <span className="brand-underline">measured twice</span>.
       </h1>
       <p className="mt-brand-s max-w-[52ch] text-brand-base leading-[var(--text-brand-base--line-height)] text-brand-fog">
-        How this site is built with agentic workflows — decisions dimensioned, dead ends included.
+        Engineering, agentic experiments and the odd ramble — decisions dimensioned, dead ends
+        included.
       </p>
 
       <ul className="mt-brand-xl">

@@ -5,7 +5,7 @@
     <title>iamnick — Concept C — Blueprint</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Montserrat:wght@600&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -95,17 +95,16 @@
         align-items: center;
         gap: 32px;
       }
+      /* The wordmark is used verbatim (Montserrat, carnival-red .dev) — the one
+         deliberate red bleed onto brand surfaces (Nick's ruling 2026-07-17). */
       .cover .word {
+        font-family: 'Montserrat', var(--c-sans);
         font-size: 50px;
         font-weight: 600;
-        letter-spacing: -0.015em;
-      }
-      .cover .word .thin {
-        font-weight: 400;
-        color: var(--c-fog);
+        letter-spacing: -0.02em;
       }
       .cover .word .dot {
-        color: var(--c-accent);
+        color: #c50201;
       }
 
       /* 2 — product surface */
@@ -269,7 +268,7 @@
           />
           <path d="M66 26 v46" stroke="#7fa8d9" stroke-width="2" stroke-dasharray="4 4" />
         </svg>
-        <div class="word"><span class="thin">iam</span>nick<span class="dot">.</span>dev</div>
+        <div class="word">iamnick<span class="dot">.dev</span></div>
       </div>
 
       <div class="panel browser">

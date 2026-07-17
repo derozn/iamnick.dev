@@ -125,7 +125,9 @@ export function SiteNav() {
               <h2 className="font-rye letterpress mt-1 text-[30px] leading-none text-ink">
                 The Midway
               </h2>
-              <ul className="mt-8 flex flex-col gap-1">
+              {/* min-h-0 + overflow lets the list scroll on short viewports —
+                  entries must never clip out of reach (resize/landscape phones). */}
+              <ul className="mt-8 flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
                 {ITEMS.map((a, i) => (
                   <li key={a.id}>
                     <button
