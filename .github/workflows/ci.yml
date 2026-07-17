@@ -30,6 +30,9 @@ jobs:
       - name: Validate env schema
         run: pnpm env:check
 
+      - name: Build content layer (velite)
+        run: pnpm content
+
       - name: Lint
         run: pnpm lint
 

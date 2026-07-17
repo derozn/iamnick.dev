@@ -1,14 +1,14 @@
 # Blog — Build Handoff
 
-> **Mission for the next session:** build **Stage 1 — content pipeline + typed layer**: wire in
-> Velite (ADR-0008), create `content/blog/` with two seed posts (one published, one Draft), the Zod
-> frontmatter schema, and a typed accessor module with a single `publishedPosts` accessor, mirroring
-> the `src/content/cv.ts` house pattern. Gate: `pnpm validate`.
+> **Mission for the next session:** build **Stage 2 — routes + reading template**: `/blog` and
+> `/blog/[slug]` on the Blueprint brand, brand-prefixed Utopia tokens in `@theme`, Shiki
+> highlighting, prev/next, reading time, SiteNav Blog link. All public reads go through
+> `publishedPosts` (`src/content/blog.ts`). Gates: `pnpm validate`, the `@ci` blog e2e spec, and
+> two human gates — Nick reads the feel, monogram small-size pass.
 >
 > Specs are done and live in `docs/blog/` — this doc points at them and adds only build-facing
-> operational detail. Read `CONTEXT.md` first (Blog/Post/Tag/Draft entries just landed). Spec branch:
-> `feature/blog-stage-0`; each stage gets its own branch, PR to master — the site is live, every
-> slice must leave production shippable.
+> operational detail. Read `CONTEXT.md` first (Blog/Post/Tag/Draft entries). Each stage gets its
+> own branch, PR to master — the site is live, every slice must leave production shippable.
 
 ---
 
@@ -17,10 +17,10 @@
 1. Read the spec set: `docs/blog/discovery.md` (decision log, rows 1–19), `docs/blog/prd.md` (what
    launch must include), `docs/blog/agentic-workflow.md` (how each stage runs and gates). ADRs
    0008–0011 are all **accepted** and binding.
-2. Stage order: **0 ✅ → B ✅ → 1 → 2 → 4 → 5** (Stage 3 deleted, ADR-0011; numbering preserved).
+2. Stage order: **0 ✅ → B ✅ → 1 ✅ → 2 → 4 → 5** (Stage 3 deleted, ADR-0011; numbering preserved).
 3. Every stage is bracketed by carnival-context **Brief** before and **Absorb** after; Absorb also
    appends a dated paragraph to `docs/blog/journal.md`.
-4. Stage 1 next (see §8). Do not duplicate spec content into code comments or this doc — the specs
+4. Stage 2 next (see §8). Do not duplicate spec content into code comments or this doc — the specs
    are the source.
 
 ---
@@ -37,10 +37,32 @@
   source.
 - **Glossary**: Blog, Post, Tag, Draft entries are in `CONTEXT.md` (plain English, no
   carnival-register naming — ADR-0011). Reviewed by glossary-guard.
-- **No code exists.** No content tooling in `package.json`, no `/blog` routes, no `content/blog/`
-  directory, no Blog link in `src/components/nav/SiteNav.tsx`. The pipeline starts from zero.
-- **House pattern to mirror**: `src/content/cv.ts` — typed data, Vitest tests beside it
-  (`cv.test.ts`), serialiser (`serializeCv.ts`).
+- **Content pipeline live** (Stage 1, 2026-07-17, `feature/blog-stage-1`): velite ^0.4.0
+  (devDependency) with `velite.config.ts` — posts collection from `content/blog/**/*.mdx`, Zod
+  frontmatter contract (title 3–99, description 10–160 so it stays usable as a meta description,
+  isodate `date`/`updated`, tags default `[]`, draft default `false`, `s.slug('blog')` uniqueness,
+  `s.metadata()` reading time, `s.excerpt()`, `s.mdx()` compiled output, permalink transform
+  `/blog/{slug}`). Invalid frontmatter fails `velite build`, therefore `pnpm validate` and the
+  production build.
+- **Typed accessor**: `src/content/blog.ts` — `allPosts` (dev/tests only) and `publishedPosts`
+  (**the** single public read: Draft-filtered, newest-first), with `src/content/blog.test.ts`
+  beside it (6 tests: published non-empty, Draft never leaks, ordering, slug/permalink
+  uniqueness + shape, frontmatter contract, derived reading time + compiled MDX).
+- **Seed Posts** in `content/blog/`: `building-this-blog-in-the-open.mdx` (published, carries a
+  code block as the Stage 2 highlighting test) and `designing-the-publish-pipeline.mdx` (Draft).
+  Every later stage tests against real content.
+- **Toolchain wired**: `#velite` path alias (tsconfig + vitest); `.velite/` ignored in
+  git/prettier/eslint/knip; knip entry `velite.config.ts`; scripts `content` (`velite build`) and
+  `build` (`velite build && next build`); `validate` prepends `pnpm content`; CI has a "Build
+  content layer (velite)" step; `next.config.ts` starts velite watch in dev only (`VELITE_STARTED`
+  guard) — production builds run velite explicitly, no race.
+- **ESLint three.js ban landed early** (planned Stage 1-or-2, done at Stage 1): `eslint.config.mjs`
+  scopes `no-restricted-imports` over `src/app/blog/**`, `src/components/blog/**`,
+  `src/content/blog.ts` with patterns `three`, `three/*`, `@react-three/*`.
+- **No routes yet.** No `/blog` pages, no Blog link in `src/components/nav/SiteNav.tsx`, no brand
+  tokens in `@theme` — all Stage 2.
+- **Master is red** on the PR #72 merge (prettier — see §7); the fix is on `feature/blog-stage-1`
+  and merging this branch restores green.
 
 ## 2. Integration map
 
@@ -77,8 +99,9 @@ suite (Stages 2/4/5).
   the carnival's fixed px tokens or its letterpress/ticket utilities; carnival components never
   reference `--brand-*` tokens. No carnival vocabulary in blog copy or identifiers.
 - **No three.js under blog code:** `three` / `@react-three/*` are banned imports for blog routes and
-  components. Enforce with an ESLint `no-restricted-imports` block cloning the `@/content/cv` ban at
-  `eslint.config.mjs` lines ~44–62 (Stage 1 or 2, whenever blog source directories first exist).
+  components. **Enforced** since Stage 1 — the `no-restricted-imports` block in `eslint.config.mjs`
+  already covers `src/app/blog/**` and `src/components/blog/**`; new blog directories are caught
+  automatically, do not re-add.
 - **Single accessor:** everything public (params, index, tags, sitemap, RSS) reads `publishedPosts`.
   Draft exclusion lives nowhere else.
 - **Build-time only:** MDX compilation and Shiki-class highlighting happen at build; no client-side
@@ -122,11 +145,14 @@ first-load JS budget → baseline recorded at Stage 2.
 - **Velite MDX render = compiled-function evaluation** (`new Function` at render, the standard
   compiled-MDX pattern). Harmless today; noted in ADR-0008 for any future CSP hardening — do not add
   a strict `script-src` without accounting for it.
-- **Velite generates an output directory** — teach knip and ESLint about it at Stage 1 or
-  `pnpm validate` fails on phantom unused/unresolved files.
-- **The ESLint boundary shape to clone** is the `@/content/cv` ban at `eslint.config.mjs` ~44–62
-  (files-scoped `no-restricted-imports` with a message pointing at the doc). Use `patterns` for
-  `@react-three/*`.
+- **pnpm 11 `allowBuilds` blocks esbuild** (velite's transitive dep). `pnpm-workspace.yaml` shipped
+  with a literal placeholder line under `allowBuilds` that broke `pnpm exec` entirely until it was
+  set to a real value; now `esbuild: true` with a comment. Any new dependency with a build script
+  needs its own entry there.
+- **`prettier --check .` covers `.html` but lint-staged only formats json/css/md** — the Stage B
+  brand-board HTMLs slipped through unformatted and broke master CI on the PR #72 merge. Boards and
+  `eslint.config.mjs` reformatted on `feature/blog-stage-1`; consider widening the lint-staged glob
+  later so the two can't disagree again.
 - **First-load JS baseline** for blog routes: record from `next build` output at Stage 2 in this
   doc; growth is a finding at every later gate, never silent.
 - **Brand monogram owes a refinement pass** — small-size distinctiveness (favicon/app-icon test) —
@@ -136,11 +162,9 @@ first-load JS budget → baseline recorded at Stage 2.
 
 ## 8. Build order
 
-1. **Stage 1 — content pipeline + typed layer** (next; gate `pnpm validate`): Velite wired;
-   `content/blog/` with two seed posts, one `draft: true`; Zod frontmatter schema per §5; derived
-   reading time + excerpts; typed accessor with `publishedPosts`, Vitest tests beside it; knip/ESLint
-   taught about generated output.
-2. **Stage 2 — routes + reading template**: `/blog`, `/blog/[slug]`; brand-prefixed Utopia tokens
+1. ~~**Stage 1 — content pipeline + typed layer**~~ ✅ done (2026-07-17, `feature/blog-stage-1`,
+   gate `pnpm validate` green, 162 tests) — see §1.
+2. **Stage 2 — routes + reading template** (next): `/blog`, `/blog/[slug]`; brand-prefixed Utopia tokens
    land in `@theme`; Shiki highlighting; prev/next; reading time; SiteNav Blog link; record JS
    baseline. Human gates: reading feel + monogram pass.
 3. **Stage 4 — SEO surfaces**: `generateMetadata`, per-post OG image, `BlogPosting` JSON-LD, sitemap
@@ -153,10 +177,12 @@ Every stage: carnival-context Brief before, Absorb after, journal paragraph appe
 
 ## 9. What just happened
 
-**Stage 0 + Stage B complete** (2026-07-16 / 2026-07-17, `feature/blog-stage-0`, uncommitted at
-time of writing). Discovery interviews locked scope; ADRs 0008–0010 were accepted, then Nick
-corrected course within the hour: the Dark Carnival is a self-contained entity, not the site brand
-(ADR-0011) — which superseded the letterpress reading identity and deleted the riskiest planned
-stage (the live-HUD Utopia migration). Brand discovery then ran as three rendered HTML/Playwright
-concept boards; Nick ruled **Blueprint**. Glossary entries landed; glossary-guard reviewed them
-(one carnival-side advisory parked, §7). Nothing built yet — Stage 1 is a clean start.
+**Stage 1 complete** (2026-07-17, `feature/blog-stage-1`, gate `pnpm validate` fully green — 162
+tests). The content pipeline and typed layer landed exactly as specified: velite + Zod contract,
+two seed Posts (one published with a code block for the Stage 2 highlighting test, one Draft),
+`publishedPosts` as the single public read with tests beside it, and the full toolchain sweep
+(§1). The three.js ESLint ban came in a stage early. The stage was mechanical — the specs absorbed
+all the thinking — and both surprises were toolchain seams, not design: the pnpm 11 `allowBuilds`
+gate and the prettier/lint-staged HTML disagreement that turned master red on the PR #72 merge;
+both fixed on this branch (§7). Before that, Stage 0 + Stage B (PR #72) locked the specs
+(ADRs 0008–0011) and ruled the **Blueprint** brand.

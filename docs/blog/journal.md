@@ -21,3 +21,14 @@ available, the boards were built as real rendered HTML screenshotted through Pla
 constraint turned out better than the intended mockups, because the winning board's CSS is now the
 literal token source rather than a picture to be reverse-engineered. Owed before Stage 2 ships: a
 monogram distinctiveness pass at small sizes.
+
+**2026-07-17 — Stage 1, content pipeline.** The stage was mechanical exactly as designed — the
+specs had absorbed all the thinking, so the build was transcription: velite, the Zod frontmatter
+contract, `publishedPosts` as the single public read, tests beside it, gate green on the first
+full run (162 tests). Both surprises were toolchain seams, not design. First, pnpm 11's
+build-scripts gate nobody had tripped yet: a placeholder line under `allowBuilds` in
+`pnpm-workspace.yaml` blocked esbuild — velite's transitive dep — and broke `pnpm exec` outright
+until set to a real value. Second, the discovery that repo-wide prettier and lint-staged disagree
+about HTML: the Stage B brand boards slipped through unformatted and turned master red on the
+PR #72 merge — found within the hour and fixed in the next PR. One quiet win: the two seed Posts
+mean every later stage tests against real content, not fixtures.

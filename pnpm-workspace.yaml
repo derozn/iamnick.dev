@@ -5,6 +5,7 @@
 allowBuilds:
   sharp: true # next/image optimization
   '@sentry/cli': true # source-map upload during build (when Sentry is configured)
+  esbuild: true # velite (blog content pipeline) loads its config via esbuild
 
 # varlock runtime integration: replace Next's internal env loader with varlock's
 # so .env.schema drives loading + validation + @sensitive redaction + leak

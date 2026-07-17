@@ -11,6 +11,8 @@ export default defineConfig({
       '@test': resolve(__dirname, 'test'),
       // Mirror the tsconfig `@/*` → ./src/* path for app imports.
       '@': resolve(__dirname, 'src'),
+      // Velite-generated blog content layer (run `pnpm content` first).
+      '#velite': resolve(__dirname, '.velite'),
     },
   },
   test: {

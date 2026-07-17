@@ -7,7 +7,14 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default tseslint.config(
   {
-    ignores: ['.next/**', 'node_modules/**', 'public/**', 'coverage/**', 'next-env.d.ts'],
+    ignores: [
+      '.next/**',
+      '.velite/**',
+      'node_modules/**',
+      'public/**',
+      'coverage/**',
+      'next-env.d.ts',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -71,6 +78,25 @@ export default tseslint.config(
     ],
     rules: {
       'no-restricted-imports': 'off',
+    },
+  },
+  {
+    // The Blog is an iamnick-brand surface with no live canvas (ADR-0002,
+    // ADR-0011): three.js must never enter its bundles.
+    files: ['src/app/blog/**', 'src/components/blog/**', 'src/content/blog.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['three', 'three/*', '@react-three/*'],
+              message:
+                'Blog code must stay canvas-free — three.js is banned under blog routes and components (docs/redesign/blog-handoff.md §4).',
+            },
+          ],
+        },
+      ],
     },
   },
   {

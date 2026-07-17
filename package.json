@@ -17,7 +17,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "content": "velite build",
+    "build": "velite build && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . && prettier --check .",
@@ -26,7 +27,7 @@
     "test:ci": "vitest run",
     "test:e2e": "playwright test",
     "knip": "knip",
-    "validate": "pnpm typecheck && pnpm lint && pnpm test:ci && pnpm knip && pnpm build",
+    "validate": "pnpm content && pnpm typecheck && pnpm lint && pnpm test:ci && pnpm knip && pnpm build",
     "prepare": "husky",
     "env:check": "varlock load"
   },
@@ -91,6 +92,7 @@
     "tailwindcss": "^4.3.2",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.63.0",
+    "velite": "^0.4.0",
     "vitest": "^4.1.10"
   }
 }

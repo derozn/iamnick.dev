@@ -1,0 +1,26 @@
+---
+title: Building this blog in the open
+description: First entry in the build journal — how this blog is being specced and built with agentic workflows, decisions recorded as they happen.
+date: 2026-07-17
+tags: ['agentic-workflows', 'meta']
+slug: building-this-blog-in-the-open
+---
+
+This blog documents its own construction. Before any of these pages existed there was a
+spec set — a discovery doc with a numbered decision log, a PRD, four architecture
+decision records and a designed delivery workflow — written with an AI pair and ruled on
+by me.
+
+The content pipeline behind this page is deliberately boring: MDX files in the repo,
+compiled at build time, with schema-validated frontmatter. If a post's metadata is
+wrong, the build fails:
+
+```ts
+description: s.string().min(10).max(160),
+date: s.isodate(),
+draft: s.boolean().default(false),
+```
+
+The interesting part is the process around it — sub-agents that keep context between
+sessions, review passes that catch what I miss, and a publish pipeline where the AI
+edits but never ghost-writes. Those are the stories this journal is for.

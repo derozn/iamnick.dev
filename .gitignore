@@ -30,6 +30,9 @@ pnpm-debug.log*
 # TS
 *.tsbuildinfo
 
+# velite (blog content pipeline) generated output
+.velite/
+
 # Claude Code agent worktrees / local
 .claude/worktrees/
 
