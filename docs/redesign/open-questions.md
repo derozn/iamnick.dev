@@ -24,9 +24,12 @@
 
 ## Blog
 
-- Content location: `content/blog/` vs `src/content/blog/` (pick one, stay consistent).
-- MDX tooling choice (e.g. `@next/mdx` vs `next-mdx-remote` vs a compile step) — implementation detail for Phase 2.
-- Categories/tags taxonomy, and whether tag pages exist at launch.
+- ~~Content location, MDX tooling choice, categories/tags taxonomy + tag pages at
+  launch~~ ✅ **Resolved** (discovery session 2026-07-16) — `content/blog/`, typed
+  content layer per ADR-0008 (proposed), tag pages in v1. Decision log in
+  `docs/blog/discovery.md`; scope in `docs/blog/prd.md`; delivery process in
+  `docs/blog/agentic-workflow.md` + ADR-0010.
+- Tag vocabulary itself — deferred; emerges from the first posts (discovery.md decision log #13).
 
 ## Cross-cutting
 
