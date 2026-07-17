@@ -1,6 +1,6 @@
 # iamnick.dev
 
-Nick de Rozarieux's portfolio site — a single, scroll-driven 3D experience. This glossary fixes the shared language for the v2 "Dark Carnival" redesign so any agent or session uses the same words for the same things.
+Nick de Rozarieux's portfolio site. This glossary fixes the shared language for the whole site — the v2 "Dark Carnival" experience and the iamnick-brand surfaces around it — so any agent or session uses the same words for the same things.
 
 ## Language
 
@@ -87,3 +87,23 @@ _Avoid_: booth, admin panel/dashboard (in copy), back office
 **Verdict**:
 The carny's single ruling on a queued tile: approve (publishes to the wall) or reject (final — a rejected tile is never restored; an approved tile can later be rejected to take it down). Code carries it as `Verdict`; the moderation route's body field is `verdict`.
 _Avoid_: decision, action (in copy), ban/delete
+
+**iamnick brand**:
+The identity of every non-carnival surface (ADR-0011): the blog and future content pages now, `StaticCv` and the carny's counter after their rebrand sweep. Source of truth is `docs/brand/brand.md`; tokens carry the `--brand-` prefix and never mix with carnival tokens. The Dark Carnival is a self-contained entity inside the site, not its brand.
+_Avoid_: site theme, blog theme, Blueprint (as the brand's name — Blueprint names the ruled direction/board)
+
+**Blog**:
+The site's long-form writing surface — `/blog` and `/blog/[slug]`, statically generated from MDX, the primary indexable-text/SEO surface. An **iamnick-brand** surface, not a carnival one (ADR-0011): no carnival styling or vocabulary, no live canvas, three.js never in its bundles. Flagship content is the AI-build-journal.
+_Avoid_: news, writings, articles (as the section name)
+
+**Post**:
+A single blog entry — an MDX file in `content/blog/` with schema-validated frontmatter (ADR-0008), rendered at `/blog/[slug]` with per-post SEO. Distinct from a doodle-wall Tile.
+_Avoid_: article, story
+
+**Tag**:
+A Post's topic label from frontmatter, browsable at `/blog/tags/[tag]`. The vocabulary is kept deliberately small; the publish pipeline warns on new tags.
+_Avoid_: category, label, topic (as the mechanism name)
+
+**Draft**:
+A Post with `draft: true` — previewable in development, excluded from production routes, index, tag pages, sitemap and RSS through the single `publishedPosts` accessor. Publishing a Draft is flipping the flag and merging the PR.
+_Avoid_: unpublished post, pending post
