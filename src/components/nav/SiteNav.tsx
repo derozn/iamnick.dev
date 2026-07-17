@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'motion/react';
 
 import { useSceneStore } from '@/store/scene';
@@ -24,10 +25,15 @@ const ITEMS: Attraction[] = ATTRACTIONS.filter((a) => a.id !== 'intro');
 
 export function SiteNav() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
   const mode = useSceneStore((s) => s.mode);
   const started = useSceneStore((s) => s.started);
   const open = useSceneStore((s) => s.open);
   const focus = useSceneStore((s) => s.focus);
+
+  // The Blog is an iamnick-brand surface (ADR-0011): the carnival chrome
+  // stands down there — the blog layout provides its own header.
+  const onBrandSurface = pathname?.startsWith('/blog');
 
   // Before entry the intro owns the whole screen (same rule as MuteButton); while
   // a content panel / game is up it owns the top-right (its own ✕). Hide the
@@ -37,6 +43,8 @@ export function SiteNav() {
   useKeyDown((e) => {
     if (e.key === 'Escape') setMenuOpen(false);
   }, menuOpen);
+
+  if (onBrandSurface) return null;
 
   const select = (a: Attraction) => {
     setMenuOpen(false);
@@ -134,6 +142,20 @@ export function SiteNav() {
                     </button>
                   </li>
                 ))}
+                {/* The one real route jump: the blog lives outside the carnival. */}
+                <li className="mt-2 border-t border-ink/20 pt-3">
+                  <a
+                    href="/blog"
+                    className="group flex w-full items-baseline gap-3 rounded-[3px] py-2 text-left"
+                  >
+                    <span className="font-fell-sc text-[12px] text-brass-text">
+                      {String(ITEMS.length + 1).padStart(2, '0')}
+                    </span>
+                    <span className="font-rye text-[24px] leading-tight text-ink transition-colors group-hover:text-oxblood">
+                      Blog
+                    </span>
+                  </a>
+                </li>
               </ul>
             </motion.nav>
           </>

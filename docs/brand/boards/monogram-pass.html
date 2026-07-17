@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>iamnick — monogram small-size pass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        width: 1600px; height: 900px; background: #101318;
+        font-family: 'IBM Plex Mono', monospace; color: #9aa3ad;
+        padding: 48px 56px; display: flex; flex-direction: column; gap: 26px;
+      }
+      header { display: flex; justify-content: space-between; font-size: 12px;
+        letter-spacing: 0.14em; text-transform: uppercase; }
+      header .acc { color: #7fa8d9; }
+      .row { flex: 1; display: grid; grid-template-columns: 240px 1fr 1fr; gap: 22px; }
+      .cell { background: #1a1e24; border: 1px solid #262c34; border-radius: 10px;
+        padding: 26px; display: flex; flex-direction: column; gap: 14px; }
+      .cell.light { background: #edf0f3; border-color: #d6dade; color: #5c6670; }
+      .name { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; }
+      .name b { color: #edf0f3; font-weight: 500; }
+      .light .name b { color: #14171c; }
+      .sizes { flex: 1; display: flex; align-items: center; gap: 34px; }
+      .s { display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 10px; }
+      .desc { font-size: 12px; line-height: 1.6; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span>iamnick — monogram <span class="acc">small-size pass</span> (brand.md §Open refinements 1)</span>
+      <span>favicon test · 16 / 32 / 48 / 96</span>
+    </header>
+
+    <!-- V1: current mark, stems thickened for small sizes -->
+    <div class="row">
+      <div class="cell">
+        <span class="name"><b>V1 — as ruled,</b> heavier stems</span>
+        <p class="desc">The Blueprint board mark with stroke weight raised 7→9 so the arch survives 16px. Construction dash kept.</p>
+      </div>
+      <div class="cell">
+        <div class="sizes">
+          <div class="s"><svg width="96" height="96" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M30 72 V40" stroke="#edf0f3" stroke-width="9" stroke-linecap="round"/><path d="M30 46 q0 -20 18 -20 q18 0 18 20 v26" stroke="#edf0f3" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M66 26 v46" stroke="#7fa8d9" stroke-width="2.5" stroke-dasharray="4 4"/></svg><span>96</span></div>
+          <div class="s"><svg width="48" height="48" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M30 72 V40" stroke="#edf0f3" stroke-width="9" stroke-linecap="round"/><path d="M30 46 q0 -20 18 -20 q18 0 18 20 v26" stroke="#edf0f3" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M66 26 v46" stroke="#7fa8d9" stroke-width="2.5" stroke-dasharray="4 4"/></svg><span>48</span></div>
+          <div class="s"><svg width="32" height="32" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M30 72 V40" stroke="#edf0f3" stroke-width="9" stroke-linecap="round"/><path d="M30 46 q0 -20 18 -20 q18 0 18 20 v26" stroke="#edf0f3" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M66 26 v46" stroke="#7fa8d9" stroke-width="2.5" stroke-dasharray="4 4"/></svg><span>32</span></div>
+          <div class="s"><svg width="16" height="16" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M30 72 V40" stroke="#edf0f3" stroke-width="9" stroke-linecap="round"/><path d="M30 46 q0 -20 18 -20 q18 0 18 20 v26" stroke="#edf0f3" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M66 26 v46" stroke="#7fa8d9" stroke-width="2.5" stroke-dasharray="4 4"/></svg><span>16</span></div>
+        </div>
+      </div>
+      <div class="cell light">
+        <div class="sizes">
+          <div class="s"><svg width="96" height="96" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#edf0f3" stroke="#d6dade"/><path d="M30 72 V40" stroke="#14171c" stroke-width="9" stroke-linecap="round"/><path d="M30 46 q0 -20 18 -20 q18 0 18 20 v26" stroke="#14171c" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M66 26 v46" stroke="#7fa8d9" stroke-width="2.5" stroke-dasharray="4 4"/></svg><span>96</span></div>
+          <div class="s"><svg width="32" height="32" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#edf0f3" stroke="#d6dade"/><path d="M30 72 V40" stroke="#14171c" stroke-width="9" stroke-linecap="round"/><path d="M30 46 q0 -20 18 -20 q18 0 18 20 v26" stroke="#14171c" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M66 26 v46" stroke="#7fa8d9" stroke-width="2.5" stroke-dasharray="4 4"/></svg><span>32</span></div>
+          <div class="s"><svg width="16" height="16" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#edf0f3" stroke="#d6dade"/><path d="M30 72 V40" stroke="#14171c" stroke-width="9" stroke-linecap="round"/><path d="M30 46 q0 -20 18 -20 q18 0 18 20 v26" stroke="#14171c" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M66 26 v46" stroke="#7fa8d9" stroke-width="2.5" stroke-dasharray="4 4"/></svg><span>16</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V2: drop the dash at small sizes, steel construction points instead -->
+    <div class="row">
+      <div class="cell">
+        <span class="name"><b>V2 — points, no dash</b></span>
+        <p class="desc">Construction dash deleted (it dies below 32px); two steel baseline points carry the Blueprint idea. Cleanest at 16.</p>
+      </div>
+      <div class="cell">
+        <div class="sizes">
+          <div class="s"><svg width="96" height="96" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M32 72 V40" stroke="#edf0f3" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#edf0f3" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="32" cy="72" r="5" fill="#7fa8d9"/><circle cx="64" cy="72" r="5" fill="#7fa8d9"/></svg><span>96</span></div>
+          <div class="s"><svg width="48" height="48" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M32 72 V40" stroke="#edf0f3" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#edf0f3" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="32" cy="72" r="5" fill="#7fa8d9"/><circle cx="64" cy="72" r="5" fill="#7fa8d9"/></svg><span>48</span></div>
+          <div class="s"><svg width="32" height="32" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M32 72 V40" stroke="#edf0f3" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#edf0f3" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="32" cy="72" r="5" fill="#7fa8d9"/><circle cx="64" cy="72" r="5" fill="#7fa8d9"/></svg><span>32</span></div>
+          <div class="s"><svg width="16" height="16" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M32 72 V40" stroke="#edf0f3" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#edf0f3" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="32" cy="72" r="5" fill="#7fa8d9"/><circle cx="64" cy="72" r="5" fill="#7fa8d9"/></svg><span>16</span></div>
+        </div>
+      </div>
+      <div class="cell light">
+        <div class="sizes">
+          <div class="s"><svg width="96" height="96" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#edf0f3" stroke="#d6dade"/><path d="M32 72 V40" stroke="#14171c" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#14171c" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="32" cy="72" r="5" fill="#7fa8d9"/><circle cx="64" cy="72" r="5" fill="#7fa8d9"/></svg><span>96</span></div>
+          <div class="s"><svg width="32" height="32" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#edf0f3" stroke="#d6dade"/><path d="M32 72 V40" stroke="#14171c" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#14171c" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="32" cy="72" r="5" fill="#7fa8d9"/><circle cx="64" cy="72" r="5" fill="#7fa8d9"/></svg><span>32</span></div>
+          <div class="s"><svg width="16" height="16" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#edf0f3" stroke="#d6dade"/><path d="M32 72 V40" stroke="#14171c" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#14171c" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="32" cy="72" r="5" fill="#7fa8d9"/><circle cx="64" cy="72" r="5" fill="#7fa8d9"/></svg><span>16</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- V3: negative space — steel gap slices the arch -->
+    <div class="row">
+      <div class="cell">
+        <span class="name"><b>V3 — measured cut</b></span>
+        <p class="desc">One steel tick interrupts the arch at its apex — a dimension mark cut into the letter itself. Boldest, most ownable; test whether the cut reads at 16.</p>
+      </div>
+      <div class="cell">
+        <div class="sizes">
+          <div class="s"><svg width="96" height="96" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M32 72 V40" stroke="#edf0f3" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#edf0f3" stroke-width="10" stroke-linecap="round" fill="none"/><line x1="48" y1="18" x2="48" y2="34" stroke="#1a1e24" stroke-width="7"/><line x1="48" y1="20" x2="48" y2="32" stroke="#7fa8d9" stroke-width="3"/></svg><span>96</span></div>
+          <div class="s"><svg width="48" height="48" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M32 72 V40" stroke="#edf0f3" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#edf0f3" stroke-width="10" stroke-linecap="round" fill="none"/><line x1="48" y1="18" x2="48" y2="34" stroke="#1a1e24" stroke-width="7"/><line x1="48" y1="20" x2="48" y2="32" stroke="#7fa8d9" stroke-width="3"/></svg><span>48</span></div>
+          <div class="s"><svg width="32" height="32" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M32 72 V40" stroke="#edf0f3" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#edf0f3" stroke-width="10" stroke-linecap="round" fill="none"/><line x1="48" y1="18" x2="48" y2="34" stroke="#1a1e24" stroke-width="7"/><line x1="48" y1="20" x2="48" y2="32" stroke="#7fa8d9" stroke-width="3"/></svg><span>32</span></div>
+          <div class="s"><svg width="16" height="16" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#1a1e24" stroke="#262c34"/><path d="M32 72 V40" stroke="#edf0f3" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#edf0f3" stroke-width="10" stroke-linecap="round" fill="none"/><line x1="48" y1="18" x2="48" y2="34" stroke="#1a1e24" stroke-width="7"/><line x1="48" y1="20" x2="48" y2="32" stroke="#7fa8d9" stroke-width="3"/></svg><span>16</span></div>
+        </div>
+      </div>
+      <div class="cell light">
+        <div class="sizes">
+          <div class="s"><svg width="96" height="96" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#edf0f3" stroke="#d6dade"/><path d="M32 72 V40" stroke="#14171c" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#14171c" stroke-width="10" stroke-linecap="round" fill="none"/><line x1="48" y1="18" x2="48" y2="34" stroke="#edf0f3" stroke-width="7"/><line x1="48" y1="20" x2="48" y2="32" stroke="#7fa8d9" stroke-width="3"/></svg><span>96</span></div>
+          <div class="s"><svg width="32" height="32" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#edf0f3" stroke="#d6dade"/><path d="M32 72 V40" stroke="#14171c" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#14171c" stroke-width="10" stroke-linecap="round" fill="none"/><line x1="48" y1="18" x2="48" y2="34" stroke="#edf0f3" stroke-width="7"/><line x1="48" y1="20" x2="48" y2="32" stroke="#7fa8d9" stroke-width="3"/></svg><span>32</span></div>
+          <div class="s"><svg width="16" height="16" viewBox="0 0 96 96"><rect x="2" y="2" width="92" height="92" rx="12" fill="#edf0f3" stroke="#d6dade"/><path d="M32 72 V40" stroke="#14171c" stroke-width="10" stroke-linecap="round"/><path d="M32 47 q0 -21 16 -21 q16 0 16 21 v25" stroke="#14171c" stroke-width="10" stroke-linecap="round" fill="none"/><line x1="48" y1="18" x2="48" y2="34" stroke="#edf0f3" stroke-width="7"/><line x1="48" y1="20" x2="48" y2="32" stroke="#7fa8d9" stroke-width="3"/></svg><span>16</span></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
