@@ -32,3 +32,18 @@ until set to a real value. Second, the discovery that repo-wide prettier and lin
 about HTML: the Stage B brand boards slipped through unformatted and turned master red on the
 PR #72 merge — found within the hour and fixed in the next PR. One quiet win: the two seed Posts
 mean every later stage tests against real content, not fixtures.
+
+**2026-07-17 — Stage 2, routes + reading template.** The brand went from board to shipped tokens
+in a single stage because the board _was_ CSS — the Blueprint token block transferred into
+`@theme` almost verbatim, and the Utopia scale that had been deferred "until the reading template
+exists" was settled the moment the template did. Three surprises, all instructive. The
+react-hooks linter objected to compiled-MDX's core pattern — a component constructed at render
+time — and the right fix was a documented exception with its justification kept beside the
+disable, not a workaround that fights the mechanism. knip caught a dependency installed out of
+habit: the standalone `shiki` package, when `@shikijs/rehype` already carries its own. And Next
+16 quietly dropped per-route size output, so the first-load JS baseline had to be measured by
+hand from the prerendered HTML — which is exactly how we learned that blog pages inherit the
+carnival's ~1 MB root-layout client bundle, paying for motion and zustand a page with no canvas
+never uses. A deviation worth recording: a third seed Post, because prev/next cannot be tested
+with one published Post. The stage ends at the human gates — Nick reads the feel on the PR
+preview, and rules the monogram pass.

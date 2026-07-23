@@ -1,6 +1,5 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": ["scripts/*.mjs", "velite.config.ts"],
-  "ignore": [".velite/**"],
   "ignoreExportsUsedInFile": true
 }

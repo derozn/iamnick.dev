@@ -116,6 +116,50 @@
   --aspect-photo: 4 / 5;
   --aspect-large-portrait: 3 / 5;
   --aspect-tv: 16 / 9;
+
+  /* ── iamnick brand (Blueprint) ───────────────────────────
+     Tokens for the non-carnival surfaces (ADR-0009/0011); source of truth
+     docs/brand/brand.md. brand-* and carnival tokens never mix: carnival
+     components stay off brand-*, brand surfaces stay off the px scales above.
+     Type/space are Utopia fluid scales, 320→1240px viewport, body 18→21px,
+     ratio 1.2→1.25 — parameters tuned on the blog reading template. */
+  --color-brand-slate: #14171c;
+  --color-brand-panel: #1a1e24;
+  --color-brand-white: #edf0f3;
+  --color-brand-fog: #9aa3ad;
+  /* The core red — shared with the carnival wordmark; the "redline" markup
+     colour on blueprint surfaces. Too dark for small text on slate (~2.9:1),
+     so text accents use the brightened variant below. */
+  --color-brand-red: #c50201;
+  --color-brand-red-bright: #f0463c;
+  /* Construction blue — grid and drawing furniture only, never text emphasis. */
+  --color-brand-steel: #7fa8d9;
+  --color-brand-hairline: #262c34;
+
+  --font-brand-sans: var(--font-brand-sans-src), ui-sans-serif, system-ui, sans-serif;
+  --font-brand-mono: var(--font-brand-mono-src), ui-monospace, 'SFMono-Regular', monospace;
+
+  --text-brand-xs: clamp(0.7813rem, 0.7608rem + 0.1022vw, 0.84rem);
+  --text-brand-sm: clamp(0.9375rem, 0.8984rem + 0.1957vw, 1.05rem);
+  --text-brand-base: clamp(1.125rem, 1.0598rem + 0.3261vw, 1.3125rem);
+  --text-brand-base--line-height: 1.7;
+  --text-brand-lg: clamp(1.35rem, 1.2489rem + 0.5054vw, 1.6406rem);
+  --text-brand-lg--line-height: 1.4;
+  --text-brand-xl: clamp(1.62rem, 1.4702rem + 0.7492vw, 2.0508rem);
+  --text-brand-xl--line-height: 1.3;
+  --text-brand-2xl: clamp(1.944rem, 1.7285rem + 1.0774vw, 2.5635rem);
+  --text-brand-2xl--line-height: 1.2;
+  --text-brand-3xl: clamp(2.3328rem, 2.0297rem + 1.5157vw, 3.2043rem);
+  --text-brand-3xl--line-height: 1.12;
+
+  --spacing-brand-3xs: clamp(0.2813rem, 0.2649rem + 0.0815vw, 0.3281rem);
+  --spacing-brand-2xs: clamp(0.5625rem, 0.5299rem + 0.163vw, 0.6563rem);
+  --spacing-brand-xs: clamp(0.8438rem, 0.7948rem + 0.2446vw, 0.9844rem);
+  --spacing-brand-s: clamp(1.125rem, 1.0598rem + 0.3261vw, 1.3125rem);
+  --spacing-brand-m: clamp(1.6875rem, 1.5897rem + 0.4891vw, 1.9688rem);
+  --spacing-brand-l: clamp(2.25rem, 2.1196rem + 0.6522vw, 2.625rem);
+  --spacing-brand-xl: clamp(3.375rem, 3.1793rem + 0.9783vw, 3.9375rem);
+  --spacing-brand-2xl: clamp(4.5rem, 4.2391rem + 1.3043vw, 5.25rem);
 }
 
 /* ── Base styles ──────────────────────────────────────── */
@@ -602,4 +646,107 @@
   border: 1px solid color-mix(in srgb, var(--color-ink-soft) 45%, transparent);
   color: var(--color-brass-text);
   background: color-mix(in srgb, var(--color-paper) 30%, transparent);
+}
+
+/* ── iamnick brand (Blueprint) surface + prose ─────────────
+   Brand-only classes (docs/brand/brand.md). Carnival surfaces never use these;
+   brand surfaces never use the letterpress/hud/paper utilities above. */
+
+/* Page shell for brand routes (blog). Faint blueprint grid behind everything. */
+.brand-surface {
+  background-color: var(--color-brand-slate);
+  background-image:
+    linear-gradient(rgb(127 168 217 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(127 168 217 / 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--color-brand-white);
+  font-family: var(--font-brand-sans);
+}
+
+/* The redline underline — at most one key phrase per view (brand.md). */
+@utility brand-underline {
+  background: linear-gradient(transparent 68%, rgb(197 2 1 / 0.55) 68%);
+  color: var(--color-brand-white);
+}
+
+/* Long-form article body (compiled MDX). Measure and rhythm come from the
+   Utopia tokens; code styling assumes build-time Shiki markup. */
+.brand-prose {
+  max-width: 68ch;
+  font-size: var(--text-brand-base);
+  line-height: var(--text-brand-base--line-height);
+  color: color-mix(in srgb, var(--color-brand-white) 82%, var(--color-brand-fog));
+}
+.brand-prose :is(p, ul, ol, pre, blockquote) {
+  margin-block: var(--spacing-brand-s);
+}
+.brand-prose :is(h2, h3) {
+  color: var(--color-brand-white);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-block: var(--spacing-brand-l) var(--spacing-brand-xs);
+}
+.brand-prose h2 {
+  font-size: var(--text-brand-xl);
+  line-height: var(--text-brand-xl--line-height);
+}
+.brand-prose h3 {
+  font-size: var(--text-brand-lg);
+  line-height: var(--text-brand-lg--line-height);
+}
+.brand-prose a {
+  color: var(--color-brand-red-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--color-brand-red-bright) 45%, transparent);
+}
+.brand-prose a:hover {
+  text-decoration-color: var(--color-brand-red-bright);
+}
+.brand-prose :is(ul, ol) {
+  padding-inline-start: 1.4em;
+}
+.brand-prose ul {
+  list-style: square;
+}
+.brand-prose li {
+  margin-block: var(--spacing-brand-3xs);
+}
+.brand-prose li::marker {
+  color: var(--color-brand-red-bright);
+}
+.brand-prose blockquote {
+  border-inline-start: 2px solid var(--color-brand-red);
+  padding-inline-start: var(--spacing-brand-s);
+  color: var(--color-brand-fog);
+}
+.brand-prose hr {
+  border: 0;
+  border-top: 1px solid var(--color-brand-hairline);
+  margin-block: var(--spacing-brand-l);
+}
+.brand-prose mark {
+  @apply brand-underline;
+}
+.brand-prose code {
+  font-family: var(--font-brand-mono);
+  font-size: 0.88em;
+}
+.brand-prose :not(pre) > code {
+  background: var(--color-brand-panel);
+  border: 1px solid var(--color-brand-hairline);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+.brand-prose pre {
+  border: 1px solid var(--color-brand-hairline);
+  border-radius: 8px;
+  padding: var(--spacing-brand-s);
+  overflow-x: auto;
+  font-size: var(--text-brand-sm);
+  line-height: 1.6;
+}
+/* Shiki inlines its theme background; pin code panels to the brand surface. */
+.brand-prose pre.shiki {
+  background-color: var(--color-brand-panel) !important;
 }

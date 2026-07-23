@@ -1,18 +1,19 @@
 ---
 title: Designing the publish pipeline
-description: Draft notes on the /publish-post editorial pipeline — the passes, the human gates, and the mechanisms that were rejected as over-engineering.
+description: 'Draft notes on /publish-post: the editing passes, the human gates, and the clever ideas I said no to.'
 date: 2026-07-16
 draft: true
 tags: ['agentic-workflows']
 slug: designing-the-publish-pipeline
 ---
 
-Draft notes, to be written up properly once the pipeline has shipped a real post.
+Draft notes. I'll write this up properly once the pipeline has shipped a real post.
 
-The shape so far: a structural pass fails fast on metadata, a read-only reviewer
-fact-checks every claim against the repo, a voice pass strips the AI tells, and nothing
-publishes until I have read the edited draft and merged the PR myself.
+The shape so far: a structural pass fails fast on bad metadata, a read-only reviewer
+fact-checks every claim against the repo, a voice pass strips out the AI tells, and
+nothing publishes until I've read the edited draft and merged the PR myself.
 
-The rejected alternatives are the more interesting half — an orchestrating editor agent
-(cannot pause for a human mid-flow), scheduled publishing loops (cadence is
-human-paced), and automated journals (judgment does not automate).
+The rejected ideas are the more interesting half. An editor agent that runs the whole
+pipeline can't stop to ask me anything, so no. Scheduled publishing assumes my writing
+pace needs a cron job. It doesn't. And automated session journals miss the point that
+judgment is the useful bit. That doesn't automate.
