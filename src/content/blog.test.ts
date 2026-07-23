@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { allPosts, publishedPosts } from './blog';
+import { allPosts, postsForTag, publishedPosts, publishedTags, routablePosts } from './blog';
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}T/;
 
@@ -44,6 +44,53 @@ describe('content/blog', () => {
     for (const post of allPosts) {
       expect(post.metadata.readingTime, `${post.slug} readingTime`).toBeGreaterThan(0);
       expect(post.code.length, `${post.slug} compiled MDX`).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('content/blog tags', () => {
+  it('lists only Tags carried by a published Post, unique and alphabetical', () => {
+    const publishedTagSet = new Set(publishedPosts.flatMap((post) => post.tags));
+    expect(new Set(publishedTags).size).toBe(publishedTags.length);
+    expect([...publishedTags].sort((a, b) => a.localeCompare(b))).toEqual([...publishedTags]);
+    for (const tag of publishedTags) expect(publishedTagSet.has(tag)).toBe(true);
+  });
+
+  it('never surfaces a Tag that only a Draft carries', () => {
+    const publishedTagSet = new Set(publishedPosts.flatMap((post) => post.tags));
+    const draftOnly = new Set(allPosts.filter((post) => post.draft).flatMap((post) => post.tags));
+    for (const tag of draftOnly) {
+      if (!publishedTagSet.has(tag)) expect(publishedTags).not.toContain(tag);
+    }
+  });
+
+  it('postsForTag returns published Posts carrying the Tag, and nothing for an unknown Tag', () => {
+    for (const tag of publishedTags) {
+      const forTag = postsForTag(tag);
+      expect(forTag.length, tag).toBeGreaterThan(0);
+      expect(
+        forTag.every((post) => !post.draft && post.tags.includes(tag)),
+        tag,
+      ).toBe(true);
+    }
+    expect(postsForTag('definitely-not-a-tag')).toHaveLength(0);
+  });
+});
+
+describe('content/blog Draft preview (routablePosts)', () => {
+  it('always routes every published Post', () => {
+    for (const post of publishedPosts) {
+      expect(routablePosts.map((p) => p.slug)).toContain(post.slug);
+    }
+  });
+
+  it('routes Drafts outside production while publishedPosts still hides them', () => {
+    // vitest runs with NODE_ENV=test, so the dev-preview branch is active. This
+    // pins the contract: a Draft is reachable at its URL locally, yet never
+    // appears in publishedPosts (the read behind index, tags, sitemap and feeds).
+    for (const draft of allPosts.filter((post) => post.draft)) {
+      expect(routablePosts.map((p) => p.slug)).toContain(draft.slug);
+      expect(publishedPosts.map((p) => p.slug)).not.toContain(draft.slug);
     }
   });
 });

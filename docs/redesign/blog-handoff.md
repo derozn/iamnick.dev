@@ -1,16 +1,17 @@
 # Blog — Build Handoff
 
-> **Mission for the next session:** build **Stage 5 — Tag pages + Draft polish**. Tag routes
-> (`/blog/tags/[tag]`) over `publishedPosts`, the draft-preview mechanism (deferred from Stage 2),
-> then the sitemap tag URLs that Stage 4 held back until tag pages existed. Docs-scribe close-out:
-> this doc gains a shipped-state summary in the `ball-toss-game-built.md` pattern.
+> **The blog build is COMPLETE.** All stages have shipped (0, B, 1, 2, 4, 5; Stage 3 was deleted
+> under ADR-0011). For the at-a-glance shipped state — routes, content pipeline, SEO surfaces, the
+> Draft/Tag model and the single-read contract — read **`docs/blog/blog-built.md` first**; it is the
+> as-built summary. This handoff keeps the full build history and gotchas behind it.
 >
-> Stage 4 (SEO surfaces) landed and merged. Stage 2 merged as PR #74, so its two human gates are
-> moot.
+> **What remains is not a build stage.** The authoring pipeline (`/publish-post` skill +
+> `post-reviewer` agent, ADR-0010) is a separate workstream: it is how Posts get written and
+> reviewed, not how the blog surface gets built. See §9.
 >
 > Specs are done and live in `docs/blog/`; this doc points at them and adds only build-facing
-> operational detail. Read `CONTEXT.md` first (Blog/Post/Tag/Draft entries). Each stage gets its
-> own branch and a PR to master. The site is live, so every slice must leave production shippable.
+> operational detail. Read `CONTEXT.md` first (Blog/Post/Tag/Draft entries). Each stage got its
+> own branch and a PR to master. The site is live, so every slice left production shippable.
 
 ---
 
@@ -19,11 +20,12 @@
 1. Read the spec set: `docs/blog/discovery.md` (decision log, rows 1–19), `docs/blog/prd.md` (what
    launch must include), `docs/blog/agentic-workflow.md` (how each stage runs and gates). ADRs
    0008–0011 are all **accepted** and binding.
-2. Stage order: **0 ✅ → B ✅ → 1 ✅ → 2 ✅ → 4 ✅ → 5** (Stage 3 deleted, ADR-0011; numbering preserved).
-3. Every stage is bracketed by carnival-context **Brief** before and **Absorb** after; Absorb also
+2. Stage order: **0 ✅ → B ✅ → 1 ✅ → 2 ✅ → 4 ✅ → 5 ✅** — all shipped (Stage 3 deleted,
+   ADR-0011; numbering preserved).
+3. Every stage was bracketed by carnival-context **Brief** before and **Absorb** after; Absorb also
    appends a dated paragraph to `docs/blog/journal.md`.
-4. Stage 5 next (see §8). Do not duplicate spec content into code comments or this doc; the specs
-   are the source.
+4. Build complete (see §8, §9). What is left is the authoring pipeline, a separate workstream. Do
+   not duplicate spec content into code comments or this doc; the specs are the source.
 
 ---
 
@@ -46,17 +48,24 @@
   `s.metadata()` reading time, `s.excerpt()`, `s.mdx()` compiled output, permalink transform
   `/blog/{slug}`). Invalid frontmatter fails `velite build`, therefore `pnpm validate` and the
   production build.
-- **Typed accessor**: `src/content/blog.ts` — `allPosts` (dev/tests only) and `publishedPosts`
-  (**the** single public read: Draft-filtered, newest-first), with `src/content/blog.test.ts`
-  beside it (6 tests: published non-empty, Draft never leaks, ordering, slug/permalink
-  uniqueness + shape, frontmatter contract, derived reading time + compiled MDX).
-- **Seed Posts** in `content/blog/`: after the Stage 2 merge only **one** is published,
-  `building-this-blog-in-the-open.mdx` (carries a code block as the highlighting test).
-  `designing-the-publish-pipeline.mdx` and `speccing-before-scaffolding.mdx` are both Drafts
-  (`speccing…` was flipped to Draft in the Stage 2 merge, commit 28ec0e7). Consequence for the
-  suite: `blog.spec.ts` prev/next now **skips** because it needs two published Posts, and the Stage
-  4 SEO tests pin `building-this-blog-in-the-open` as the published fixture with the other two as
-  the Draft-never-leaks fixtures. Restoring a second published Post un-skips prev/next; see §7.
+- **Typed accessor**: `src/content/blog.ts` — `allPosts` (dev/tests only), `publishedPosts`
+  (**the** single public read: Draft-filtered, newest-first), and since Stage 5 three more reads that
+  all derive from `publishedPosts`: `publishedTags` (unique, alphabetical, Tags on published Posts
+  only), `postsForTag(tag)` (published Posts carrying a Tag, newest-first), and `routablePosts` (the
+  Post route's param source: `publishedPosts` in production, `publishedPosts` + Drafts in `next dev`
+  via a `NODE_ENV !== 'production'` gate). `src/content/blog.test.ts` beside it now runs the tag and
+  Draft-preview cases too (a Draft-only Tag never surfaces; `routablePosts` previews Drafts outside
+  production while `publishedPosts` hides them).
+- **Seed Posts** in `content/blog/`: **one published**,
+  `building-this-blog-in-the-open.mdx` (Tags `agentic-workflows` + `meta`; carries a code block as the
+  highlighting test). Two Drafts: `designing-the-publish-pipeline.mdx` (Tag `agentic-workflows`) and
+  `speccing-before-scaffolding.mdx` (Tags `agentic-workflows` + `process`). **Published Tags** are
+  therefore `agentic-workflows` and `meta`; `process` is a Draft-only Tag and gets no page or sitemap
+  entry. Consequence for the suite: `blog.spec.ts` prev/next **skips** (needs two published Posts),
+  the SEO tests pin `building-this-blog-in-the-open` as the published fixture with the two Drafts as
+  the never-leaks fixtures, and the tag tests use `agentic-workflows`/`meta` as the published Tags and
+  `process` as the Draft-only Tag that must 404. Restoring a second published Post un-skips prev/next;
+  see §7.
 - **Toolchain wired**: `#velite` path alias (tsconfig + vitest); `.velite/` ignored in
   git/prettier/eslint/knip; knip entry `velite.config.ts`; scripts `content` (`velite build`) and
   `build` (`velite build && next build`); `validate` prepends `pnpm content`; CI has a "Build
@@ -98,8 +107,24 @@
   (`dynamic = 'force-static'`, published only, XML-escaped, `application/rss+xml`, no new
   dependency). Gates green: `pnpm content` + `pnpm typecheck` + `pnpm lint` + `pnpm test:ci` (162
   unit) + `pnpm knip` + `pnpm build`, plus the new `@ci` spec `e2e/blog-seo.spec.ts` 6/6.
-- **Branch state**: Stage 2 merged to master as **PR #74**; Stage 1 was PR #73, Stage 0 PR #72.
-  Master is green. Stage 4 sits on `feature/blog-stage-4`.
+- **Tag pages + Draft preview live** (Stage 5, 2026-07-23, `feature/blog-stage-5`, commit 52f8411):
+  `src/app/blog/tags/[tag]/page.tsx` — brand-styled like the index (kicker + `#tag` with the
+  dimension underline, fig-less Post list), SSG via `generateStaticParams` over `publishedTags` with
+  `dynamicParams = false` so an unknown or Draft-only Tag 404s, and `generateMetadata` for a canonical
+  - OpenGraph per Tag. The Post meta row now links each Tag to its page; the index leaves Tags as text
+    (the whole row is already a link to the Post, and a link cannot nest). **Draft preview**: only the
+    Post route reads `routablePosts`, so in `next dev` a Draft is reachable at its URL with a "Draft.
+    Visible only in local development, never in production." banner and no `BlogPosting` JSON-LD;
+    production and Vercel preview builds (both `NODE_ENV=production`) exclude it. `src/app/sitemap.ts`
+    now emits `/blog/tags/[tag]` for each published Tag (the URLs Stage 4 deferred). Polish: the fig.
+    meta separator on the index and Post pages moved from an em dash to a middot (voice rule). Gate
+    green: `pnpm validate` (167 unit, knip clean, build prerenders only published surfaces) plus the
+    extended `@ci` specs — `blog.spec.ts` (tag page renders its published Posts, unknown + Draft-only
+    Tag 404, Post tags link out) and `blog-seo.spec.ts` (sitemap carries published Tag URLs, not
+    `process`). Draft preview verified live: 200 + banner in `next dev`, 404 in the production build.
+- **Branch state**: Stage 4 merged to master as **PR #76**; Stage 2 was PR #74, Stage 1 PR #73,
+  Stage 0 PR #72. Master is green. Stage 5 sits on `feature/blog-stage-5` (commit 52f8411), awaiting
+  its PR to master.
 
 ## 2. Integration map
 
@@ -111,9 +136,9 @@ content/blog/*.mdx  ──Velite (build/watch)──►  generated typed output
                                                     │
               ┌─────────────────────────────────────┼──────────────────────────┐
         /blog + /blog/[slug]                  /blog/tags/[tag]           SEO surfaces
-        (Stage 2 ✅ — brand tokens          (Stage 5)                (Stage 4 ✅: metadata,
-         live in @theme)                                              OG, JSON-LD,
-                                                                      sitemap, RSS)
+        (Stage 2 ✅ — brand tokens          (Stage 5 ✅ — tag        (Stage 4 ✅: metadata,
+         live in @theme; Post route          pages + Draft            OG, JSON-LD,
+         reads routablePosts, Stage 5)        preview)                sitemap + tag URLs, RSS)
 ```
 
 Touchpoints with the existing tree: `src/styles/globals.css` `@theme` block (brand-prefixed Utopia
@@ -162,9 +187,10 @@ Full log with rationale: `docs/blog/discovery.md` rows 1–19. The build-facing 
 | Nick drafts, AI edits, publishing is Nick merging the PR                               | ADR-0010 (Nick's word)             |
 
 Settled at Stage 2: Utopia scale parameters (320→1240px, body 18→21px, ratio 1.2→1.25 — in
-`@theme`, subject only to Nick's reading-feel gate). Still deferred (do not decide early): draft
-preview mechanism → Stage 5 brief; tag vocabulary → emerges from first posts; first-load JS
-**budget** → baseline now recorded (§7), the budget number itself remains open.
+`@theme`, subject only to Nick's reading-feel gate). Settled at Stage 5: the draft preview mechanism
+(dev-only `routablePosts`, `NODE_ENV` gate, read by the Post route alone) and the tag route shape.
+Still open: tag vocabulary keeps emerging from real Posts (three published/Draft Tags so far); the
+first-load JS **budget** number (baseline recorded, §7).
 
 ## 6. How to verify
 
@@ -174,8 +200,10 @@ preview mechanism → Stage 5 brief; tag vocabulary → emerges from first posts
   block, prev/next, draft slug 404s), plus the verify skill and **Nick reads the feel** (human gate).
 - **Stage 4:** `@ci` contract assertions in the `api.spec.ts` style — RSS valid XML excluding
   Drafts, sitemap contains post URLs, JSON-LD parses, OG route returns an image.
-- **Stage 5:** extended `@ci` blog spec (tag pages correct; Draft absent from index/RSS/sitemap,
-  previewable in dev).
+- **Stage 5 ✅:** extended `@ci` specs — `blog.spec.ts` (tag page lists only its published Posts,
+  unknown + Draft-only Tag 404, Post Tags link out) and `blog-seo.spec.ts` (sitemap carries published
+  Tag URLs, not `process`), plus a live check that a Draft is 200 + banner in `next dev` and 404 in
+  the production build.
 - Blog pages are plain DOM — no headless-canvas screenshot rig needed; standard Playwright suffices.
 
 ## 7. Gotchas
@@ -216,14 +244,20 @@ preview mechanism → Stage 5 brief; tag vocabulary → emerges from first posts
   `brand.md`, px widths), never classNames or `ch` units — a `ch`-based title width collapsed the
   wrap to one word per line the first time. Nick ruled all-inline is correct here (2026-07-23); the
   carnival `/opengraph-image` sets the same precedent.
-- **Seed content drift, and the tests that pin it** (Stage 4) — with only one published Post,
-  `blog.spec.ts` prev/next skips (needs two) and the SEO contract tests hardcode
-  `building-this-blog-in-the-open` as the published fixture and the two Drafts as the
-  never-leaks fixtures. If Stage 5 changes which seeds are published, both suites move with it. See
-  §1.
-- **Sitemap tag URLs deliberately deferred to Stage 5** — tag pages do not exist yet, so no sitemap
-  entry points at a 404. Stage 5 adds the tag routes first, then their sitemap URLs. `src/app/
-sitemap.ts` carries the marker comment where they go.
+- **Seed content drift, and the tests that pin it** (Stage 4, still live at Stage 5) — with only one
+  published Post, `blog.spec.ts` prev/next skips (needs two) and the SEO contract tests hardcode
+  `building-this-blog-in-the-open` as the published fixture and the two Drafts as the never-leaks
+  fixtures. Stage 5 added tag fixtures on the same footing: `agentic-workflows`/`meta` are the
+  published Tags, `process` is the Draft-only Tag the tests assert must 404 and stay out of the
+  sitemap. Any change to which seeds are published moves all three suites. See §1.
+- **Draft preview is dev-only by a `NODE_ENV` gate, not a build flag** (Stage 5) — `routablePosts`
+  previews Drafts only when `process.env.NODE_ENV !== 'production'`. Vercel preview deployments build
+  with `NODE_ENV=production`, so they correctly hide Drafts too; the preview is a **local `next dev`**
+  affordance, not a staging one. Only the Post route reads `routablePosts`; the index, tags, sitemap
+  and feeds stay on `publishedPosts`, so the single-read Draft-exclusion contract still holds.
+- **Sitemap tag URLs — done** (was deferred Stage 4 → Stage 5). `src/app/sitemap.ts` now maps
+  `publishedTags` to `/blog/tags/[tag]`, so every emitted Tag URL has a real SSG page behind it and a
+  Draft-only Tag (`process`) never appears. The Stage 4 marker comment is gone.
 - **Brand monogram small-size pass done, ruling pending** — three variants rendered in
   `docs/brand/boards/monogram-pass.{html,png}`: V1 (heavier stems, dash kept), V2 (points, no
   dash — cleanest at 16px), V3 (measured cut — boldest at large, muddy ≤32px). Nick rules the
@@ -240,40 +274,61 @@ sitemap.ts` carries the marker comment where they go.
 3. ~~**Stage 4 — SEO surfaces**~~ ✅ done (2026-07-23, `feature/blog-stage-4`): `generateMetadata`
    for index + Posts, per-Post OG card, `BlogPosting` JSON-LD, sitemap extension, RSS. Full gate
    green plus `e2e/blog-seo.spec.ts` 6/6. See §1.
-4. **Stage 5 — tag pages + Draft polish** (next): `/blog/tags/[tag]` over `publishedPosts`, the
-   draft-preview mechanism deferred from Stage 2, then the sitemap tag URLs Stage 4 held back.
-   Docs-scribe close-out; this doc gains a shipped-state summary (the `ball-toss-game-built.md`
-   pattern).
+4. ~~**Stage 5 — tag pages + Draft polish**~~ ✅ done (2026-07-23, `feature/blog-stage-5`, commit
+   52f8411): `/blog/tags/[tag]` over `publishedPosts`, the draft-preview mechanism deferred from
+   Stage 2 (`routablePosts`, dev-only), then the sitemap tag URLs Stage 4 held back. `pnpm validate`
+   green (167 unit), `@ci` blog + SEO specs extended and passing. See §1, §9. Shipped-state summary
+   written to `docs/blog/blog-built.md`.
 
-Every stage: carnival-context Brief before, Absorb after, journal paragraph appended to
-`docs/blog/journal.md`. Branch per stage, PR to master.
+**The blog build is COMPLETE** — Stages 0, B, 1, 2, 4, 5 all shipped (Stage 3 deleted, ADR-0011).
+Every stage ran carnival-context Brief before, Absorb after, journal paragraph appended to
+`docs/blog/journal.md`, branch per stage, PR to master. What remains is the authoring pipeline (§9),
+a separate workstream, not a build stage.
 
 ## 9. What just happened
 
-**Stage 4 built and gated** (2026-07-23, `feature/blog-stage-4`). Every public SEO surface landed
-against the single `publishedPosts` read: static index `metadata`, per-Post `generateMetadata` off
-frontmatter, a Blueprint-branded per-Post OG card, `BlogPosting` JSON-LD (the CV `JsonLd` Person
-pattern mirrored), the sitemap extension, and a hand-rolled RSS 2.0 route with no new dependency.
-The OG card holds the ADR-0011 boundary on purpose, so it is the Blueprint palette (slate, steel
-margin, redline underline, wordmark with the red `.dev`) rather than the carnival poster. Full gate
-green, plus a new `@ci` spec `e2e/blog-seo.spec.ts` 6/6.
+**Stage 5 built and gated, the final build stage** (2026-07-23, `feature/blog-stage-5`, commit
+52f8411). Tag pages, the Draft preview deferred from Stage 2, and the sitemap tag URLs Stage 4 held
+back all landed together, each still resolving through the single `publishedPosts` read. The tag
+route (`src/app/blog/tags/[tag]/page.tsx`) is brand-styled like the index, SSG over `publishedTags`
+with `dynamicParams = false`, so an unknown or Draft-only Tag 404s and each Tag page carries its own
+canonical + OpenGraph. Post meta-row Tags now link out; the index leaves them as text because the
+whole row is already a Post link and a link cannot nest. The Draft preview is a dev-only affordance:
+`routablePosts` gates on `NODE_ENV`, the Post route alone reads it, and a Draft shows at its URL in
+`next dev` with a banner and no JSON-LD while production and Vercel preview builds exclude it. The
+sitemap now emits every published Tag URL, and the fig. meta separator moved from an em dash to a
+middot to hold the voice rule. Gate green: `pnpm validate` (167 unit, knip clean, build prerenders
+only published surfaces), the extended `@ci` blog + SEO specs, and a live check that the Draft is 200
 
-Two build seams became gotchas (§7). Next 16 refuses `runtime = 'edge'` on a metadata image route
-that also has `generateStaticParams`, so the per-Post card runs the Node default while the root
-carnival OG keeps edge. And the seed set had drifted under us: the Stage 2 merge left only one
-published Post, so `blog.spec.ts` prev/next skips and the SEO tests pin
-`building-this-blog-in-the-open` as the published fixture with the two Drafts as the never-leaks
-fixtures. Sitemap tag URLs were held back to Stage 5 so nothing points at a tag 404 before those
-pages exist.
+- banner in `next dev` and 404 in the production build.
 
-Before this, Stage 2 (`feature/blog-stage-2`) merged as **PR #74**, which cleared its two human
-gates and made them moot.
+Also folded in this day: the **Stage 4 OG-card follow-up**. The per-Post card was re-cut to render in
+the real brand fonts (Montserrat wordmark, Plex Sans title, Plex Mono labels, all vendored as local
+woff in `src/assets/fonts/`) with explicit px widths so the title wraps as a sentence. Satori cannot
+read Tailwind or the `@theme` tokens, so Nick ruled the card stays all-inline (§7).
+
+**The blog build is now COMPLETE** — Stages 0, B, 1, 2, 4, 5 all shipped (Stage 3 deleted under
+ADR-0011). The public surface is done: index, Post reading template, tag pages, Draft preview, and
+the full SEO/discovery/social set, all on the single-read contract. The as-built summary is
+`docs/blog/blog-built.md`; read it first from here on.
+
+**What is left is the authoring pipeline, and it is a separate workstream, not a build stage.**
+ADR-0010 specifies a `/publish-post` skill (scaffold a Post from an idea, enforce the frontmatter
+contract, warn on a new Tag) and a `post-reviewer` agent (voice + `avoid-ai-writing` pass on a draft
+Post before Nick merges). Neither is built. They are how Posts get _written and reviewed_, not how
+the blog surface gets _built_, so they sit outside the staged build and outside this handoff's remit.
+The two-component hard cap (ADR-0010) means these are the only two `.claude` components the blog is
+allowed. `docs/blog/agentic-workflow.md` holds the spec.
 
 ### Needs Nick
 
-- **OG card feel** — the per-Post social card shipped in the Blueprint palette without a look
-  ruling. When Nick has a moment, check a live card (`/blog/building-this-blog-in-the-open/
-opengraph-image`) and say whether the composition holds. Not a blocker; a share preview is not on
-  the critical path, but it is a public visual surface and the feel is Nick's call.
-- **Nothing else outstanding.** The Stage 2 gates (reading feel, monogram ruling) cleared on the
-  PR #74 merge.
+- **OG card feel** — the per-Post social card now renders in the real brand fonts, but the
+  composition still has no explicit look ruling. When Nick has a moment, check a live card
+  (`/blog/building-this-blog-in-the-open/opengraph-image`) and say whether it holds. Not a blocker; a
+  share preview is off the critical path, but it is a public visual surface and the feel is Nick's
+  call.
+- **Merge `feature/blog-stage-5`** — Stage 5 is gated green on its branch and awaits its PR to
+  master (the last build PR). Merging it is Nick's, as every stage merge has been.
+- **Kick off the authoring pipeline when ready** — building `/publish-post` + `post-reviewer` is the
+  next natural piece of work, but it is Nick's call when to start it and it runs as its own workstream
+  under ADR-0010, not as a blog build stage.

@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 /**
- * Blog surface (Stage 2 gate — docs/redesign/blog-handoff.md §6). Plain DOM,
- * no canvas: safe for the @ci subset. Seed content: two published Posts and
- * one Draft (designing-the-publish-pipeline).
+ * Blog surface (docs/redesign/blog-handoff.md §6). Plain DOM, no canvas, safe
+ * for the @ci subset. Seed content: one published Post
+ * (building-this-blog-in-the-open) and two Drafts (designing-the-publish-pipeline,
+ * speccing-before-scaffolding).
  */
 test.describe('blog', { tag: '@ci' }, () => {
   test('index lists published Posts, newest first', async ({ page }) => {
@@ -52,5 +53,27 @@ test.describe('blog', { tag: '@ci' }, () => {
     await expect(page.locator('canvas')).toHaveCount(0);
     // The carnival SiteNav stands down on brand surfaces (ADR-0011).
     await expect(page.getByRole('button', { name: 'Open menu' })).toHaveCount(0);
+  });
+
+  test('a tag page lists only its published Posts', async ({ page }) => {
+    await page.goto('/blog/tags/agentic-workflows');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('agentic-workflows');
+    await expect(page.getByRole('heading', { level: 2 })).toContainText(
+      'Building this blog in the open',
+    );
+    // speccing-before-scaffolding carries the tag but is a Draft, so it is absent.
+    await expect(page.getByText('Speccing before scaffolding')).toHaveCount(0);
+  });
+
+  test('an unknown tag and a Draft-only tag both 404', async ({ page }) => {
+    expect((await page.goto('/blog/tags/definitely-not-a-tag'))?.status()).toBe(404);
+    // "process" sits only on a Draft, so it never becomes a page.
+    expect((await page.goto('/blog/tags/process'))?.status()).toBe(404);
+  });
+
+  test('a Post links its tags to the tag pages', async ({ page }) => {
+    await page.goto('/blog/building-this-blog-in-the-open');
+    await page.getByRole('link', { name: 'agentic-workflows' }).first().click();
+    await expect(page).toHaveURL(/\/blog\/tags\/agentic-workflows$/);
   });
 });

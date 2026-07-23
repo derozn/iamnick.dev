@@ -28,6 +28,16 @@ test.describe('blog SEO surfaces', { tag: '@ci' }, () => {
     }
   });
 
+  test('sitemap lists Tag pages carried by a published Post, not Draft-only Tags', async ({
+    request,
+  }) => {
+    const res = await request.get(`${ORIGIN}/sitemap.xml`);
+    const xml = await res.text();
+    expect(xml).toContain(`${SITE}/blog/tags/agentic-workflows`);
+    // "process" sits only on a Draft, so its Tag page does not exist.
+    expect(xml).not.toContain('/blog/tags/process');
+  });
+
   test('RSS is well-formed, published-only, and served as RSS', async ({ request }) => {
     const res = await request.get(`${ORIGIN}/blog/rss.xml`);
     expect(res.status()).toBe(200);

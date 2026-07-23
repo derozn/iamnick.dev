@@ -4,27 +4,30 @@ import { notFound } from 'next/navigation';
 
 import { BlogPostingJsonLd } from '@/components/blog/BlogPostingJsonLd';
 import { MdxContent } from '@/components/blog/MdxContent';
-import { publishedPosts } from '@/content/blog';
+import { publishedPosts, routablePosts } from '@/content/blog';
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
 }
 
-/** Published Posts only — a Draft slug is a 404, never a page. */
+/** Production: published Posts only. `next dev` also routes Drafts for preview
+ *  (routablePosts). Either way an unknown slug 404s (dynamicParams = false). */
 export function generateStaticParams() {
-  return publishedPosts.map((post) => ({ slug: post.slug }));
+  return routablePosts.map((post) => ({ slug: post.slug }));
 }
 
 export const dynamicParams = false;
 
 export async function generateMetadata({ params }: PostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = publishedPosts.find((p) => p.slug === slug);
+  const post = routablePosts.find((p) => p.slug === slug);
   if (!post) return {};
 
   return {
     title: post.title,
     description: post.description,
+    // A Draft only reaches here in dev; keep it out of any index if ever crawled.
+    ...(post.draft && { robots: { index: false, follow: false } }),
     alternates: {
       canonical: post.permalink,
       types: { 'application/rss+xml': [{ url: '/blog/rss.xml', title: "Nick's rambles" }] },
@@ -52,30 +55,50 @@ const formatDate = (iso: string) =>
 
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
-  const index = publishedPosts.findIndex((post) => post.slug === slug);
-  if (index === -1) notFound();
+  const post = routablePosts.find((p) => p.slug === slug);
+  if (!post) notFound();
 
-  const post = publishedPosts[index];
-  // publishedPosts is newest-first: "newer" sits earlier in the list.
-  const newer = index > 0 ? publishedPosts[index - 1] : undefined;
-  const older = index < publishedPosts.length - 1 ? publishedPosts[index + 1] : undefined;
+  // fig. number and prev/next live on the published sequence; a Draft preview has
+  // neither (it never joins the public order).
+  const publishedIndex = publishedPosts.findIndex((p) => p.slug === slug);
+  const figNumber =
+    publishedIndex >= 0 ? String(publishedPosts.length - publishedIndex).padStart(2, '0') : '--';
+  const newer = publishedIndex > 0 ? publishedPosts[publishedIndex - 1] : undefined;
+  const older =
+    publishedIndex >= 0 && publishedIndex < publishedPosts.length - 1
+      ? publishedPosts[publishedIndex + 1]
+      : undefined;
 
   return (
     <article>
-      <BlogPostingJsonLd post={post} />
+      {post.draft ? (
+        <p className="mb-brand-l border-l-2 border-brand-red bg-brand-panel px-brand-s py-brand-2xs font-brand-mono text-brand-xs text-brand-red-bright">
+          Draft. Visible only in local development, never in production.
+        </p>
+      ) : (
+        <BlogPostingJsonLd post={post} />
+      )}
       <header>
         <p className="font-brand-mono text-brand-xs uppercase tracking-[0.22em] text-brand-fog">
-          <span className="normal-case text-brand-red-bright">
-            fig. {String(publishedPosts.length - index).padStart(2, '0')}
-          </span>
-          {' — '}
+          <span className="normal-case text-brand-red-bright">fig. {figNumber}</span>
+          {' · '}
           <time dateTime={post.date}>{formatDate(post.date)}</time>
           {' · '}
           {Math.max(1, Math.round(post.metadata.readingTime))} min
           {post.tags.length > 0 && (
             <>
-              {' '}
-              {' · '} {post.tags.join(', ')}
+              {' · '}
+              {post.tags.map((tag, i) => (
+                <span key={tag}>
+                  {i > 0 && ', '}
+                  <Link
+                    href={`/blog/tags/${tag}`}
+                    className="normal-case hover:text-brand-red-bright"
+                  >
+                    {tag}
+                  </Link>
+                </span>
+              ))}
             </>
           )}
         </p>
@@ -88,37 +111,39 @@ export default async function PostPage({ params }: PostPageProps) {
         <MdxContent code={post.code} />
       </div>
 
-      <nav
-        aria-label="More Posts"
-        className="mt-brand-2xl flex justify-between gap-brand-m border-t border-brand-hairline pt-brand-m font-brand-mono text-brand-sm"
-      >
-        <div>
-          {older && (
-            <Link
-              href={older.permalink}
-              className="group text-brand-fog hover:text-brand-red-bright"
-            >
-              <span aria-hidden>←</span> older
-              <span className="mt-brand-3xs block text-brand-white group-hover:text-brand-red-bright">
-                {older.title}
-              </span>
-            </Link>
-          )}
-        </div>
-        <div className="text-right">
-          {newer && (
-            <Link
-              href={newer.permalink}
-              className="group text-brand-fog hover:text-brand-red-bright"
-            >
-              newer <span aria-hidden>→</span>
-              <span className="mt-brand-3xs block text-brand-white group-hover:text-brand-red-bright">
-                {newer.title}
-              </span>
-            </Link>
-          )}
-        </div>
-      </nav>
+      {publishedIndex >= 0 && (older || newer) && (
+        <nav
+          aria-label="More Posts"
+          className="mt-brand-2xl flex justify-between gap-brand-m border-t border-brand-hairline pt-brand-m font-brand-mono text-brand-sm"
+        >
+          <div>
+            {older && (
+              <Link
+                href={older.permalink}
+                className="group text-brand-fog hover:text-brand-red-bright"
+              >
+                <span aria-hidden>←</span> older
+                <span className="mt-brand-3xs block text-brand-white group-hover:text-brand-red-bright">
+                  {older.title}
+                </span>
+              </Link>
+            )}
+          </div>
+          <div className="text-right">
+            {newer && (
+              <Link
+                href={newer.permalink}
+                className="group text-brand-fog hover:text-brand-red-bright"
+              >
+                newer <span aria-hidden>→</span>
+                <span className="mt-brand-3xs block text-brand-white group-hover:text-brand-red-bright">
+                  {newer.title}
+                </span>
+              </Link>
+            )}
+          </div>
+        </nav>
+      )}
     </article>
   );
 }
