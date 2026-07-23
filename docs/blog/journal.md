@@ -47,3 +47,18 @@ carnival's ~1 MB root-layout client bundle, paying for motion and zustand a page
 never uses. A deviation worth recording: a third seed Post, because prev/next cannot be tested
 with one published Post. The stage ends at the human gates — Nick reads the feel on the PR
 preview, and rules the monogram pass.
+
+**2026-07-23 — Stage 4, SEO surfaces.** Every metadata, discovery and social surface went on in one
+stage, and all of them read the same `publishedPosts` list and nothing else, so by construction a
+Draft cannot leak into a feed, a sitemap or a social card. The per-Post card was the one real
+design call. It had to be the Blueprint brand rather than the carnival poster, and Satori ships no
+brand typeface, so the palette carries the identity on its own. Slate ground, a steel margin down
+the left, a redline underline and the wordmark with its red `.dev` do the work the face would. Two
+surprises, both from the platform. Next 16 now refuses the edge runtime on an image route that also
+pre-renders per slug, so the card fell back to the Node default, which is the preferred default now
+anyway. And the seed set had drifted while nobody was watching. The Stage 2 merge put two of the
+three Posts back into Draft, leaving one published, which turned the prev/next test into a skip and
+made that single Post the fixture the SEO contract tests pin to. The lesson worth keeping is that
+content state is now part of the test surface, not just the pages. One quiet win to close on: RSS
+was hand-rolled instead of pulled from a package, so knip stayed green and nothing new entered the
+tree.

@@ -1,6 +1,25 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { publishedPosts } from '@/content/blog';
+
+const BLOG_DESCRIPTION =
+  'Mostly how this site gets built with AI agents. Sometimes whatever else is in my head. Dead ends included.';
+
+export const metadata: Metadata = {
+  title: 'Blog',
+  description: BLOG_DESCRIPTION,
+  alternates: {
+    canonical: '/blog',
+    types: { 'application/rss+xml': [{ url: '/blog/rss.xml', title: "Nick's rambles" }] },
+  },
+  openGraph: {
+    title: 'Blog · iamnick.dev',
+    description: BLOG_DESCRIPTION,
+    url: '/blog',
+    type: 'website',
+  },
+};
 
 /** Stable "fig." number: oldest Post is fig. 01, appended as Posts publish. */
 const figNumber = (index: number) => String(publishedPosts.length - index).padStart(2, '0');
