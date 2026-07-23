@@ -208,6 +208,14 @@ preview mechanism → Stage 5 brief; tag vocabulary → emerges from first posts
   drops the edge runtime and uses the Node default, which is the platform-preferred default now
   anyway. The root carnival `/opengraph-image` keeps edge because it has no `generateStaticParams`.
   Do not "restore" edge on the per-Post card; it will break the build.
+- **Satori can't read next/font's Plex, so the OG card vendors its own woff** (Stage 4) — `next/og`
+  renders through Satori, which never loads the app stylesheet, Tailwind, the `@theme` brand tokens,
+  or `next/font`'s self-hosted Plex. Fonts must be passed as real binaries to `ImageResponse.fonts`.
+  Montserrat (wordmark) already shipped as local woff; IBM Plex Sans 600 + Mono 500 were vendored to
+  `src/assets/fonts/ibm-plex-*.woff` for the card. Style it with inline literal values (hex from
+  `brand.md`, px widths), never classNames or `ch` units — a `ch`-based title width collapsed the
+  wrap to one word per line the first time. Nick ruled all-inline is correct here (2026-07-23); the
+  carnival `/opengraph-image` sets the same precedent.
 - **Seed content drift, and the tests that pin it** (Stage 4) — with only one published Post,
   `blog.spec.ts` prev/next skips (needs two) and the SEO contract tests hardcode
   `building-this-blog-in-the-open` as the published fixture and the two Drafts as the
