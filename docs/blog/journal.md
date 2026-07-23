@@ -62,3 +62,23 @@ made that single Post the fixture the SEO contract tests pin to. The lesson wort
 content state is now part of the test surface, not just the pages. One quiet win to close on: RSS
 was hand-rolled instead of pulled from a package, so knip stayed green and nothing new entered the
 tree.
+
+**2026-07-23 — Stage 5, tag pages and Draft polish.** The last build stage, and it closed cleanly.
+Tag pages, the Draft preview held over from Stage 2, and the sitemap Tag URLs held back at Stage 4
+all went on together, and every one of them still resolved through the same `publishedPosts` read
+that has carried the Draft-exclusion contract since Stage 1. The tag route derives `publishedTags`
+and `postsForTag` from that one list, so the whole model fell out for free: a Draft-only Tag like
+`process` gets no page, no sitemap entry, no way to surface, because it was never in the list to
+begin with. Two decisions worth keeping. The Draft preview is a local `next dev` affordance gated on
+`NODE_ENV`, not a staging one, because Vercel preview builds run as production and should hide Drafts
+exactly as production does, so only the Post route reads the preview list and everything else stays
+on `publishedPosts`. And the index leaves its Tags as plain text while the Post page links them,
+because the index row is already one link to the Post and HTML forbids a link inside a link, a small
+constraint that quietly settled where Tag links belong. The one surprise was carried over from the
+same day's OG-card fix rather than the tag work: Satori renders the social card through neither
+Tailwind nor the `@theme` tokens nor `next/font`, so the brand faces had to be vendored as raw woff
+and the card styled entirely inline, which Nick ruled is simply how a Satori card works. A tidy note
+to end the build on: the fig. separator moved from an em dash to a middot, the voice rule reaching
+even the punctuation between two numbers. The blog surface is complete. What is left, the
+`/publish-post` skill and the `post-reviewer` agent, is how Posts get written, a separate workstream,
+not another stage.
