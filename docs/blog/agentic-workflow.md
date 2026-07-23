@@ -2,7 +2,7 @@
 
 > Design doc and learning artefact (ADR-0010). Two pipelines: the **build workflow** that delivers the blog feature, and the **authoring workflow** that ships each post afterwards. For every mechanism choice this doc records the reasoning **and the simpler alternative that was rejected** — the point is to learn when each tool earns its complexity, not just to use them.
 >
-> Drafted 2026-07-16 during discovery. The `.claude` components described here are designed, not yet built; they are created during the build stages, never before they are needed.
+> Drafted 2026-07-16 during discovery. The `.claude` components described here were built on 2026-07-23 (`feature/blog-authoring-pipeline`), after the build stages shipped and only once they were needed. This doc remains the design record; the components themselves live under `.claude/`.
 
 ## Principles
 

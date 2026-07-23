@@ -5,9 +5,10 @@
 > Draft/Tag model and the single-read contract — read **`docs/blog/blog-built.md` first**; it is the
 > as-built summary. This handoff keeps the full build history and gotchas behind it.
 >
-> **What remains is not a build stage.** The authoring pipeline (`/publish-post` skill +
-> `post-reviewer` agent, ADR-0010) is a separate workstream: it is how Posts get written and
-> reviewed, not how the blog surface gets built. See §9.
+> **The authoring pipeline is built too** (2026-07-23, `feature/blog-authoring-pipeline`). The
+> `/publish-post` skill and the `post-reviewer` agent, the only two `.claude` components ADR-0010
+> allows, now exist and are invocable. They are how Posts get written and reviewed, not how the
+> blog surface gets built; they ran as their own workstream. See §1 and §9.
 >
 > Specs are done and live in `docs/blog/`; this doc points at them and adds only build-facing
 > operational detail. Read `CONTEXT.md` first (Blog/Post/Tag/Draft entries). Each stage got its
@@ -24,8 +25,8 @@
    ADR-0011; numbering preserved).
 3. Every stage was bracketed by carnival-context **Brief** before and **Absorb** after; Absorb also
    appends a dated paragraph to `docs/blog/journal.md`.
-4. Build complete (see §8, §9). What is left is the authoring pipeline, a separate workstream. Do
-   not duplicate spec content into code comments or this doc; the specs are the source.
+4. Build complete and the authoring pipeline built (see §8, §9). Do not duplicate spec content
+   into code comments or this doc; the specs are the source.
 
 ---
 
@@ -122,9 +123,27 @@
     extended `@ci` specs — `blog.spec.ts` (tag page renders its published Posts, unknown + Draft-only
     Tag 404, Post tags link out) and `blog-seo.spec.ts` (sitemap carries published Tag URLs, not
     `process`). Draft preview verified live: 200 + banner in `next dev`, 404 in the production build.
-- **Branch state**: Stage 4 merged to master as **PR #76**; Stage 2 was PR #74, Stage 1 PR #73,
-  Stage 0 PR #72. Master is green. Stage 5 sits on `feature/blog-stage-5` (commit 52f8411), awaiting
-  its PR to master.
+- **Authoring pipeline built** (2026-07-23, `feature/blog-authoring-pipeline`, commit 5308dfc):
+  the two `.claude` components ADR-0010 capped the design at.
+  `.claude/skills/publish-post/SKILL.md` is the `/publish-post` orchestrator, pass order per
+  `docs/blog/agentic-workflow.md` Part 2: structural fail-fast pass, post-reviewer fact/SEO pass,
+  avoid-ai-writing voice pass against `docs/brand/voice.md`, glossary-guard pass, human gate 1
+  (Nick reads the edited Draft, per-pass changelog presented), ship step (flip `draft: false`,
+  branch `post/<slug>`, `pnpm validate`, code-review at low effort, PR), human gate 2 (publishing
+  is the merge, nothing auto-merges). Passes are individually skippable via `--skip=`; a standing
+  review after three published Posts deletes any pass that never changed an outcome.
+  `.claude/agents/post-reviewer.md` is the read-only fact + SEO reviewer in the glossary-guard
+  house format (tools Read/Bash/Glob/Grep, file:line findings, blocking/advisory, verdict line
+  `POST: CLEAN` / `POST: n findings`). Smoke-tested for real: the reviewer charter ran against the
+  `designing-the-publish-pipeline` Draft and returned the correct report shape with verdict
+  `POST: 3 findings (0 blocking, 3 advisory)`, including a genuinely useful catch (the Draft
+  described pipeline components untracked at review time). Three charter ambiguities the smoke
+  test surfaced were fixed: the fact source is the working tree with an untracked-file advisory
+  caveat, a Post with no headings is fine, and a true-but-incomplete summary only counts when the
+  omission would mislead. Both components are registered and invocable.
+- **Branch state**: every build stage is on master. Stage 5 merged as **PR #77**, Stage 4 as
+  PR #76, Stage 2 PR #74, Stage 1 PR #73, Stage 0 PR #72. Master is green. The authoring pipeline
+  sits on `feature/blog-authoring-pipeline` (commit 5308dfc), awaiting its PR to master.
 
 ## 2. Integration map
 
@@ -261,7 +280,8 @@ first-load JS **budget** number (baseline recorded, §7).
 - **Brand monogram small-size pass done, ruling pending** — three variants rendered in
   `docs/brand/boards/monogram-pass.{html,png}`: V1 (heavier stems, dash kept), V2 (points, no
   dash — cleanest at 16px), V3 (measured cut — boldest at large, muddy ≤32px). Nick rules the
-  result (`docs/brand/brand.md` §Open refinements); blocks the Stage 2 merge.
+  result (`docs/brand/brand.md` §Open refinements). Stage 2 merged (PR #74) without the ruling,
+  so nothing blocks on it now; it stays tracked in brand.md, not here.
 - **"Career tickets" glossary gap** — glossary-guard advisory from the Stage 0 review; a
   carnival-side term, not blog work. Parked; do not fix under a blog branch.
 
@@ -274,61 +294,46 @@ first-load JS **budget** number (baseline recorded, §7).
 3. ~~**Stage 4 — SEO surfaces**~~ ✅ done (2026-07-23, `feature/blog-stage-4`): `generateMetadata`
    for index + Posts, per-Post OG card, `BlogPosting` JSON-LD, sitemap extension, RSS. Full gate
    green plus `e2e/blog-seo.spec.ts` 6/6. See §1.
-4. ~~**Stage 5 — tag pages + Draft polish**~~ ✅ done (2026-07-23, `feature/blog-stage-5`, commit
-   52f8411): `/blog/tags/[tag]` over `publishedPosts`, the draft-preview mechanism deferred from
-   Stage 2 (`routablePosts`, dev-only), then the sitemap tag URLs Stage 4 held back. `pnpm validate`
-   green (167 unit), `@ci` blog + SEO specs extended and passing. See §1, §9. Shipped-state summary
-   written to `docs/blog/blog-built.md`.
+4. ~~**Stage 5 — tag pages + Draft polish**~~ ✅ done and merged as **PR #77** (2026-07-23,
+   `feature/blog-stage-5`, commit 52f8411): `/blog/tags/[tag]` over `publishedPosts`, the
+   draft-preview mechanism deferred from Stage 2 (`routablePosts`, dev-only), then the sitemap tag
+   URLs Stage 4 held back. `pnpm validate` green (167 unit), `@ci` blog + SEO specs extended and
+   passing. See §1, §9. Shipped-state summary written to `docs/blog/blog-built.md`.
 
-**The blog build is COMPLETE** — Stages 0, B, 1, 2, 4, 5 all shipped (Stage 3 deleted, ADR-0011).
-Every stage ran carnival-context Brief before, Absorb after, journal paragraph appended to
-`docs/blog/journal.md`, branch per stage, PR to master. What remains is the authoring pipeline (§9),
-a separate workstream, not a build stage.
+**The blog build is COMPLETE** — Stages 0, B, 1, 2, 4, 5 all shipped and merged (Stage 3 deleted,
+ADR-0011). Every stage ran carnival-context Brief before, Absorb after, journal paragraph appended
+to `docs/blog/journal.md`, branch per stage, PR to master. The authoring pipeline followed as its
+own workstream and is now built too (§1, §9).
 
 ## 9. What just happened
 
-**Stage 5 built and gated, the final build stage** (2026-07-23, `feature/blog-stage-5`, commit
-52f8411). Tag pages, the Draft preview deferred from Stage 2, and the sitemap tag URLs Stage 4 held
-back all landed together, each still resolving through the single `publishedPosts` read. The tag
-route (`src/app/blog/tags/[tag]/page.tsx`) is brand-styled like the index, SSG over `publishedTags`
-with `dynamicParams = false`, so an unknown or Draft-only Tag 404s and each Tag page carries its own
-canonical + OpenGraph. Post meta-row Tags now link out; the index leaves them as text because the
-whole row is already a Post link and a link cannot nest. The Draft preview is a dev-only affordance:
-`routablePosts` gates on `NODE_ENV`, the Post route alone reads it, and a Draft shows at its URL in
-`next dev` with a banner and no JSON-LD while production and Vercel preview builds exclude it. The
-sitemap now emits every published Tag URL, and the fig. meta separator moved from an em dash to a
-middot to hold the voice rule. Gate green: `pnpm validate` (167 unit, knip clean, build prerenders
-only published surfaces), the extended `@ci` blog + SEO specs, and a live check that the Draft is 200
+**PR #77 merged** (2026-07-23): Stage 5 landed on master, closing the blog build. Stages 0, B, 1,
+2, 4, 5 are all shipped and merged (Stage 3 deleted under ADR-0011). The public surface is done on
+the single-read contract; the as-built summary is `docs/blog/blog-built.md`, read it first from
+here on. Stage 5's build detail lives in §1 and §8.
 
-- banner in `next dev` and 404 in the production build.
-
-Also folded in this day: the **Stage 4 OG-card follow-up**. The per-Post card was re-cut to render in
-the real brand fonts (Montserrat wordmark, Plex Sans title, Plex Mono labels, all vendored as local
-woff in `src/assets/fonts/`) with explicit px widths so the title wraps as a sentence. Satori cannot
-read Tailwind or the `@theme` tokens, so Nick ruled the card stays all-inline (§7).
-
-**The blog build is now COMPLETE** — Stages 0, B, 1, 2, 4, 5 all shipped (Stage 3 deleted under
-ADR-0011). The public surface is done: index, Post reading template, tag pages, Draft preview, and
-the full SEO/discovery/social set, all on the single-read contract. The as-built summary is
-`docs/blog/blog-built.md`; read it first from here on.
-
-**What is left is the authoring pipeline, and it is a separate workstream, not a build stage.**
-ADR-0010 specifies a `/publish-post` skill (scaffold a Post from an idea, enforce the frontmatter
-contract, warn on a new Tag) and a `post-reviewer` agent (voice + `avoid-ai-writing` pass on a draft
-Post before Nick merges). Neither is built. They are how Posts get _written and reviewed_, not how
-the blog surface gets _built_, so they sit outside the staged build and outside this handoff's remit.
-The two-component hard cap (ADR-0010) means these are the only two `.claude` components the blog is
-allowed. `docs/blog/agentic-workflow.md` holds the spec.
+**The authoring pipeline is built** (2026-07-23, `feature/blog-authoring-pipeline`, commit
+5308dfc). Its own workstream, not a build stage: the `/publish-post` skill and the `post-reviewer`
+agent now exist under `.claude/`, the only two components ADR-0010's hard cap allows, built to the
+spec in `docs/blog/agentic-workflow.md` Part 2 (whose header now records them as built). Full
+component shape in §1. The smoke test earned its keep: running the reviewer charter against the
+`designing-the-publish-pipeline` Draft produced the correct report shape, the verdict `POST: 3
+findings (0 blocking, 3 advisory)`, and one genuinely useful advisory (the Draft described
+pipeline components that were untracked at review time). Three charter ambiguities the smoke test
+surfaced were fixed in the charter itself: the fact source is the working tree with an
+untracked-file advisory caveat, a Post with no headings is fine, and a true-but-incomplete summary
+only counts when the omission would mislead. Both components are registered and invocable; the
+branch awaits its PR to master.
 
 ### Needs Nick
 
-- **OG card feel** — the per-Post social card now renders in the real brand fonts, but the
-  composition still has no explicit look ruling. When Nick has a moment, check a live card
-  (`/blog/building-this-blog-in-the-open/opengraph-image`) and say whether it holds. Not a blocker; a
-  share preview is off the critical path, but it is a public visual surface and the feel is Nick's
-  call.
-- **Merge `feature/blog-stage-5`** — Stage 5 is gated green on its branch and awaits its PR to
-  master (the last build PR). Merging it is Nick's, as every stage merge has been.
-- **Kick off the authoring pipeline when ready** — building `/publish-post` + `post-reviewer` is the
-  next natural piece of work, but it is Nick's call when to start it and it runs as its own workstream
-  under ADR-0010, not as a blog build stage.
+- **Run `/publish-post <slug>` on a Draft when ready** — the pipeline is live; the two seed Drafts
+  (`designing-the-publish-pipeline`, `speccing-before-scaffolding`) are the natural candidates.
+  Publishing stays Nick's merge at gate 2, as ADR-0010 rules. The pipeline branch
+  (`feature/blog-authoring-pipeline`) also awaits its PR to master; merging it is Nick's, as every
+  merge has been.
+- **OG card feel** — still open. The per-Post social card renders in the real brand fonts, but the
+  composition has no explicit look ruling. When Nick has a moment, check a live card
+  (`/blog/building-this-blog-in-the-open/opengraph-image`) and say whether it holds. Not a blocker;
+  a share preview is off the critical path, but it is a public visual surface and the feel is
+  Nick's call.
