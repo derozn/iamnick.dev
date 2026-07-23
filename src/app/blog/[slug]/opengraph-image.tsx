@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { ImageResponse } from 'next/og';
 
 import { publishedPosts } from '@/content/blog';
@@ -15,11 +18,20 @@ export function generateStaticParams() {
 
 export const dynamicParams = false;
 
+// Satori needs the real font binaries (it cannot read next/font's self-hosted
+// Plex). We vendor the exact faces the card uses as local woff, the same way the
+// carnival wordmark ships Montserrat. Read once at module load (build time).
+const fontsDir = join(process.cwd(), 'src/assets/fonts');
+const montserrat600 = readFileSync(join(fontsDir, 'montserrat-v14-latin-600.woff'));
+const plexSans600 = readFileSync(join(fontsDir, 'ibm-plex-sans-latin-600-normal.woff'));
+const plexMono500 = readFileSync(join(fontsDir, 'ibm-plex-mono-latin-500-normal.woff'));
+
+const KICKER = "Nick's rambles".toUpperCase();
+
 /**
  * Per-Post social card — Blueprint brand, deliberately not the carnival poster
- * (ADR-0011 brand boundary). Slate ground, steel drawing margin, redline
- * underline, wordmark with the red `.dev`. Satori bundles no brand face, so the
- * palette and rules carry the identity (the same compromise the root OG made).
+ * (ADR-0011 brand boundary). Slate ground, steel drawing margin, redline tick,
+ * Montserrat wordmark with the red `.dev`, Plex Sans title, Plex Mono labels.
  */
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -45,6 +57,12 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     : '';
   const readingTime = post ? `${Math.max(1, Math.round(post.metadata.readingTime))} min read` : '';
 
+  const mono = {
+    fontFamily: 'Plex Mono',
+    fontWeight: 500,
+    fontSize: 22,
+  } as const;
+
   return new ImageResponse(
     <div
       style={{
@@ -54,10 +72,10 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        padding: '80px',
+        padding: '76px 80px',
         backgroundColor: slate,
         color: white,
-        fontFamily: 'sans-serif',
+        fontFamily: 'Plex Sans',
       }}
     >
       {/* drawing margin — a steel construction rule down the left */}
@@ -66,7 +84,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           position: 'absolute',
           top: 0,
           bottom: 0,
-          left: '48px',
+          left: '40px',
           width: '2px',
           backgroundColor: steelFaint,
         }}
@@ -76,53 +94,45 @@ export default async function Image({ params }: { params: Promise<{ slug: string
       <div
         style={{
           display: 'flex',
+          width: '100%',
           justifyContent: 'space-between',
           alignItems: 'center',
-          fontSize: 30,
         }}
       >
-        <div style={{ display: 'flex', fontWeight: 700, letterSpacing: '-0.01em' }}>
+        <div style={{ display: 'flex', fontFamily: 'Montserrat', fontWeight: 600, fontSize: 34 }}>
           <span style={{ color: white }}>iamnick</span>
           <span style={{ color: redBright }}>.dev</span>
         </div>
-        <div style={{ display: 'flex', color: fog, letterSpacing: '0.2em', fontSize: 22 }}>
-          FIG. {fig}
-        </div>
+        <div style={{ ...mono, color: fog, letterSpacing: '0.18em' }}>{`FIG. ${fig}`}</div>
       </div>
 
       {/* title block */}
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <div
-          style={{
-            display: 'flex',
-            color: redBright,
-            fontSize: 24,
-            letterSpacing: '0.24em',
-            marginBottom: 24,
-          }}
-        >
-          NICK&apos;S RAMBLES
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+        <div style={{ ...mono, color: redBright, letterSpacing: '0.28em', marginBottom: '22px' }}>
+          {KICKER}
         </div>
         <div
           style={{
             display: 'flex',
-            fontSize: 68,
+            width: '1000px',
+            fontFamily: 'Plex Sans',
             fontWeight: 600,
-            lineHeight: 1.1,
+            fontSize: 74,
+            lineHeight: 1.08,
             letterSpacing: '-0.02em',
-            maxWidth: '16ch',
+            color: white,
           }}
         >
           {title}
         </div>
-        {/* redline underline — one deliberate red mark */}
+        {/* redline tick — one deliberate red mark */}
         <div
           style={{
             display: 'flex',
-            width: '220px',
-            height: '6px',
+            width: '132px',
+            height: '8px',
             backgroundColor: red,
-            marginTop: '32px',
+            marginTop: '30px',
           }}
         />
       </div>
@@ -131,16 +141,24 @@ export default async function Image({ params }: { params: Promise<{ slug: string
       <div
         style={{
           display: 'flex',
+          width: '100%',
           justifyContent: 'space-between',
           alignItems: 'center',
+          ...mono,
           color: fog,
-          fontSize: 24,
         }}
       >
         <div style={{ display: 'flex' }}>{date}</div>
         <div style={{ display: 'flex' }}>{readingTime}</div>
       </div>
     </div>,
-    { ...size },
+    {
+      ...size,
+      fonts: [
+        { name: 'Montserrat', data: montserrat600, weight: 600, style: 'normal' },
+        { name: 'Plex Sans', data: plexSans600, weight: 600, style: 'normal' },
+        { name: 'Plex Mono', data: plexMono500, weight: 500, style: 'normal' },
+      ],
+    },
   );
 }
