@@ -1,17 +1,27 @@
 import type { MetadataRoute } from 'next';
 
-import { publishedPosts } from '@/content/blog';
+import { postsForTag, publishedPosts, publishedTags } from '@/content/blog';
 import { SITE_URL } from '@/lib/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Drafts never appear (publishedPosts is the single Draft-filtered read). Tag
-  // URLs join at Stage 5 once the tag pages exist — no entry points at a 404.
+  // Drafts never appear (publishedPosts is the single Draft-filtered read).
   const posts: MetadataRoute.Sitemap = publishedPosts.map((post) => ({
     url: `${SITE_URL}${post.permalink}`,
     lastModified: new Date(post.updated ?? post.date),
     changeFrequency: 'monthly',
     priority: 0.7,
   }));
+
+  // One entry per Tag on a published Post; freshest Post in the Tag drives lastMod.
+  const tags: MetadataRoute.Sitemap = publishedTags.map((tag) => {
+    const newest = postsForTag(tag)[0];
+    return {
+      url: `${SITE_URL}/blog/tags/${tag}`,
+      lastModified: new Date(newest.updated ?? newest.date),
+      changeFrequency: 'weekly',
+      priority: 0.5,
+    };
+  });
 
   const blogIndexModified = publishedPosts.length
     ? new Date(publishedPosts[0].updated ?? publishedPosts[0].date)
@@ -31,5 +41,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     ...posts,
+    ...tags,
   ];
 }

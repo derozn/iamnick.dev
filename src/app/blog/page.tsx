@@ -47,7 +47,7 @@ export default function BlogIndexPage() {
             <Link href={post.permalink} className="group block py-brand-m">
               <p className="font-brand-mono text-brand-xs text-brand-fog">
                 <span className="text-brand-red-bright">fig. {figNumber(index)}</span>
-                {' — '}
+                {' · '}
                 <time dateTime={post.date}>{formatDate(post.date)}</time>
                 {' · '}
                 {Math.max(1, Math.round(post.metadata.readingTime))} min
