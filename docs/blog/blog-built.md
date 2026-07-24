@@ -6,8 +6,9 @@
 > contract that ties them together. Read this first; `docs/redesign/blog-handoff.md` behind it holds
 > the full build history, the stage-by-stage detail, and the gotchas.
 >
-> The one thing left is the **authoring pipeline** (`/publish-post` skill + `post-reviewer` agent).
-> That is how Posts get written and reviewed, a separate workstream, not a build stage. See §6.
+> The **authoring pipeline** (`/publish-post` skill + `post-reviewer` agent) is built too
+> (2026-07-23). That is how Posts get written and reviewed, a separate workstream from the surface
+> build. See §6 for how it is invoked.
 
 ---
 
@@ -151,19 +152,27 @@ All read `publishedPosts` and nothing else, so a Draft cannot enter a feed, site
 
 ---
 
-## 6. What remains: the authoring pipeline (separate workstream)
+## 6. The authoring pipeline (built, separate workstream)
 
-The blog **surface** is built. What is not built is how Posts get written and reviewed, specified in
-ADR-0010 and `docs/blog/agentic-workflow.md`:
+How Posts get written and reviewed, specified in ADR-0010 and `docs/blog/agentic-workflow.md`
+Part 2, **built 2026-07-23** (`feature/blog-authoring-pipeline`):
 
-- **`/publish-post` skill** — scaffold a Post from an idea, enforce the frontmatter contract, warn on
-  a new Tag (the vocabulary is kept deliberately small).
-- **`post-reviewer` agent** — a voice + `avoid-ai-writing` pass on a draft Post before Nick merges.
+- **`/publish-post <slug> [--skip=...]`** (`.claude/skills/publish-post/SKILL.md`) — the editorial
+  orchestrator over a Draft. Pass order: structural fail-fast (frontmatter contract, Tag-vocabulary
+  warning, `pnpm content`), the post-reviewer fact/SEO pass, the avoid-ai-writing voice pass
+  against `docs/brand/voice.md`, the glossary-guard pass, then human gate 1 (Nick reads the edited
+  Draft with a per-pass changelog), the ship step (flip `draft: false`, branch `post/<slug>`,
+  `pnpm validate`, low-effort code-review, PR) and human gate 2. Publishing is the merge; nothing
+  auto-merges.
+- **`post-reviewer` agent** (`.claude/agents/post-reviewer.md`) — read-only fact + SEO reviewer;
+  verifies every technical claim against the repo (the working tree is the fact source, untracked
+  files get an advisory caveat) and audits frontmatter/SEO quality. Findings carry file:line and
+  blocking/advisory severity under a `POST: CLEAN` / `POST: n findings` verdict line. Smoke-tested
+  against the `designing-the-publish-pipeline` Draft (3 advisory findings, one a genuine catch).
 
 These are the **only two** `.claude` components the blog is allowed (ADR-0010's two-component hard
-cap). Publishing stays Nick's act: Nick drafts, AI edits, publishing is Nick flipping `draft: false`
-and merging the PR. This work is Nick's to kick off, and it runs as its own workstream, not as
-another blog build stage.
+cap); a standing review after three published Posts deletes any pass that never changed an outcome.
+Publishing stays Nick's act: Nick drafts, AI edits, publishing is Nick merging the PR.
 
 ---
 

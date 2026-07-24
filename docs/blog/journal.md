@@ -82,3 +82,19 @@ to end the build on: the fig. separator moved from an em dash to a middot, the v
 even the punctuation between two numbers. The blog surface is complete. What is left, the
 `/publish-post` skill and the `post-reviewer` agent, is how Posts get written, a separate workstream,
 not another stage.
+
+**2026-07-23 — Authoring pipeline.** The workstream the build kept pointing at ran the same day
+Stage 5 merged, and it stayed inside its cap: two `.claude` components, the `/publish-post` skill
+and the `post-reviewer` agent, exactly the pair ADR-0010 allowed and nothing beyond it. The build
+itself was transcription from the workflow doc's Part 2, much as Stage 1 was transcription from the
+specs. The interesting part was the smoke test. Rather than trust the reviewer charter on paper, it
+was executed for real against the `designing-the-publish-pipeline` Draft, and it behaved like a
+reviewer should. The report came back in the right shape with the verdict `POST: 3 findings
+(0 blocking, 3 advisory)`, and one of those advisories was a catch genuinely worth having, because
+the Draft described pipeline components that were untracked files at the moment of review. The Post about the pipeline was,
+strictly, ahead of the repo it claimed to describe. That one run also exposed three ambiguities in
+the charter that a design read-through had never surfaced. The fact source, it turned out, needed
+saying: the working tree, with an advisory caveat for untracked files. A Post with no headings is
+fine, and a true-but-incomplete summary only counts as a finding when the omission would mislead.
+All three fixes went into the charter the same session. The pipeline's first real outing is still
+ahead; two seed Drafts are waiting for Nick to say `/publish-post`.
