@@ -2,17 +2,20 @@ import { expect, test } from '@playwright/test';
 
 /**
  * Blog surface (docs/redesign/blog-handoff.md §6). Plain DOM, no canvas, safe
- * for the @ci subset. Seed content: one published Post
- * (building-this-blog-in-the-open) and two Drafts (designing-the-publish-pipeline,
- * speccing-before-scaffolding).
+ * for the @ci subset. Seed content: two published Posts, newest first
+ * (building-the-dark-carnival, building-this-blog-in-the-open) and two Drafts
+ * (designing-the-publish-pipeline, speccing-before-scaffolding).
  */
 test.describe('blog', { tag: '@ci' }, () => {
   test('index lists published Posts, newest first', async ({ page }) => {
     await page.goto('/blog');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('measured twice');
     const titles = page.getByRole('heading', { level: 2 });
-    await expect(titles.first()).toContainText('Building this blog in the open');
-    await expect(titles).toContainText(['Building this blog in the open']);
+    await expect(titles.first()).toContainText('Building the Dark Carnival');
+    await expect(titles).toContainText([
+      'Building the Dark Carnival',
+      'Building this blog in the open',
+    ]);
   });
 
   test('index never lists a Draft', async ({ page }) => {
@@ -58,9 +61,12 @@ test.describe('blog', { tag: '@ci' }, () => {
   test('a tag page lists only its published Posts', async ({ page }) => {
     await page.goto('/blog/tags/agentic-workflows');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('agentic-workflows');
-    await expect(page.getByRole('heading', { level: 2 })).toContainText(
+    // building-the-dark-carnival and building-this-blog-in-the-open both carry
+    // the tag and are published, newest first.
+    await expect(page.getByRole('heading', { level: 2 })).toContainText([
+      'Building the Dark Carnival',
       'Building this blog in the open',
-    );
+    ]);
     // speccing-before-scaffolding carries the tag but is a Draft, so it is absent.
     await expect(page.getByText('Speccing before scaffolding')).toHaveCount(0);
   });
