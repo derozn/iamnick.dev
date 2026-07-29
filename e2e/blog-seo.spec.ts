@@ -3,8 +3,10 @@ import { expect, test } from '@playwright/test';
 const ORIGIN = 'http://localhost:3000';
 const SITE = 'https://iamnick.dev';
 
-/** Fixed to the seed content: one published Post, two Drafts. If the seed set
- *  changes these move, but the Draft-never-leaks contract does not. */
+/** Fixed to the seed content: two published Posts (building-the-dark-carnival,
+ *  building-this-blog-in-the-open), two Drafts. These checks only assert that
+ *  PUBLISHED_SLUG is present, so an added published Post does not move them.
+ *  If the seed set changes these move, but the Draft-never-leaks contract does not. */
 const PUBLISHED_SLUG = 'building-this-blog-in-the-open';
 const DRAFT_SLUGS = ['designing-the-publish-pipeline', 'speccing-before-scaffolding'];
 

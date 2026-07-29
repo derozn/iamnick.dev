@@ -1,0 +1,326 @@
+---
+title: Building the Dark Carnival
+description: 'The home page is a 3D carnival with working games. Six weeks of building it with an AI pair: the stack, the doodle wall, Madame Zara, and the process.'
+date: 2026-07-29
+tags: ['agentic-workflows', 'meta']
+draft: false
+slug: building-the-dark-carnival
+---
+
+The home page of this site is a 3D carnival. You drag the map around, click a lit sign,
+and the camera flies you in to a ball toss, a high striker, a wall of doodles drawn by
+strangers, or a fortune teller who has actually read my CV. An AI pair built most of it
+with me over about six weeks. This is the long write-up, first commit to production,
+wrong turns included. One admission before anything else. I said posts here would always
+be my own words. This one I asked the AI to draft, because a post about how the AI built
+the site seemed like the honest place for an exception. I've edited it.
+
+## Where it started
+
+Mid June 2026, with a tidy-up. The repo had been a dusty monorepo since 2020, so the
+first real commit of this version flattens it to a single Next.js app on pnpm. The same
+day, the first carnival went in: a scroll-driven 3D scene where the page scroll drove a
+camera along a fixed path through the dark.
+
+I liked it enough to write it into law. ADR-0004 committed the site to on-rails
+navigation and explicitly parked the free-roam, Bruno-Simon-style alternative. The
+reasoning was sensible on paper. Everyone already knows how to scroll, and search engines
+get real pages out of it. Phones don't need a virtual joystick either.
+
+## The three-day U-turn
+
+The design lasted three days and the ADR barely one. By the 15th of June the commit
+log says "isometric, drag-to-explore carnival (Bruno-Simon style)", which is exactly
+the thing the ADR had ruled out. On-rails scroll fought the overlay panels, because the page scroll had to be
+stolen from any panel you were reading. It needed a hand-tuned camera spline through a
+dense scene, which is a miserable thing to maintain. And stepping into a game from a
+fixed rail felt jarring.
+
+So the shipped site is the one the paperwork rejected. A fixed isometric camera, drag to
+pan, pinch or wheel to zoom, and clicking a sign flies you in over 1.4 seconds. ADR-0007
+records the reversal properly, a month after it happened in practice. I could have
+quietly deleted ADR-0004 and pretended I'd been right all along. Keeping both is the
+point. The decision record is only useful if it includes the decisions that died.
+
+One fossil survived the U-turn. The default camera mode in the state store is still
+called `travelling`, a name from the scroll era that nobody has got round to renaming.
+
+## The stack
+
+Next.js 16 on the App Router, React 19, and three.js through React Three Fiber with drei
+on top. State lives in a small zustand store. Styling is Tailwind v4 with the design
+tokens in one theme block. Supabase holds the doodle wall. The AI SDK talks to Claude for
+Madame Zara. Env vars go through varlock, and the whole thing deploys on Vercel.
+
+The most important dependency is the one that isn't there. There is no physics engine.
+The original plan specced Rapier, lazy-loaded when you stepped into the ball toss. I
+declined it during the build, because a projectile arc and some sphere-versus-cylinder
+tests didn't justify shipping a physics runtime. Both games run on hand-rolled maths.
+More on that below.
+
+## 2,789 props on a laptop GPU
+
+The scenery comes from Synty's POLYGON Horror Carnival asset pack, and an ADR governs
+what's allowed out of the box: carnival props only, static figures at most, and a hard
+ban on gore and jump-scares. The pack is authored for Unity, so there's a
+translation layer that converts Unity's coordinate system and transform conventions into
+three.js, driven by a JSON export of the scene layout. That file describes 268 distinct
+prefabs placed 2,789 times.
+
+Naively cloning 2,789 meshes would bury any GPU in draw calls. Instead every placement of
+a prefab renders through instanced meshes, one per sub-mesh, which gets the whole scene
+down to a few hundred draw calls. Instances beyond a cull distance collapse to a zero
+matrix, and the buffer only re-uploads when something crosses the boundary.
+
+Downloads got the same treatment. Every Synty GLB shipped its own embedded copy of the
+same texture atlas, roughly 0.6 MB each, which added up to about 17 MB of identical
+bytes. A build script strips the embedded atlas from each file and the runtime re-applies
+one shared copy. The models folder now weighs 6.4 MB.
+
+My favourite artefact of the Unity translation was the origin pile. Around 450 stall
+accessories came through with transforms relative to parents that didn't exist on the
+three.js side, so they all stacked into one glitchy heap at the centre of the map. The
+fix filters them out geometrically while keeping the poles and flags that really do
+live near the origin.
+
+Lighting has a fixed budget. A forward renderer compiles every point light into the
+shader, and the roughly 37 static lights the scene wanted were enough to crash weaker
+GPUs outright. The shipped version keeps a pool of exactly eight point lights that snap
+each frame to whichever glowing props are nearest the camera. Shader cost stays constant
+no matter how much of the carnival is lit.
+
+On top of all that sits a quality tier. Phones and low-core machines get the Lite
+profile, a demand-driven frame loop and a capped pixel ratio. Anyone with reduced motion
+set gets no canvas at all, and the site still works without it, because every word of
+content is server-rendered HTML first and the 3D is decoration by decree. That's ADR-0003
+and it's the rule I'd defend hardest.
+
+## The week the screen went black
+
+The worst bug of the build produced a completely black frame with bloom enabled, and only
+sometimes. The commit log reads like a diary of wrong turns. Recompute vertex normals.
+Drop the composer's 8x multisampling. Dedup the atlases. Remove the composer entirely.
+Then a properly deflating discovery, preserved verbatim in a commit message: black props
+were black vertex colours, not lighting. The Unity assets carried vertex colour data that
+three.js was happily multiplying in.
+
+That fixed the black props. The black frames carried on regardless, because the real
+chain was nastier. A single
+wagon model contains degenerate triangles. Recomputing normals on those produces
+zero-length vectors, the lighting maths turns them into NaN, and bloom's mipmap blur
+smears NaN across the entire frame. One bad wagon, one black screen. The fix is a
+sanitiser that walks every normal on load and replaces anything non-finite or near zero
+with straight up.
+
+Bloom went back on behind a permanent tripwire. If the WebGL context is ever lost while
+the composer is mounted, a flag is written to that device's localStorage and the site
+falls back to emissive-only glow forever after. Nobody has to notice, and nobody has to
+clear anything. Cheap insurance.
+
+## The games
+
+### Ball toss
+
+Three balls, a pyramid of six milk bottles, knock them down for points. The physics is a
+few hundred lines in refs: a projectile under gravity, sphere-versus-cylinder hit tests,
+and a topple simulation where a struck bottle can cascade into its neighbours. Gravity
+runs at a soft -8 because a floaty arc reads better than the real -9.81, and the hit
+test is 8 cm generous because the bottles are tiny and near-misses are infuriating.
+
+The controls got rewritten mid-build. Version one was point to aim and hold to charge.
+The replacement is a slingshot. Press the ball, drag it back, let go, and it fires
+opposite the pull, Angry Birds style. That rewrite had knock-on tuning: the
+original launch lift sent every shot sailing over a target only four metres away, so the
+lift got cut from 0.25 to 0.05 and the aim loft went to zero. The throw is nearly flat
+because the range is nearly nothing.
+
+### High striker
+
+Swing the hammer, ring the bell. This one is pure timing. A needle
+sweeps up and down a gauge and your tap freezes it. The whole game is one pure function:
+
+```ts
+export const meterValue = (msSinceArmed: number): number => {
+  const t = (msSinceArmed / 1000 / METER_PERIOD) % 1;
+  return t < 0.5 ? t * 2 : 2 - t * 2; // triangle wave
+};
+```
+
+The DOM gauge and the in-canvas hit read the same function off the same timestamp, so
+what you see is exactly what you hit, with no state churn per frame. The puck's rise is
+eased, it hangs a quarter second at the top for the bell moment, and the score labels run
+from "Wet noodle" to "RING THAT BELL". I remain quite bad at my own game.
+
+### The golden tickets
+
+Eight golden tickets are hidden around the map, tucked at landmarks like the teacup rim
+and the clown-mouth doorway, so collecting them all means exploring the whole map.
+Progress persists in localStorage and a full house earns you a confetti burst. It cost
+the least of anything on the site and it's my favourite.
+
+## The doodle wall
+
+At the end of the Midway there's a bulb-strung board where anyone can draw. You step in,
+get a small canvas with six neon inks named after the scene's lights, three brush sizes
+and an undo, and whatever you draw becomes a Tile. It doesn't appear straight away. Every
+Tile lands in a queue, I approve or reject it at the carny's counter, and approved Tiles
+hang on the board in the 3D scene for everyone.
+
+The drawing surface is a plain 2D canvas, 512 pixels square while you draw, exported at
+256 as a PNG. Strokes live in refs so drawing never re-renders React, and one pointer
+owns a stroke so your resting palm can't hijack the line on a phone.
+
+Behind it, the architecture is deliberately hexagonal. The domain logic is pure of both
+HTTP and Supabase. Routes are thin adapters on one side, and a single adapters folder is
+the only place in the repo allowed to import the Supabase client. That paid off
+immediately, because the whole feature runs against in-memory fakes when no Supabase
+credentials exist. Tests and CI never touch the real backend, and a half-configured
+production environment throws instead of quietly serving fakes.
+
+The server trusts nothing. Submissions are capped at 128 KB. The PNG check is hand-rolled
+byte parsing of the signature and header, so an SVG wearing a `.png` name can never pass,
+and the dimensions must be exactly 256. Status is forced to pending server-side, no
+caller can supply one. Rate limiting comes in two tiers: a best-effort in-memory guard
+of two submissions a minute per IP, and the real bound, ten per day per
+submitter, counted from database rows so it survives serverless instances coming and
+going.
+
+No raw IP address is ever stored anywhere. Submitters are identified by an HMAC of the
+IP under a server secret, which is enough to enforce the daily cap and
+useless for identifying anyone. And exactly one function converts a stored row into a
+public wall Tile, stripping the storage path and the hash, so there is a single privacy
+boundary that can't be forgotten in some second code path.
+
+My approval side signs in with Google through Supabase Auth, entirely server-side, with
+a few decisions I'd repeat anywhere. Sessions get verified against signed claims,
+because cookies are attacker-supplied input. The provider is pinned, so a non-Google
+session claiming my email fails. And the allow-list of who can sign in lives inside the
+auth module, where removing it takes a deliberate, visible code change. Even the database policies
+assume the worst: anonymous inserts are simply not granted, every write goes through the
+service role, so a leaked public key can't flood the queue.
+
+The wall itself is boring by choice. One cacheable endpoint, a sixty-second CDN window,
+done. Six PRs took it from nothing to live.
+
+## Madame Zara
+
+The fortune teller is the only place the site spends money per visitor, so it got the
+most paranoia. Visit her wagon, ask about me, and what comes back is a Reading that
+opens with one Card from a fixed deck of twelve. The Architect, The
+High Striker, The Hall of Mirrors, and nine more. Her client renders that first line as
+the letterpress heading.
+
+Under the hood it's the AI SDK with the Anthropic provider, streaming from Claude Haiku
+4.5 with a 400-token ceiling. The route runs on plain Node, and the reasoning is written
+down: latency is dominated by the model call anyway, and Node leaves room for a proper
+rate limiter with a shared store behind it later. The client is wired for a plain text
+stream, and that choice is load-bearing, because plain text is all the server ever
+sends.
+
+The best bug in the repo lives here. The AI SDK masks stream errors. Give it an invalid
+API key and the text stream doesn't throw, it just ends, zero chunks, no error. To a
+visitor that's a fortune teller who stares at you in silence. The fix leans on a nice
+property of the persona: Zara never legitimately says nothing, so an empty stream is
+treated as a failure and a canned Reading is served instead. The error surfaces through
+the one callback that actually sees it, and gets logged there.
+
+Everything about her is grounded. My CV is serialised into the system prompt as the only
+source of truth, with instructions never to invent facts about me, and a snapshot test
+pins the serialisation. Off-topic questions get deflected in character, and there's a
+named Card reserved for people trying to extract the prompt.
+
+Cost control is layered. Ten requests a minute per IP, and a global kill-switch at two
+hundred calls a day across all visitors, checked without consuming so a rate-limited
+request doesn't burn budget. Both limits refuse in character, with honest 429s
+underneath. Same-site origin checks, a 32 KB body ceiling, schema validation, and history
+capped server-side at twelve turns. When no API key is present she serves canned Readings
+word by word at 24 ms a word, so the streaming UI stays honest and CI never spends a
+token. A full conversation costs well under a cent, and the kill-switch means the worst
+possible day costs about as much as a coffee.
+
+## How the AI actually worked
+
+This is the part people ask about, and the honest answer is less sci-fi than the
+marketing. One AI session does the building, in the main conversation, with me in it. The
+sub-agents that exist are deliberately narrow, none of them writes feature code, and none
+of them orchestrates anything.
+
+There are five. A context keeper owns each feature's living handoff doc, briefs a slice
+of work from it, and folds the outcome back in afterwards, checking the doc against git
+before briefing so nothing is ever briefed from stale claims. A glossary guard reviews
+diffs against the project's glossary file, which is treated as law, and its findings have
+produced real commits. A refactor verifier traces imports before any batch of deletions
+or moves, because its output authorises irreversible operations. A docs scribe re-syncs
+documentation to shipped reality. And a post reviewer fact-checks blog Posts it played no
+part in writing, which is the entire value of it.
+
+The governing rule got written into an ADR: the simplest mechanism that works. Inline in
+the main session by default. A sub-agent only where isolation or independence pays for
+itself. There's even a list of agents that were considered and rejected, with reasons,
+and a standing rule that any review pass which never changes an outcome gets deleted.
+
+The paperwork is the other half. Eleven ADRs, and their value is that they're cheap to
+supersede. The record for shortest-lived is under an hour: an ADR about the
+blog's typography was accepted, and before the morning was out a follow-up rescoped it,
+because the specs had inherited the carnival theme by default and nobody had asked
+whether the blog was even part of the carnival brand. It isn't. An accepted decision
+dying in an hour is the system working. The question got asked at all, and in writing.
+
+The process itself changed shape mid-project. The June build ran down one long branch,
+descriptive commits piling up until the lot landed on master in a single merge. By July
+everything moved to stage-gated pull requests, each stage
+independently mergeable with its own checks, six stages for the blog, six PRs for the
+doodle wall. Two things never changed: the commit log doubles as the debugging diary you
+saw in the bloom saga, and nothing reaches production without me merging a PR. The AI
+proposes and the gates check. I merge. This Post will go through the same pipeline,
+reviewed by an agent that didn't write it, which given who drafted it is a sentence I
+had to read twice.
+
+## Shipping it
+
+Production is Vercel, and the deploy story I'm most pleased with is that the site works
+with zero environment variables. No Supabase, and the doodle wall runs on in-memory
+fakes. No API key, and Zara deals canned Readings. Features light up as credentials get
+added, and nothing half-configured limps along, it throws.
+
+Env vars go through varlock, with a committed schema and the values nowhere near the
+repo. Values marked sensitive get redacted from logs and scanned for in build output. One
+sharp lesson is recorded in the schema comments: the Supabase URL had to be explicitly
+marked as not sensitive, because every public image URL the wall returns embeds it, and
+the leak scanner would correctly find it in responses and fail the route the moment a
+real Tile was approved. A security tool doing its job on the wrong secret.
+
+The rest of the production checklist is quieter. A daily cron pings a keepalive route so
+the free-tier database never pauses, guarded by a timing-safe token check. Strict
+transport security and the usual hardening headers ship from config. Open Graph images
+render on the fly, and the renderer can't load the brand typeface, so the palette
+carries the theme instead. Error tracking wires itself up only when its key exists, and
+the analytics component is a no-op anywhere off Vercel.
+
+## Proving it still works
+
+Twenty-six test files cover the pure logic, which is why so much got built as pure
+logic in the first place. The game maths, the tile rules, the PNG parser and the CV
+serialisation all test without a browser in sight. End-to-end tests run Playwright
+against a real production build with the fortune stub on, so no CI run has ever paid
+Anthropic. Headless Chromium renders through a software rasteriser where colours aren't
+trustworthy, so the canvas checks are programmatic, the scene is non-black and moving
+the camera changes the pixels. The DOM overlays get proper screenshot diffs.
+
+For humans there's a debug mode. With a query flag the store is scriptable from the
+console, and every scene system can be unmounted from the URL, lights, rides, glow,
+post-processing, one at a time. That bisection rig is how the bloom bug finally got
+cornered.
+
+The lint config enforces architecture, which I'd never bothered with before and now
+won't give up. Importing three.js from any blog file is a build error, so this page never
+pays for the carnival. Importing the CV from client code is a build error with two named,
+justified exceptions in the config. A third exception would have to be argued for in a
+diff. And a rule from the docs that kept me honest all the way
+through: no green build proves the carnival renders. Screenshots or it didn't happen.
+
+The carnival was never the point, which I realise is rich coming from someone who spent
+six weeks on one. It's a job-search portfolio. The games hold a visitor for a minute or
+two. What I'd show an interviewer is the trail behind them. The ADR that died in an
+hour. The wagon with the broken triangles. A fortune teller that fails politely, in
+character, for less than a cent a go.
