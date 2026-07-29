@@ -49,8 +49,16 @@ An in-game or status overlay — the ball-toss, high-striker and doodle wall gam
 _Avoid_: game UI, scoreboard, widget
 
 **Ball-toss**:
-The fairground game where you throw a ball at stacked tins. Playable only on Full; appears as lit scenery on Lite.
+The fairground game where you sling a ball at a pyramid of milk bottles. Playable only on Full; appears as lit scenery on Lite.
 _Avoid_: tin game, coconut shy, throwing game
+
+**High striker**:
+The strength-test stall — step in, tap to freeze the sweeping needle, and the puck rises to (maybe) ring the bell. Pure timing, no physics. Code identifiers use `high-striker` (`HighStrikerGame`, `HighStrikerHud`).
+_Avoid_: strongman game, hammer game
+
+**Golden tickets**:
+The collectible hunt — eight tickets tucked at landmarks around the Midway, tallied in the golden-ticket HUD and persisted in localStorage; a full house earns a confetti burst. Found while exploring, no step-in — the hunt is not a stall.
+_Avoid_: easter eggs, achievements, scavenger hunt
 
 **Madame Zara**:
 The fortune teller — the character in the painted wagon who answers visitor questions about Nick, grounded solely in the CV. Her wagon is an attraction, not a stall — conversation happens in an overlay, no step-in.
